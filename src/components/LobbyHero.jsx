@@ -15,6 +15,8 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
   const sparkleBurst = useRef(null);
 
   // React state
+  const [girlImgSrc,   setGirlImgSrc]   = useState('/photo/girl-layer.png');
+  const [boyImgSrc,    setBoyImgSrc]    = useState('/photo/boy-layer.png');
   const [entryHovered, setEntryHovered] = useState(false);
   const [exitHovered,  setExitHovered]  = useState(false);
   const [sparkling,    setSparkling]    = useState(false);
@@ -74,12 +76,14 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
     if (animLock.current) return;
     animLock.current = true;
 
-    // Pause idle float during jump
+    // Pause idle float during jump & swap to jump pose image
     gsap.killTweensOf(girlRef.current);
+    setGirlImgSrc('/photo/girl-jump.png');
 
     const tl = gsap.timeline({
       onComplete: () => {
-        // Re-start idle float after landing
+        // Re-start idle float & reset girl image after landing
+        setGirlImgSrc('/photo/girl-layer.png');
         gsap.to(girlRef.current, { y: -6, duration: 1.8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
         gsap.to(girlRef.current, { rotation: 2.5, duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
         animLock.current = false;
@@ -87,21 +91,21 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
       },
     });
 
-    // 1. Girl jumps up towards the Entry sign edge
+    // 1. Girl jumps with a smaller range away from the Entry button
     tl.to(girlRef.current, {
-      x: 235,
-      y: -210,
-      rotation: -8,
-      scale: 1.12,
-      duration: 0.45,
+      x: 110,
+      y: -110,
+      rotation: -6,
+      scale: 1.06,
+      duration: 0.42,
       ease: 'power2.out',
     });
 
-    // 2. Touch & tap the edge of the Entry sign with her left hand at peak height
+    // 2. Peak of small jump
     tl.to(girlRef.current, {
-      y: -230,
-      rotation: -3,
-      duration: 0.16,
+      y: -125,
+      rotation: -2,
+      duration: 0.14,
       ease: 'sine.out',
     });
 
@@ -150,12 +154,14 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
     if (animLock.current) return;
     animLock.current = true;
 
-    // Pause idle float during jump
+    // Pause idle float during jump & swap to sad exit pose image
     gsap.killTweensOf(boyRef.current);
+    setBoyImgSrc('/photo/boy-exit.png');
 
     const tl = gsap.timeline({
       onComplete: () => {
-        // Re-start idle float after landing
+        // Re-start idle float & reset boy image after landing
+        setBoyImgSrc('/photo/boy-layer.png');
         gsap.to(boyRef.current, { y: -6, duration: 1.8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
         gsap.to(boyRef.current, { rotation: 2.5, duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
         animLock.current = false;
@@ -163,21 +169,21 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
       },
     });
 
-    // 1. Boy jumps up towards the Exit sign edge
+    // 1. Boy jumps with an even smaller range further away from the Exit button
     tl.to(boyRef.current, {
-      x: -235,
-      y: -210,
-      rotation: -8,
-      scale: 1.12,
-      duration: 0.45,
+      x: -70,
+      y: -70,
+      rotation: -4,
+      scale: 1.04,
+      duration: 0.40,
       ease: 'power2.out',
     });
 
-    // 2. Touch & tap the edge of the Exit sign with his hand at peak height
+    // 2. Peak of tiny jump
     tl.to(boyRef.current, {
-      y: -230,
-      rotation: -3,
-      duration: 0.16,
+      y: -85,
+      rotation: -1,
+      duration: 0.12,
       ease: 'sine.out',
     });
 
@@ -246,7 +252,7 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
           onClick={() => triggerCharacterClick('girl')}
           title="Click me!"
         >
-          <img src="/photo/girl-layer.png" alt="Girl character" className="char-layer-img" />
+          <img src={girlImgSrc} alt="Girl character" className="char-layer-img" />
           {activeBubble === t.girlSpeech && (
             <div className="speech-bubble speech-bubble--girl">{t.girlSpeech}</div>
           )}
@@ -261,7 +267,7 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
           onClick={() => triggerCharacterClick('boy')}
           title="Click me!"
         >
-          <img src="/photo/boy-layer.png" alt="Boy character" className="char-layer-img" />
+          <img src={boyImgSrc} alt="Boy character" className="char-layer-img" />
           {activeBubble === t.boySpeech && (
             <div className="speech-bubble speech-bubble--boy">{t.boySpeech}</div>
           )}
