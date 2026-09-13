@@ -14,8 +14,15 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
   const exitBtnRef   = useRef(null);
   const sparkleBurst = useRef(null);
 
+  // Frames for girl character animation
+  const GIRL_FRAMES = {
+    stand: '/photo/landingpagegirl/frame-1.png',
+    jumpStart: '/photo/landingpagegirl/frame-2.png',
+    jumpPeak: '/photo/landingpagegirl/frame-3.png',
+  };
+
   // React state
-  const [girlImgSrc,   setGirlImgSrc]   = useState('/photo/girl-layer.png');
+  const [girlImgSrc,   setGirlImgSrc]   = useState(GIRL_FRAMES.stand);
   const [boyImgSrc,    setBoyImgSrc]    = useState('/photo/boy-layer.png');
   const [entryHovered, setEntryHovered] = useState(false);
   const [exitHovered,  setExitHovered]  = useState(false);
@@ -23,6 +30,14 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
   const [sparklePos,   setSparklePos]   = useState({ left: '25%', top: '32%' });
   const [activeBubble, setActiveBubble] = useState(null);
   const animLock = useRef(false); // prevent double-click mid-animation
+
+  // Preload all frames on mount for instant zero-lag frame switching
+  useEffect(() => {
+    Object.values(GIRL_FRAMES).forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
 
   // ─────────────────────────────────────────────
   // IDLE ANIMATIONS  (mount once, run forever)
@@ -70,20 +85,19 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
   }, []);
 
   // ─────────────────────────────────────────────
-  // ENTRY SIGN CLICK  →  Girl jumps & taps sign with hand
+  // ENTRY SIGN CLICK  →  Girl jumps & taps sign with hand, cycling through all frames
   // ─────────────────────────────────────────────
   const handleEntryClick = () => {
     if (animLock.current) return;
     animLock.current = true;
 
-    // Pause idle float during jump & swap to jump pose image
+    // Pause idle float during jump
     gsap.killTweensOf(girlRef.current);
-    setGirlImgSrc('/photo/girl-jump.png');
 
     const tl = gsap.timeline({
       onComplete: () => {
         // Re-start idle float & reset girl image after landing
-        setGirlImgSrc('/photo/girl-layer.png');
+        setGirlImgSrc(GIRL_FRAMES.stand);
         gsap.to(girlRef.current, { y: -6, duration: 1.8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
         gsap.to(girlRef.current, { rotation: 2.5, duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
         animLock.current = false;
@@ -91,7 +105,13 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
       },
     });
 
-    // 1. Girl jumps with a smaller range away from the Entry button
+    // Frame 1: Ground takeoff
+    tl.call(() => setGirlImgSrc(GIRL_FRAMES.stand), null, 0);
+
+    // Frame 2: Rising jump pose
+    tl.call(() => setGirlImgSrc(GIRL_FRAMES.jumpStart), null, 0.12);
+
+    // 1. Girl jumps with a trajectory towards the Entry button
     tl.to(girlRef.current, {
       x: 110,
       y: -110,
@@ -99,7 +119,10 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
       scale: 1.06,
       duration: 0.42,
       ease: 'power2.out',
-    });
+    }, 0);
+
+    // Frame 3: Peak reach pose tapping the sign
+    tl.call(() => setGirlImgSrc(GIRL_FRAMES.jumpPeak), null, 0.38);
 
     // 2. Peak of small jump
     tl.to(girlRef.current, {
@@ -107,7 +130,7 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
       rotation: -2,
       duration: 0.14,
       ease: 'sine.out',
-    });
+    }, 0.42);
 
     // 3. Entry Sign swings on chains upon hand impact
     tl.to(
@@ -119,7 +142,7 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
         repeat: 5,
         ease: 'sine.inOut',
       },
-      '<',
+      0.44,
     );
 
     // 4. Sparkle + confetti burst at Entry sign position
@@ -133,7 +156,10 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
         colors: ['#ffd15c', '#ffffff', '#00c2e0', '#ff6b6b'],
       });
       setTimeout(() => setSparkling(false), 800);
-    });
+    }, null, 0.44);
+
+    // Frame 2: Descending pose
+    tl.call(() => setGirlImgSrc(GIRL_FRAMES.jumpStart), null, 0.70);
 
     // 5. Girl lands back down bouncing
     tl.to(girlRef.current, {
@@ -143,8 +169,10 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
       scale: 1,
       duration: 0.55,
       ease: 'bounce.out',
-      delay: 0.15,
-    });
+    }, 0.70);
+
+    // Frame 1: Landed back on ground
+    tl.call(() => setGirlImgSrc(GIRL_FRAMES.stand), null, 1.15);
   };
 
   // ─────────────────────────────────────────────
@@ -225,23 +253,50 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
     });
   };
 
-  // Normal character click (speech bubble + confetti)
+  // Normal character click (speech bubble + confetti + playful jump animation)
   const triggerCharacterClick = (who) => {
     confetti({ particleCount: 55, spread: 65, origin: { y: 0.7 } });
     setActiveBubble(who === 'girl' ? t.girlSpeech : t.boySpeech);
     setTimeout(() => setActiveBubble(null), 4200);
+
+    if (who === 'girl' && !animLock.current) {
+      gsap.killTweensOf(girlRef.current);
+      const hopTl = gsap.timeline({
+        onComplete: () => {
+          setGirlImgSrc(GIRL_FRAMES.stand);
+          gsap.to(girlRef.current, { y: -6, duration: 1.8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+          gsap.to(girlRef.current, { rotation: 2.5, duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+        },
+      });
+      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.jumpStart), null, 0.06);
+      hopTl.to(girlRef.current, { y: -30, rotation: -3, scale: 1.04, duration: 0.2, ease: 'power1.out' }, 0);
+      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.jumpPeak), null, 0.18);
+      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.jumpStart), null, 0.35);
+      hopTl.to(girlRef.current, { y: 0, rotation: 0, scale: 1, duration: 0.32, ease: 'bounce.out' }, 0.32);
+      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.stand), null, 0.6);
+    }
   };
 
   return (
     <div className="hero-container">
+      {/* Ambient background glow & blurred backdrop for widescreen displays */}
+      <div className="hero-backdrop" aria-hidden="true">
+        <img src="/photo/bg-sdqpur.png" alt="" className="hero-backdrop-img" />
+        <div className="hero-backdrop-overlay" />
+      </div>
+
       <div className="hero-image-wrapper">
 
         {/* ── Background Photo ── */}
         <img
-          src="/photo/bg-thelast.png"
+          src="/photo/bg-sdqpur.png"
           alt="American Dream Ismailia Reception"
           className="hero-main-img"
         />
+
+        {/* Atmospheric vignettes for seamless lighting & contrast */}
+        <div className="hero-vignette-top" aria-hidden="true" />
+        <div className="hero-vignette-bottom" aria-hidden="true" />
 
         {/* ══════════════════════════════════════════
             GIRL CHARACTER OVERLAY  (GSAP-animated)
