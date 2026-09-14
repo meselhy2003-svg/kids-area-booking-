@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import confetti from 'canvas-confetti';
-import { Ticket, Clock } from 'lucide-react';
 import { translations } from '../data/content';
 
 export default function LobbyHero({ lang, openModal, setActiveTab }) {
@@ -113,10 +112,10 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
 
     // 1. Girl jumps with a trajectory towards the Entry button
     tl.to(girlRef.current, {
-      x: 110,
-      y: -110,
-      rotation: -6,
-      scale: 1.06,
+      x: 65,
+      y: -90,
+      rotation: -5,
+      scale: 1.05,
       duration: 0.42,
       ease: 'power2.out',
     }, 0);
@@ -124,9 +123,9 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
     // Frame 3: Peak reach pose tapping the sign
     tl.call(() => setGirlImgSrc(GIRL_FRAMES.jumpPeak), null, 0.38);
 
-    // 2. Peak of small jump
+    // 2. Peak of jump
     tl.to(girlRef.current, {
-      y: -125,
+      y: -102,
       rotation: -2,
       duration: 0.14,
       ease: 'sine.out',
@@ -197,19 +196,19 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
       },
     });
 
-    // 1. Boy jumps with an even smaller range further away from the Exit button
+    // 1. Boy jumps towards the Exit button
     tl.to(boyRef.current, {
-      x: -70,
-      y: -70,
+      x: -65,
+      y: -90,
       rotation: -4,
       scale: 1.04,
       duration: 0.40,
       ease: 'power2.out',
     });
 
-    // 2. Peak of tiny jump
+    // 2. Peak of jump
     tl.to(boyRef.current, {
-      y: -85,
+      y: -102,
       rotation: -1,
       duration: 0.12,
       ease: 'sine.out',
@@ -375,25 +374,6 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
         </div>
         <div className="hotspot hotspot-reception" onClick={() => openModal('reception')} />
 
-      </div>
-
-      {/* ── Floating Status Bar ── */}
-      <div className="hero-controls">
-        <div className="hero-stat-chip">
-          <span className="stat-dot" />
-          <span>{t.liveStatus}</span>
-        </div>
-        <div className="hero-stat-chip">
-          <Clock size={16} style={{ color: '#ffd15c' }} />
-          <span>{t.openHours}</span>
-        </div>
-        <button className="btn-primary" onClick={() => openModal('tickets')}>
-          <Ticket size={18} />
-          <span>{t.bookTickets}</span>
-        </button>
-        <button className="btn-accent" onClick={() => setActiveTab('play')}>
-          <span>{t.explorePark}</span>
-        </button>
       </div>
     </div>
   );
