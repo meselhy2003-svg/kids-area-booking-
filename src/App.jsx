@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
 import LobbyHero from './components/LobbyHero';
 import MenuSection from './components/MenuSection';
 import PlaySection from './components/PlaySection';
@@ -29,14 +28,6 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Top Header Navbar */}
-      <Navbar 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        lang={lang} 
-        setLang={setLang}
-        openNotifications={() => openModal('notifications')}
-      />
 
       {/* Main Content Area */}
       <main style={{ flex: 1 }}>
