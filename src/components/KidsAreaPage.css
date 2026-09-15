@@ -1,8 +1,7 @@
 /* ═══════════════════════════════════════════════════════════
-   KIDS AREA PAGE STYLING (matching user reference screenshot)
-   Main navbar & footer background: #013D47
-   Offers background: #013D47
-   Active button: #f5a623
+   KIDS AREA / PLAY ZONES STYLING
+   - Desktop Mode: Premium Park Showcase & Pricing
+   - Mobile Mode: Pixel-perfect replica of mobile mockup
 ═══════════════════════════════════════════════════════════ */
 
 .kids-area-page {
@@ -10,14 +9,652 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #edf2f7;
+  background-color: #f5faff;
   font-family: var(--font-main, 'Outfit', sans-serif);
   color: #1e293b;
+  position: relative;
 }
 
 /* ─────────────────────────────────────────────
-   1. MAIN NAVIGATION BAR
+   DEVICE PREVIEW TOGGLE BAR (Testing helper)
 ───────────────────────────────────────────── */
+.ka-preview-toggle-bar {
+  position: fixed;
+  bottom: 68px;
+  right: 14px;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(1, 61, 71, 0.94);
+  backdrop-filter: blur(8px);
+  padding: 4px 6px;
+  border-radius: 30px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ka-preview-btn {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.ka-preview-btn:hover {
+  color: #ffffff;
+}
+
+.ka-preview-btn.active {
+  background: #00a2b8;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 162, 184, 0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   1. MOBILE LAYOUT STYLING (Active on screen <= 768px)
+═══════════════════════════════════════════════════════════ */
+
+.ka-mobile-layout {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f5faff;
+}
+
+/* ── Mobile Header ── */
+.ka-mob-header {
+  background-color: #014254;
+  padding-top: 10px;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  box-shadow: 0 2px 10px rgba(1, 66, 84, 0.15);
+}
+
+.ka-mob-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 14px 8px 14px;
+}
+
+.ka-mob-brand {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.ka-mob-brand-logo {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+}
+
+.ka-mob-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ka-mob-icon-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+}
+
+.ka-mob-icon-btn:hover {
+  opacity: 0.85;
+}
+
+/* ── Mobile Search Bar ── */
+.ka-mob-search-wrapper {
+  padding: 2px 14px 10px 14px;
+  width: 100%;
+}
+
+.ka-mob-search-bar {
+  background: #ffffff;
+  border-radius: 9999px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.ka-mob-search-icon {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.ka-mob-search-input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 0.82rem;
+  color: #1e293b;
+  background: transparent;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.ka-mob-search-input::placeholder {
+  color: #8392a5;
+}
+
+/* ── Mobile Category Pills ── */
+.ka-mob-categories-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 14px 12px 14px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ka-mob-categories-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.ka-mob-cat-pill {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.ka-mob-cat-pill:hover {
+  border-color: #cbd5e1;
+}
+
+.ka-mob-cat-pill.active {
+  background: #009cb6;
+  border-color: #009cb6;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 156, 182, 0.3);
+}
+
+/* ── Mobile Main Content ── */
+.ka-mob-main {
+  padding: 12px 12px 75px 12px;
+  flex: 1;
+}
+
+.ka-mob-hero-wrap {
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  margin-bottom: 14px;
+}
+
+.ka-mob-hero-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── Mobile Sections ── */
+.ka-mob-section {
+  margin-bottom: 16px;
+}
+
+.ka-mob-section-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: -0.01em;
+}
+
+.ka-mob-divider {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* ── Feature Offer Card (Challenge Pass) ── */
+.ka-mob-offer-card {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  overflow: hidden;
+  border: 1px solid #edf2f7;
+}
+
+.ka-mob-offer-media {
+  width: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  background: #0f172a;
+}
+
+.ka-mob-offer-collage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ka-mob-offer-body {
+  width: 50%;
+  padding: 10px 10px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ka-mob-offer-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.ka-mob-offer-name {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: #082b45;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.ka-mob-badge-save {
+  background: #00a2b8;
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ka-mob-offer-sub {
+  color: #0097a7;
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin: 2px 0 6px 0;
+}
+
+.ka-mob-features-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 6px;
+  margin-bottom: 8px;
+}
+
+.ka-mob-feat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.ka-mob-feat-icon {
+  color: #0097a7;
+  flex-shrink: 0;
+}
+
+.ka-mob-feat-emoji {
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.ka-mob-pricing-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.ka-mob-price-main {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #082b45;
+}
+
+.ka-mob-price-strike {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.ka-mob-btn-offer {
+  background: #fbb11e;
+  color: #0f172a;
+  border: none;
+  border-radius: 9999px;
+  height: 32px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(251, 177, 30, 0.3);
+  font-family: inherit;
+}
+
+.ka-mob-btn-offer:active {
+  transform: scale(0.98);
+  background: #e59f14;
+}
+
+/* ── 3-Column Extra Games Grid ── */
+.ka-mob-games-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.ka-mob-game-card {
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #edf2f7;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ka-mob-game-img-wrap {
+  width: 100%;
+  height: 56px;
+  overflow: hidden;
+  background: #0b192c;
+}
+
+.ka-mob-game-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ka-mob-game-details {
+  padding: 6px 6px 8px 6px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.ka-mob-game-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 2px 0;
+  line-height: 1.15;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.ka-mob-game-price {
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.ka-mob-btn-play {
+  background: #fbb11e;
+  color: #0f172a;
+  border: none;
+  border-radius: 9999px;
+  height: 22px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.ka-mob-btn-play:active {
+  transform: scale(0.96);
+  background: #e59f14;
+}
+
+/* ── Safety & Rules Banner ── */
+.ka-mob-safety-banner {
+  background: #e6f4fc;
+  border-radius: 12px;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  border: 1px solid #d0ebfa;
+}
+
+.ka-mob-safety-icon-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ka-mob-safety-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ka-mob-safety-en {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #0f4e66;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.ka-mob-safety-ar {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #0f4e66;
+  margin: 0;
+  line-height: 1.25;
+  font-family: inherit;
+}
+
+/* ── Kids Area Mobile Adapters ── */
+.ka-mob-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.ka-mob-gallery-img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.ka-mob-dome-wrap {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+}
+
+.ka-mob-dome-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.ka-mob-pkg-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #edf2f7;
+  margin-bottom: 10px;
+}
+
+.ka-mob-pkg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.ka-mob-pkg-name {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #082b45;
+  margin: 4px 0 2px 0;
+}
+
+.ka-mob-pkg-time {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.ka-mob-pkg-price {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #082b45;
+}
+
+.ka-mob-badge-popular {
+  background: #f5a623;
+  color: #ffffff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.ka-mob-badge-family {
+  background: #00879e;
+  color: #ffffff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.ka-mob-empty-zone {
+  text-align: center;
+  padding: 20px 10px;
+}
+
+/* ── Fixed Mobile Bottom Navigation Bar ── */
+.ka-mob-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 56px;
+  background: #ffffff;
+  border-top: 1px solid #eef2f6;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 1000;
+  padding: 0 4px;
+}
+
+.ka-mob-nav-item {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #64748b;
+  font-size: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  padding: 4px 8px;
+  font-family: inherit;
+  transition: color 0.2s ease;
+}
+
+.ka-mob-nav-item.active {
+  color: #0097a7;
+  font-weight: 700;
+}
+
+.ka-mob-nav-item.active .ka-mob-nav-icon {
+  color: #0097a7;
+}
+
+.ka-mob-tab-indicator {
+  position: absolute;
+  bottom: 0px;
+  width: 22px;
+  height: 2.5px;
+  background: #0097a7;
+  border-radius: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   2. DESKTOP LAYOUT STYLING (Active on screen > 768px)
+═══════════════════════════════════════════════════════════ */
+
+.ka-desktop-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ── Main Desktop Navigation Bar ── */
 .ka-header {
   background-color: #013D47;
   height: 72px;
@@ -95,9 +732,7 @@
   transform: translateY(-1px);
 }
 
-/* ─────────────────────────────────────────────
-   2. SECONDARY CATEGORY SUB-NAV
-───────────────────────────────────────────── */
+/* ── Desktop Secondary Category Sub-Nav ── */
 .ka-subnav {
   background: #ffffff;
   border-bottom: 1px solid #e2e8f0;
@@ -163,9 +798,7 @@
   color: currentColor;
 }
 
-/* ─────────────────────────────────────────────
-   3. HERO & 4. GALLERY & 5. DOME
-───────────────────────────────────────────── */
+/* ── Desktop Hero & Gallery ── */
 .ka-light-container {
   background-color: #edf2f7;
   padding: 1.5rem 1rem 3rem 1rem;
@@ -237,9 +870,7 @@
   display: block;
 }
 
-/* ─────────────────────────────────────────────
-   6 & 7. OFFERS SECTIONS (Dark Teal #013D47)
-───────────────────────────────────────────── */
+/* ── Desktop Offers Section ── */
 .ka-offers-section {
   background-color: #013D47;
   padding: 4.5rem 1.5rem 4rem 1.5rem;
@@ -254,49 +885,49 @@
 
 .ka-offers-header {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1.2fr;
-  align-items: flex-end;
-  margin-bottom: 2.5rem;
-  gap: 1rem;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2.25rem;
 }
 
 .ka-offers-eyebrow {
   display: block;
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   color: #38bdf8;
-  letter-spacing: 0.8px;
+  text-transform: uppercase;
   margin-bottom: 0.35rem;
 }
 
 .ka-offers-title {
   font-size: 2.2rem;
   font-weight: 800;
-  color: #00e5ff;
-  font-family: var(--font-kids, 'Fredoka', cursive, sans-serif);
-  line-height: 1.15;
+  color: #ffffff;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 .ka-offers-term {
   font-size: 2.2rem;
   font-weight: 800;
-  color: #00e5ff;
-  font-family: var(--font-kids, 'Fredoka', cursive, sans-serif);
-  text-align: center;
-  line-height: 1.15;
+  color: #f5a623;
+  line-height: 1.1;
 }
 
 .ka-offers-subtext {
+  font-size: 0.95rem;
   color: #94a3b8;
-  font-size: 0.9rem;
   text-align: right;
+  max-width: 260px;
 }
 
 .ka-pricing-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
-  max-width: 780px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -304,22 +935,23 @@
   background: #ffffff;
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
-  color: #1e293b;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  transition: transform 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .ka-pricing-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
 }
 
 .ka-card-thumb-wrap {
-  position: relative;
   width: 100%;
-  height: 145px;
+  height: 180px;
+  position: relative;
   overflow: hidden;
+  background: #0f172a;
 }
 
 .ka-card-thumb {
@@ -330,72 +962,74 @@
 
 .ka-card-age-badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(255, 255, 255, 0.95);
-  color: #1e293b;
-  font-size: 0.72rem;
-  font-weight: 800;
-  padding: 0.2rem 0.65rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  top: 14px;
+  right: 14px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
 }
 
 .ka-card-body {
-  padding: 1.25rem 1.4rem;
+  padding: 1.75rem 1.5rem 1.5rem 1.5rem;
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
 .ka-badge {
-  display: inline-block;
-  font-size: 0.65rem;
+  align-self: flex-start;
+  font-size: 0.68rem;
   font-weight: 800;
-  padding: 0.2rem 0.6rem;
-  border-radius: 6px;
-  letter-spacing: 0.5px;
-  width: fit-content;
-  margin-bottom: 0.4rem;
+  letter-spacing: 0.06em;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  margin-bottom: 0.65rem;
 }
 
-.ka-badge--popular,
+.ka-badge--popular {
+  background: #fef3c7;
+  color: #b45309;
+}
+
 .ka-badge--family {
-  background: #e0e7ff;
-  color: #4338ca;
+  background: #e0f2fe;
+  color: #0369a1;
 }
 
 .ka-card-title {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #0284c7;
-  font-family: var(--font-kids, 'Fredoka', cursive, sans-serif);
+  color: #0f172a;
+  margin-bottom: 0.2rem;
 }
 
 .ka-card-subtitle {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   color: #64748b;
   font-weight: 600;
-  margin-bottom: 1.1rem;
+  margin-bottom: 1.25rem;
 }
 
 .ka-checklist {
   list-style: none;
   padding: 0;
-  margin: 0 0 1.25rem 0;
+  margin: 0 0 1.5rem 0;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  flex: 1;
+  gap: 0.65rem;
 }
 
 .ka-checklist li {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
   font-size: 0.85rem;
-  font-weight: 600;
   color: #334155;
+  font-weight: 600;
 }
 
 .ka-check-icon {
@@ -406,19 +1040,19 @@
 }
 
 .ka-price-box {
-  background: #f0f9ff;
-  border-radius: 14px;
-  padding: 0.75rem 1.1rem;
-  margin-bottom: 1.1rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1rem;
+  margin-top: auto;
+  margin-bottom: 1.25rem;
 }
 
 .ka-price-label {
   display: block;
   font-size: 0.65rem;
   font-weight: 800;
-  color: #0284c7;
-  letter-spacing: 0.6px;
-  margin-bottom: 0.15rem;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
 }
 
 .ka-price-row {
@@ -428,23 +1062,23 @@
 }
 
 .ka-price-val {
-  font-size: 1.85rem;
+  font-size: 1.6rem;
   font-weight: 900;
-  color: #0284c7;
+  color: #0f172a;
 }
 
 .ka-price-per {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: #64748b;
   font-weight: 600;
 }
 
 .ka-btn-book {
   background: #f5a623;
-  color: #ffffff;
+  color: #0f172a;
   border: none;
-  border-radius: 25px;
-  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  padding: 0.85rem 1.25rem;
   font-size: 0.85rem;
   font-weight: 800;
   display: flex;
@@ -464,9 +1098,7 @@
   box-shadow: 0 6px 18px rgba(245, 166, 35, 0.45);
 }
 
-/* ─────────────────────────────────────────────
-   8. FOOTER
-───────────────────────────────────────────── */
+/* ── Desktop Footer ── */
 .ka-footer {
   background-color: #013D47;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -522,41 +1154,38 @@
   color: #64748b;
 }
 
-/* ─────────────────────────────────────────────
-   RESPONSIVE ADJUSTMENTS (Mobile & Tablet)
-───────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .ka-nav-links {
-    display: none;
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS (Mobile Mode Activation)
+═══════════════════════════════════════════════════════════ */
+
+/* Mobile view kicks in at <= 768px */
+@media (max-width: 768px) {
+  .ka-desktop-layout {
+    display: none !important;
   }
-  .ka-offers-header {
-    grid-template-columns: 1fr;
-    text-align: center;
-    gap: 0.5rem;
-  }
-  .ka-offers-subtext {
-    text-align: center;
+  .ka-mobile-layout {
+    display: flex !important;
   }
 }
 
-@media (max-width: 768px) {
-  .ka-gallery-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .ka-pricing-grid {
-    grid-template-columns: 1fr;
-    max-width: 400px;
-  }
-  .ka-footer-inner {
-    flex-direction: column;
-    text-align: center;
-    gap: 1.25rem;
-  }
-  .ka-footer-links {
-    justify-content: center;
-  }
-  .ka-offers-title,
-  .ka-offers-term {
-    font-size: 1.75rem;
-  }
+/* Force Mobile Mode (when previewing on desktop) */
+.force-mobile-mode .ka-desktop-layout {
+  display: none !important;
+}
+
+.force-mobile-mode .ka-mobile-layout {
+  display: flex !important;
+  max-width: 480px;
+  margin: 0 auto;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+  min-height: 100vh;
+}
+
+/* Force Desktop Mode */
+.force-desktop-mode .ka-desktop-layout {
+  display: flex !important;
+}
+
+.force-desktop-mode .ka-mobile-layout {
+  display: none !important;
 }
