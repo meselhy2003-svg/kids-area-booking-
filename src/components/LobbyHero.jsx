@@ -13,15 +13,16 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
   const exitBtnRef   = useRef(null);
   const sparkleBurst = useRef(null);
 
-  // Frames for girl character animation
+  // Frames for girl character animation (all frames from photo/landingpagegirl)
   const GIRL_FRAMES = {
-    stand: '/photo/landingpagegirl/frame-1.png',
-    jumpStart: '/photo/landingpagegirl/frame-2.png',
-    jumpPeak: '/photo/landingpagegirl/frame-3.png',
+    frame1: '/photo/landingpagegirl/frame-1.png',
+    frame2: '/photo/landingpagegirl/frame-2.png',
+    frame3: '/photo/landingpagegirl/frame-3.png',
+    frame4: '/photo/landingpagegirl/frame-4.png',
   };
 
   // React state
-  const [girlImgSrc,   setGirlImgSrc]   = useState(GIRL_FRAMES.stand);
+  const [girlImgSrc,   setGirlImgSrc]   = useState(GIRL_FRAMES.frame1);
   const [boyImgSrc,    setBoyImgSrc]    = useState('/photo/boy-layer.png');
   const [entryHovered, setEntryHovered] = useState(false);
   const [exitHovered,  setExitHovered]  = useState(false);
@@ -33,6 +34,10 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
   // Preload all frames on mount for instant zero-lag frame switching
   useEffect(() => {
     Object.values(GIRL_FRAMES).forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+    ['/photo/boy-exit.png', '/photo/boy-layer.png'].forEach((src) => {
       const img = new Image();
       img.src = src;
     });
@@ -96,19 +101,19 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
     const tl = gsap.timeline({
       onComplete: () => {
         // Re-start idle float & reset girl image after landing
-        setGirlImgSrc(GIRL_FRAMES.stand);
+        setGirlImgSrc(GIRL_FRAMES.frame1);
         gsap.to(girlRef.current, { y: -6, duration: 1.8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
         gsap.to(girlRef.current, { rotation: 2.5, duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
         animLock.current = false;
-        openModal('entry');
+        setActiveTab('kids-area');
       },
     });
 
     // Frame 1: Ground takeoff
-    tl.call(() => setGirlImgSrc(GIRL_FRAMES.stand), null, 0);
+    tl.call(() => setGirlImgSrc(GIRL_FRAMES.frame1), null, 0);
 
     // Frame 2: Rising jump pose
-    tl.call(() => setGirlImgSrc(GIRL_FRAMES.jumpStart), null, 0.12);
+    tl.call(() => setGirlImgSrc(GIRL_FRAMES.frame2), null, 0.10);
 
     // 1. Girl jumps with a trajectory towards the Entry button
     tl.to(girlRef.current, {
@@ -120,8 +125,11 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
       ease: 'power2.out',
     }, 0);
 
-    // Frame 3: Peak reach pose tapping the sign
-    tl.call(() => setGirlImgSrc(GIRL_FRAMES.jumpPeak), null, 0.38);
+    // Frame 3: Mid-air flight pose
+    tl.call(() => setGirlImgSrc(GIRL_FRAMES.frame3), null, 0.22);
+
+    // Frame 4: Peak reach pose tapping sign with pointing finger!
+    tl.call(() => setGirlImgSrc(GIRL_FRAMES.frame4), null, 0.36);
 
     // 2. Peak of jump
     tl.to(girlRef.current, {
@@ -157,8 +165,11 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
       setTimeout(() => setSparkling(false), 800);
     }, null, 0.44);
 
-    // Frame 2: Descending pose
-    tl.call(() => setGirlImgSrc(GIRL_FRAMES.jumpStart), null, 0.70);
+    // Frame 3: Descending flight
+    tl.call(() => setGirlImgSrc(GIRL_FRAMES.frame3), null, 0.65);
+
+    // Frame 2: Preparing for ground contact
+    tl.call(() => setGirlImgSrc(GIRL_FRAMES.frame2), null, 0.85);
 
     // 5. Girl lands back down bouncing
     tl.to(girlRef.current, {
@@ -171,23 +182,24 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
     }, 0.70);
 
     // Frame 1: Landed back on ground
-    tl.call(() => setGirlImgSrc(GIRL_FRAMES.stand), null, 1.15);
+    tl.call(() => setGirlImgSrc(GIRL_FRAMES.frame1), null, 1.15);
   };
 
   // ─────────────────────────────────────────────
-  // EXIT SIGN CLICK  →  Boy jumps & taps sign with hand (identical motion)
+  // EXIT SIGN CLICK  →  Boy stays in place while exit pose shows
   // ─────────────────────────────────────────────
   const handleExitClick = () => {
     if (animLock.current) return;
     animLock.current = true;
 
-    // Pause idle float during jump & swap to sad exit pose image
+    // Pause idle float & ensure boy stays grounded in the exact same place
     gsap.killTweensOf(boyRef.current);
+    gsap.set(boyRef.current, { x: 0, y: 0, rotation: 0, scale: 1 });
     setBoyImgSrc('/photo/boy-exit.png');
 
     const tl = gsap.timeline({
       onComplete: () => {
-        // Re-start idle float & reset boy image after landing
+        // Re-start idle float & reset boy image
         setBoyImgSrc('/photo/boy-layer.png');
         gsap.to(boyRef.current, { y: -6, duration: 1.8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
         gsap.to(boyRef.current, { rotation: 2.5, duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
@@ -196,25 +208,7 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
       },
     });
 
-    // 1. Boy jumps towards the Exit button
-    tl.to(boyRef.current, {
-      x: -65,
-      y: -90,
-      rotation: -4,
-      scale: 1.04,
-      duration: 0.40,
-      ease: 'power2.out',
-    });
-
-    // 2. Peak of jump
-    tl.to(boyRef.current, {
-      y: -102,
-      rotation: -1,
-      duration: 0.12,
-      ease: 'sine.out',
-    });
-
-    // 3. Exit Sign swings on chains upon hand impact
+    // 1. Exit Sign swings on chains
     tl.to(
       exitBtnRef.current,
       {
@@ -224,10 +218,10 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
         repeat: 5,
         ease: 'sine.inOut',
       },
-      '<',
+      0,
     );
 
-    // 4. Sparkle + confetti burst at Exit sign position
+    // 2. Sparkle + confetti burst at Exit sign position
     tl.call(() => {
       setSparklePos({ left: '68%', top: '32%' });
       setSparkling(true);
@@ -238,17 +232,11 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
         colors: ['#ffd15c', '#ffffff', '#00c2e0', '#ff6b6b'],
       });
       setTimeout(() => setSparkling(false), 800);
-    });
+    }, null, 0.1);
 
-    // 5. Boy lands back down bouncing
+    // 3. Keep boy in place for 0.9s showing the sad exit pose
     tl.to(boyRef.current, {
-      x: 0,
-      y: 0,
-      rotation: 0,
-      scale: 1,
-      duration: 0.55,
-      ease: 'bounce.out',
-      delay: 0.15,
+      duration: 0.9,
     });
   };
 
@@ -262,17 +250,19 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
       gsap.killTweensOf(girlRef.current);
       const hopTl = gsap.timeline({
         onComplete: () => {
-          setGirlImgSrc(GIRL_FRAMES.stand);
+          setGirlImgSrc(GIRL_FRAMES.frame1);
           gsap.to(girlRef.current, { y: -6, duration: 1.8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
           gsap.to(girlRef.current, { rotation: 2.5, duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
         },
       });
-      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.jumpStart), null, 0.06);
+      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.frame2), null, 0.06);
       hopTl.to(girlRef.current, { y: -30, rotation: -3, scale: 1.04, duration: 0.2, ease: 'power1.out' }, 0);
-      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.jumpPeak), null, 0.18);
-      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.jumpStart), null, 0.35);
-      hopTl.to(girlRef.current, { y: 0, rotation: 0, scale: 1, duration: 0.32, ease: 'bounce.out' }, 0.32);
-      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.stand), null, 0.6);
+      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.frame3), null, 0.14);
+      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.frame4), null, 0.24);
+      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.frame3), null, 0.38);
+      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.frame2), null, 0.48);
+      hopTl.to(girlRef.current, { y: 0, rotation: 0, scale: 1, duration: 0.32, ease: 'bounce.out' }, 0.45);
+      hopTl.call(() => setGirlImgSrc(GIRL_FRAMES.frame1), null, 0.7);
     }
   };
 
@@ -368,11 +358,14 @@ export default function LobbyHero({ lang, openModal, setActiveTab }) {
           />
         </button>
 
-        {/* ── Reception Neon ── */}
-        <div className="hotspot-reception-neon" onClick={() => openModal('reception')}>
-          Reception
+        {/* ── Main Park Sign (Above Entry & Exit) ── */}
+        <div className="main-park-sign">
+          <img
+            src="/photo/Gemini_Generated_Image_7a4kvx7a4kvx7a4k-removebg-preview.png"
+            alt="American Dream Ismailia"
+            className="main-park-sign-img"
+          />
         </div>
-        <div className="hotspot hotspot-reception" onClick={() => openModal('reception')} />
 
       </div>
     </div>

@@ -1,0 +1,562 @@
+/* ═══════════════════════════════════════════════════════════
+   KIDS AREA PAGE STYLING (matching user reference screenshot)
+   Main navbar & footer background: #013D47
+   Offers background: #013D47
+   Active button: #f5a623
+═══════════════════════════════════════════════════════════ */
+
+.kids-area-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #edf2f7;
+  font-family: var(--font-main, 'Outfit', sans-serif);
+  color: #1e293b;
+}
+
+/* ─────────────────────────────────────────────
+   1. MAIN NAVIGATION BAR
+───────────────────────────────────────────── */
+.ka-header {
+  background-color: #013D47;
+  height: 72px;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(1, 61, 71, 0.25);
+}
+
+.ka-header-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ka-brand {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.ka-brand-logo {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+}
+
+.ka-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2.25rem;
+}
+
+.ka-nav-link {
+  background: none;
+  border: none;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0.4rem 0.2rem;
+  font-family: inherit;
+}
+
+.ka-nav-link:hover {
+  color: #38bdf8;
+}
+
+.ka-nav-link.active {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.ka-btn-book-us {
+  background: #00879e;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1.4rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.ka-btn-book-us:hover {
+  background: #029cb6;
+  transform: translateY(-1px);
+}
+
+/* ─────────────────────────────────────────────
+   2. SECONDARY CATEGORY SUB-NAV
+───────────────────────────────────────────── */
+.ka-subnav {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.85rem 1rem;
+  width: 100%;
+}
+
+.ka-subnav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.ka-subnav-inner::-webkit-scrollbar {
+  display: none;
+}
+
+.ka-subnav-pill {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 30px;
+  padding: 0.45rem 1.1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.ka-subnav-pill:hover {
+  border-color: #f5a623;
+  color: #f5a623;
+}
+
+.ka-subnav-pill.active {
+  background: #f5a623;
+  border-color: #f5a623;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(245, 166, 35, 0.35);
+}
+
+.ka-subnav-img-icon {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+}
+
+.ka-subnav-img-icon.invert-white {
+  filter: brightness(0) invert(1);
+}
+
+.ka-subnav-icon {
+  color: currentColor;
+}
+
+/* ─────────────────────────────────────────────
+   3. HERO & 4. GALLERY & 5. DOME
+───────────────────────────────────────────── */
+.ka-light-container {
+  background-color: #edf2f7;
+  padding: 1.5rem 1rem 3rem 1rem;
+}
+
+.ka-content-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ka-hero-banner-wrapper {
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.ka-hero-banner-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.ka-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.ka-gallery-card {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+.ka-gallery-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14);
+}
+
+.ka-gallery-img {
+  width: 100%;
+  aspect-ratio: 1 / 1.15;
+  object-fit: cover;
+  display: block;
+}
+
+.ka-dome-banner-wrapper {
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.ka-dome-banner-wrapper:hover {
+  transform: scale(1.008);
+}
+
+.ka-dome-banner-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ─────────────────────────────────────────────
+   6 & 7. OFFERS SECTIONS (Dark Teal #013D47)
+───────────────────────────────────────────── */
+.ka-offers-section {
+  background-color: #013D47;
+  padding: 4.5rem 1.5rem 4rem 1.5rem;
+  color: #ffffff;
+  width: 100%;
+}
+
+.ka-offers-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ka-offers-header {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.2fr;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+  gap: 1rem;
+}
+
+.ka-offers-eyebrow {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.8px;
+  margin-bottom: 0.35rem;
+}
+
+.ka-offers-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #00e5ff;
+  font-family: var(--font-kids, 'Fredoka', cursive, sans-serif);
+  line-height: 1.15;
+}
+
+.ka-offers-term {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #00e5ff;
+  font-family: var(--font-kids, 'Fredoka', cursive, sans-serif);
+  text-align: center;
+  line-height: 1.15;
+}
+
+.ka-offers-subtext {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.ka-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.ka-pricing-card {
+  background: #ffffff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  color: #1e293b;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease;
+}
+
+.ka-pricing-card:hover {
+  transform: translateY(-5px);
+}
+
+.ka-card-thumb-wrap {
+  position: relative;
+  width: 100%;
+  height: 145px;
+  overflow: hidden;
+}
+
+.ka-card-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ka-card-age-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1e293b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.65rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.ka-card-body {
+  padding: 1.25rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.ka-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  width: fit-content;
+  margin-bottom: 0.4rem;
+}
+
+.ka-badge--popular,
+.ka-badge--family {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.ka-card-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0284c7;
+  font-family: var(--font-kids, 'Fredoka', cursive, sans-serif);
+}
+
+.ka-card-subtitle {
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 1.1rem;
+}
+
+.ka-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.ka-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.ka-check-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.ka-price-box {
+  background: #f0f9ff;
+  border-radius: 14px;
+  padding: 0.75rem 1.1rem;
+  margin-bottom: 1.1rem;
+}
+
+.ka-price-label {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #0284c7;
+  letter-spacing: 0.6px;
+  margin-bottom: 0.15rem;
+}
+
+.ka-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.ka-price-val {
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #0284c7;
+}
+
+.ka-price-per {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.ka-btn-book {
+  background: #f5a623;
+  color: #ffffff;
+  border: none;
+  border-radius: 25px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(245, 166, 35, 0.35);
+  width: 100%;
+  font-family: inherit;
+}
+
+.ka-btn-book:hover {
+  background: #e69512;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(245, 166, 35, 0.45);
+}
+
+/* ─────────────────────────────────────────────
+   8. FOOTER
+───────────────────────────────────────────── */
+.ka-footer {
+  background-color: #013D47;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2.75rem 1.5rem;
+  color: #94a3b8;
+  width: 100%;
+}
+
+.ka-footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.ka-footer-brand {
+  cursor: pointer;
+}
+
+.ka-footer-logo {
+  height: 56px;
+  width: auto;
+  object-fit: contain;
+}
+
+.ka-footer-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.ka-footer-link {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  font-family: inherit;
+}
+
+.ka-footer-link:hover {
+  color: #38bdf8;
+}
+
+.ka-footer-copy {
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+/* ─────────────────────────────────────────────
+   RESPONSIVE ADJUSTMENTS (Mobile & Tablet)
+───────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .ka-nav-links {
+    display: none;
+  }
+  .ka-offers-header {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  .ka-offers-subtext {
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .ka-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ka-pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+  }
+  .ka-footer-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.25rem;
+  }
+  .ka-footer-links {
+    justify-content: center;
+  }
+  .ka-offers-title,
+  .ka-offers-term {
+    font-size: 1.75rem;
+  }
+}

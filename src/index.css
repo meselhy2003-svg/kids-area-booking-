@@ -282,7 +282,7 @@ body {
 
 .character-overlay {
   position: absolute;
-  z-index: 25;
+  z-index: 40;
   cursor: pointer;
   /* GSAP will animate transform; we set transform-origin here */
   transform-origin: bottom center;
@@ -336,7 +336,7 @@ body {
   text-align: center;
   animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   white-space: normal;
-  z-index: 30;
+  z-index: 50;
 }
 
 .speech-bubble--boy {
@@ -354,7 +354,7 @@ body {
   text-align: center;
   animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   white-space: normal;
-  z-index: 30;
+  z-index: 50;
 }
 
 /* ── Sparkle Burst near the Entry sign ── */
@@ -407,7 +407,7 @@ body {
   background: none;
   border: none;
   padding: 0;
-  margin-bottom: 14px;
+  margin-bottom: 17px;
   cursor: pointer;
   z-index: 20;
   /* pivot from the very top-center — where the chain attaches */
@@ -417,11 +417,13 @@ body {
   transition: filter 0.3s ease;
 }
 
-/* Hover: swing strongly like chain was pulled */
-.sign-btn:hover {
+/* Hover & click: swing strongly like chain was pulled, remaining strictly behind the main sign */
+.sign-btn:hover,
+.sign-btn:active,
+.sign-btn:focus {
   animation: chainSwingHover 0.7s ease-in-out infinite alternate;
   filter: drop-shadow(0 0 22px rgba(255, 220, 80, 0.85));
-  z-index: 30;
+  z-index: 20;
 }
 
 @keyframes chainSwingHover {
@@ -431,19 +433,19 @@ body {
 
 /* Position Entry sign — chain sway idle animation */
 .sign-btn--entry {
-  top: calc(31% - 3.9px);
+  top: calc(31% - 20.9px);
   left: 34.5%;
   width: 13.5%;
-  margin-bottom: 14px;
+  margin-bottom: 17px;
   animation: chainIdleSway 3.2s ease-in-out infinite;
 }
 
 /* Position Exit sign — subtle idle sway (slight offset timing) */
 .sign-btn--exit {
-  top: calc(31% - 3.9px);
+  top: calc(31% - 20.9px);
   right: 33.5%;
   width: 13.5%;
-  margin-bottom: 14px;
+  margin-bottom: 17px;
   animation: chainIdleSway 3.8s ease-in-out infinite 0.6s;
 }
 
@@ -471,6 +473,25 @@ body {
 /* Slight extra glow when hovered */
 .sign-img--hovered {
   filter: brightness(1.1) drop-shadow(0 0 12px rgba(255, 200, 0, 0.9));
+}
+
+/* ─── Main Park Board Sign (American Dream Ismailia) ─── */
+.main-park-sign {
+  position: absolute;
+  top: -7.8%;
+  left: 51%;
+  transform: translateX(-50%);
+  width: 46.3%;
+  z-index: 35;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.4));
+  user-select: none;
+}
+
+.main-park-sign-img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 
@@ -873,6 +894,11 @@ body {
     width: 28%;
     right: 12%;
     bottom: 2%;
+  }
+  .main-park-sign {
+    top: -3%;
+    left: 50%;
+    width: 72%;
   }
   .sign-btn--entry {
     top: 38%;

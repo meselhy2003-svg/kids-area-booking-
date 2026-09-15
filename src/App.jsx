@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import LobbyHero from './components/LobbyHero';
+import KidsAreaPage from './components/KidsAreaPage';
 import MenuSection from './components/MenuSection';
 import PlaySection from './components/PlaySection';
 import EventsSection from './components/EventsSection';
@@ -39,6 +40,14 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'kids-area' && (
+          <KidsAreaPage 
+            lang={lang} 
+            openModal={openModal} 
+            setActiveTab={setActiveTab} 
+          />
+        )}
+
         {activeTab === 'menu' && (
           <MenuSection 
             lang={lang} 
@@ -60,11 +69,13 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer matching reference screenshot */}
-      <Footer 
-        lang={lang} 
-        openModal={openModal} 
-      />
+      {/* Footer matching reference screenshot (KidsAreaPage includes its own dedicated footer) */}
+      {activeTab !== 'kids-area' && (
+        <Footer 
+          lang={lang} 
+          openModal={openModal} 
+        />
+      )}
 
       {/* Global Interactive Modals */}
       {modal.isOpen && (

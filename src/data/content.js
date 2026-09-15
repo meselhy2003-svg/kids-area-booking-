@@ -16,7 +16,7 @@ export const translations = {
       openHours: "Open Today: 10:00 AM - 11:00 PM",
       bookTickets: "Buy Wristband",
       explorePark: "Explore Play Zones",
-      boySpeech: "Hi! Welcome to American Dream Ismailia! Click Reception to check in! 🎈",
+      boySpeech: "Hi! Welcome to American Dream Ismailia! Click Entry to check in! 🎈",
       girlSpeech: "Hey there! Are you ready to play, bounce, and eat yummy treats? 🍕✨"
     },
     menuSection: {
@@ -68,7 +68,7 @@ export const translations = {
       openHours: "مفتوح اليوم: ١٠:٠٠ ص - ١١:٠٠ م",
       bookTickets: "حجز تذكرة / إسورة",
       explorePark: "استكشف الألعاب",
-      boySpeech: "أهلاً بك في أمريكان دريم الإسماعيلية! اضغط على الاستقبال للدخول! 🎈",
+      boySpeech: "أهلاً بك في أمريكان دريم الإسماعيلية! اضغط على الدخول! 🎈",
       girlSpeech: "مرحباً! هل أنت مستعد للمرح والمغامرة والوجبات اللذيذة؟ 🍕✨"
     },
     menuSection: {
