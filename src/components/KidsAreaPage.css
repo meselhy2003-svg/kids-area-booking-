@@ -72,22 +72,26 @@
   background-color: #f5faff;
 }
 
-/* ── Mobile Header ── */
-.ka-mob-header {
-  background-color: #014254;
-  padding-top: 10px;
+/* ── Mobile Top Sticky Section with Floating Search ── */
+.ka-mob-top-section {
   width: 100%;
   position: sticky;
   top: 0;
   z-index: 500;
-  box-shadow: 0 2px 10px rgba(1, 66, 84, 0.15);
+  background-color: #f5faff;
+}
+
+/* Dark Teal Bar (Top half) */
+.ka-mob-teal-bar {
+  background-color: #014254;
+  padding: 10px 14px 24px 14px;
+  width: 100%;
 }
 
 .ka-mob-header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 14px 8px 14px;
 }
 
 .ka-mob-brand {
@@ -123,25 +127,29 @@
   opacity: 0.85;
 }
 
-/* ── Mobile Search Bar ── */
-.ka-mob-search-wrapper {
-  padding: 2px 14px 10px 14px;
+/* Floating Search Bar straddling the dark teal bar and the light section below */
+.ka-mob-floating-search-wrap {
+  padding: 0 14px;
+  margin-top: -21px; /* Floats directly on the seam between teal and light bg */
+  position: relative;
+  z-index: 20;
   width: 100%;
 }
 
 .ka-mob-search-bar {
   background: #ffffff;
   border-radius: 9999px;
-  height: 38px;
+  height: 42px;
   display: flex;
   align-items: center;
-  padding: 0 14px;
-  gap: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  padding: 0 16px;
+  gap: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.09), 0 2px 6px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .ka-mob-search-icon {
-  color: #64748b;
+  color: #1e293b;
   flex-shrink: 0;
 }
 
@@ -149,7 +157,7 @@
   border: none;
   outline: none;
   width: 100%;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   color: #1e293b;
   background: transparent;
   font-family: inherit;
@@ -157,17 +165,19 @@
 }
 
 .ka-mob-search-input::placeholder {
-  color: #8392a5;
+  color: #64748b;
+  font-weight: 400;
 }
 
-/* ── Mobile Category Pills ── */
+/* ── Mobile Category Pills (placed on light background below the floating search bar) ── */
 .ka-mob-categories-scroll {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 2px 14px 12px 14px;
+  padding: 12px 14px 10px 14px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  background-color: #f5faff;
 }
 
 .ka-mob-categories-scroll::-webkit-scrollbar {
@@ -279,33 +289,70 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 4px;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
 .ka-mob-offer-name {
-  font-size: 0.96rem;
+  font-size: 0.98rem;
   font-weight: 800;
   color: #082b45;
   margin: 0;
   line-height: 1.2;
 }
 
-.ka-mob-badge-save {
-  background: #00a2b8;
-  color: #ffffff;
-  font-size: 0.62rem;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 8px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
 .ka-mob-offer-sub {
   color: #0097a7;
   font-size: 0.76rem;
   font-weight: 700;
-  margin: 2px 0 6px 0;
+  margin: 2px 0 0 0;
+}
+
+/* ── Tilted "Save 60 EGP" Sticker Badge (matching reference pic) ── */
+.ka-mob-badge-tag {
+  position: relative;
+  background: linear-gradient(135deg, #00b4d8 0%, #0096c7 100%);
+  color: #ffffff;
+  border-radius: 11px;
+  padding: 5px 9px 4px 9px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transform: rotate(-9deg);
+  box-shadow: 0 4px 12px rgba(0, 150, 199, 0.36);
+  flex-shrink: 0;
+  margin-top: 1px;
+  margin-right: 2px;
+}
+
+.ka-mob-tag-pin {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  opacity: 0.6;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.ka-mob-tag-save {
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.ka-mob-tag-amount {
+  font-size: 0.94rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 .ka-mob-features-grid {

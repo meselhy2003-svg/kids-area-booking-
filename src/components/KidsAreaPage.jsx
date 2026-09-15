@@ -156,37 +156,39 @@ export default function KidsAreaPage({ setActiveTab, openModal, lang }) {
       ═════════════════════════════════════════════════════════════════════ */}
       <div className="ka-mobile-layout">
         
-        {/* 1. Mobile Header */}
-        <header className="ka-mob-header">
-          {/* Top Bar: Logo & Icons */}
-          <div className="ka-mob-header-top">
-            <div className="ka-mob-brand" onClick={() => setActiveTab('lobby')}>
-              <img 
-                src="/photo/mobile-challenge/header-logo.png" 
-                alt="American Dream Ismailia" 
-                className="ka-mob-brand-logo" 
-              />
-            </div>
-            <div className="ka-mob-header-actions">
-              <button 
-                className="ka-mob-icon-btn" 
-                onClick={() => openModal && openModal('account')}
-                aria-label="User profile"
-              >
-                <User size={22} color="#ffffff" strokeWidth={2} />
-              </button>
-              <button 
-                className="ka-mob-icon-btn" 
-                onClick={() => openModal && openModal('menu')}
-                aria-label="Menu"
-              >
-                <Menu size={26} color="#ffffff" strokeWidth={2.2} />
-              </button>
+        {/* 1. Mobile Header with Floating Search */}
+        <header className="ka-mob-top-section">
+          {/* Dark Teal Top Bar */}
+          <div className="ka-mob-teal-bar">
+            <div className="ka-mob-header-top">
+              <div className="ka-mob-brand" onClick={() => setActiveTab('lobby')}>
+                <img 
+                  src="/photo/mobile-challenge/header-logo.png" 
+                  alt="American Dream Ismailia" 
+                  className="ka-mob-brand-logo" 
+                />
+              </div>
+              <div className="ka-mob-header-actions">
+                <button 
+                  className="ka-mob-icon-btn" 
+                  onClick={() => openModal && openModal('account')}
+                  aria-label="User profile"
+                >
+                  <User size={22} color="#ffffff" strokeWidth={2} />
+                </button>
+                <button 
+                  className="ka-mob-icon-btn" 
+                  onClick={() => openModal && openModal('menu')}
+                  aria-label="Menu"
+                >
+                  <Menu size={26} color="#ffffff" strokeWidth={2.2} />
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="ka-mob-search-wrapper">
+          {/* Floating Search Bar (straddles the teal bar and white category section) */}
+          <div className="ka-mob-floating-search-wrap">
             <div className="ka-mob-search-bar">
               <Search size={17} className="ka-mob-search-icon" />
               <input 
@@ -199,7 +201,7 @@ export default function KidsAreaPage({ setActiveTab, openModal, lang }) {
             </div>
           </div>
 
-          {/* Category Filter Pills (Horizontal Scroll) */}
+          {/* Category Filter Pills (on light background) */}
           <div className="ka-mob-categories-scroll">
             {mobileCategories.map((cat) => {
               const isActive = mobileCategory === cat;
@@ -251,11 +253,18 @@ export default function KidsAreaPage({ setActiveTab, openModal, lang }) {
                   {/* Right: Offer Details */}
                   <div className="ka-mob-offer-body">
                     <div className="ka-mob-offer-top">
-                      <h3 className="ka-mob-offer-name">Challenge Pass</h3>
-                      <span className="ka-mob-badge-save">Save 60 EGP</span>
-                    </div>
+                      <div>
+                        <h3 className="ka-mob-offer-name">Challenge Pass</h3>
+                        <p className="ka-mob-offer-sub">Pick any 4 games</p>
+                      </div>
 
-                    <p className="ka-mob-offer-sub">Pick any 4 games</p>
+                      {/* Tilted "Save 60 EGP" Sticker Badge matching reference */}
+                      <div className="ka-mob-badge-tag">
+                        <span className="ka-mob-tag-pin" />
+                        <span className="ka-mob-tag-save">Save</span>
+                        <span className="ka-mob-tag-amount">60 EGP</span>
+                      </div>
+                    </div>
 
                     {/* 2x2 Features Grid */}
                     <div className="ka-mob-features-grid">
