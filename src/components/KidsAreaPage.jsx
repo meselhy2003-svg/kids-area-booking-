@@ -1,826 +1,335 @@
-import React, { useState } from 'react';
-import { 
-  Home, 
-  ArrowRight, 
-  Video, 
-  Search, 
-  User, 
-  Menu, 
-  Ticket, 
-  MapPin, 
-  Image as ImageIcon, 
-  MoreHorizontal, 
-  ShieldCheck, 
-  Gamepad2, 
-  Crosshair, 
-  Car,
-  Smartphone,
-  Monitor
-} from 'lucide-react';
-import './KidsAreaPage.css';
+import React, { useState, useMemo } from 'react';
+import RunningHeroBanner from './RunningHeroBanner';
 
 export default function KidsAreaPage({ setActiveTab, openModal, lang }) {
-  // Desktop state
-  const [activeCategory, setActiveCategory] = useState('KIDS AREA');
-
-  // Mobile state (defaults to 'Challenge Zone' to match reference screenshot exactly)
-  const [mobileCategory, setMobileCategory] = useState('Challenge Zone');
-  const [mobileNavTab, setMobileNavTab] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
-  const [previewMode, setPreviewMode] = useState('auto'); // 'auto' | 'mobile' | 'desktop'
+  const [activeBannerSlide, setActiveBannerSlide] = useState(0);
 
-  const desktopCategories = [
-    { name: 'Home', icon: 'home', isSpecial: false },
-    { name: 'KIDS AREA', icon: '/photo/kid-area-pic/icon/icon-kids.png', isSpecial: true },
-    { name: 'FUN PARK', icon: '/photo/kid-area-pic/icon/icon-fun.png', isSpecial: false },
-    { name: 'CHALLENGE ZONE', icon: '/photo/kid-area-pic/icon/icon-challenge.png', isSpecial: false },
-    { name: 'ADVENTURE ZONE', icon: '/photo/kid-area-pic/icon/icon-adventure.png', isSpecial: false },
-    { name: 'PACKAGES', icon: '/photo/kid-area-pic/icon/icon-package.png', isSpecial: false },
-    { name: 'V-REG', icon: 'video', isSpecial: false },
-  ];
-
-  const mobileCategories = [
-    'All',
-    'Kids Area',
-    'Fun Park',
-    'Adventure Zone',
-    'Challenge Zone'
-  ];
-
-  const extraGames = [
+  const bannerSlides = [
     {
-      id: 'motorcycle',
-      title: 'Motorcycle Racing',
-      price: 'EGP 40 / ticket',
-      priceNum: 40,
-      img: '/photo/mobile-challenge/game-motorcycle.png'
+      titleEn: 'Kids Area',
+      subtitleEn: 'Little Adventurers Big Smiles!',
+      titleAr: 'منطقة الأطفال',
+      subtitleAr: 'مغامرات صغيرة وسعادة كبيرة!',
+      badge: 'Play Explore Learn Together!',
+      bgGradient: 'linear-gradient(135deg, #0b2533 0%, #104252 60%, #195b68 100%)'
     },
     {
-      id: 'airhockey',
-      title: 'Air Hockey',
-      price: 'EGP 50 / 30 min',
-      priceNum: 50,
-      img: '/photo/mobile-challenge/game-airhockey.png'
+      titleEn: 'Sensory Wonder',
+      subtitleEn: 'Colors, Shapes & Joyful Play!',
+      titleAr: 'عالم الاستكشاف',
+      subtitleAr: 'ألوان ومرح وتنمية مهارات!',
+      badge: 'Safe & Sanitized!',
+      bgGradient: 'linear-gradient(135deg, #08343f 0%, #0d5162 60%, #126e82 100%)'
     },
     {
-      id: 'billiards',
-      title: 'Billards',
-      price: 'EGP 50 / 30 min',
-      priceNum: 50,
-      img: '/photo/mobile-challenge/game-billiards.png'
-    },
-    {
-      id: 'pingpong',
-      title: 'Ping Pong',
-      price: 'EGP 50 / 30 min',
-      priceNum: 50,
-      img: '/photo/mobile-challenge/game-pingpong.png'
-    },
-    {
-      id: 'ps4',
-      title: 'PS4',
-      price: 'EGP 50 / 30 min',
-      priceNum: 50,
-      img: '/photo/mobile-challenge/game-ps4.png'
-    },
-    {
-      id: 'boxing',
-      title: 'Boxing Machine',
-      price: 'EGP 30 / ticket',
-      priceNum: 30,
-      img: '/photo/mobile-challenge/game-boxing.png'
+      titleEn: 'Creative Zone',
+      subtitleEn: 'Clay, Colors & Imagination!',
+      titleAr: 'ورش الإبداع',
+      subtitleAr: 'ألوان وتلوين وجبس مرح!',
+      badge: 'Workshops Daily!',
+      bgGradient: 'linear-gradient(135deg, #0a3a40 0%, #15626a 60%, #208792 100%)'
     }
   ];
 
-  const handleCategoryClick = (cat) => {
-    setActiveCategory(cat.name);
-    if (cat.name === 'Home') {
-      setActiveTab('lobby');
-    } else if (cat.name === 'FUN PARK') {
-      setActiveTab('play');
+  const offers = [
+    {
+      id: 'single-midweek',
+      titleEn: 'Single Midweek',
+      titleAr: 'تذكرة فردية منتصف الأسبوع',
+      saveBadge: 'Save 85 EGP',
+      age: 'Ages 1 - 3',
+      features: [
+        'All-day entry + 1 Package',
+        'جبس وألوان'
+      ],
+      price: 'EGP 100',
+      priceNum: 100,
+      origPrice: 'EGP 185',
+      thumb: '/photo/kid-area-pic/graphic-composition.png'
+    },
+    {
+      id: 'sisters-midweek',
+      titleEn: 'Sisters Midweek',
+      titleAr: 'تذكرة الأختين منتصف الأسبوع',
+      saveBadge: 'Save 150 EGP',
+      age: 'Ages 1 - 3',
+      features: [
+        'All-day entry for 2 kids'
+      ],
+      price: 'EGP 150',
+      priceNum: 150,
+      origPrice: 'EGP 300',
+      thumb: '/photo/kid-area-pic/graphic-composition.png'
+    },
+    {
+      id: 'single-weekend',
+      titleEn: 'Single Weekend',
+      titleAr: 'تذكرة فردية نهاية الأسبوع',
+      saveBadge: 'Save 35 EGP',
+      age: 'Ages 1 - 3',
+      features: [
+        'All-day entry + 1 Package',
+        'جبس وألوان',
+        '+ Free coloring workshop + Party included'
+      ],
+      price: 'EGP 150',
+      priceNum: 150,
+      origPrice: 'EGP 185',
+      thumb: '/photo/kid-area-pic/graphic-composition.png'
+    },
+    {
+      id: 'sisters-weekend',
+      titleEn: 'Sisters Weekend',
+      titleAr: 'تذكرة الأختين نهاية الأسبوع',
+      saveBadge: 'Save 120 EGP',
+      age: 'Ages 1 - 3',
+      features: [
+        'Entry for 2 kids + 2 Package',
+        'جبس وألوان',
+        '+ Free coloring workshop + Party included'
+      ],
+      price: 'EGP 250',
+      priceNum: 250,
+      origPrice: 'EGP 370',
+      thumb: '/photo/kid-area-pic/graphic-composition.png'
     }
-  };
+  ];
 
-  const handleBookPackage = (packageName, price) => {
-    if (openModal) {
-      openModal('tickets', { package: packageName, price });
+  const attractions = [
+    {
+      id: 'ball-pit',
+      titleEn: 'Ball Pit',
+      titleAr: 'مسبح الكرات',
+      img: '/photo/kid-area-pic/explore-ballpit-clean.png',
+      fallbackImg: '/photo/kid-area-pic/kids-ball-pit-slide.png',
+      desc: 'Giant soft ball pit with safe slides, tunnels, and gentle climbing cushions.'
+    },
+    {
+      id: 'soft-play',
+      titleEn: 'Soft Play Maze',
+      titleAr: 'مناطق اللعب الناعمة',
+      img: '/photo/kid-area-pic/explore-softplay-clean.png',
+      fallbackImg: '/photo/kid-area-pic/family-bumper-cars.png',
+      desc: 'Multi-level soft maze designed for toddlers to explore balance and coordination.'
+    },
+    {
+      id: 'art-workshop',
+      titleEn: 'Art Workshop',
+      titleAr: 'ورش الرسم والألوان',
+      img: '/photo/kid-area-pic/explore-artworkshop-clean.png',
+      fallbackImg: '/photo/kid-area-pic/classic-carousel.png',
+      desc: 'Creative corner for gypsum painting, coloring, sand art, and hands-on crafts.'
     }
-  };
+  ];
 
-  const handleMobileNavClick = (tab) => {
-    setMobileNavTab(tab);
-    if (tab === 'home') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (tab === 'offers') {
-      const el = document.getElementById('mob-offers-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    } else if (tab === 'gallery') {
-      if (openModal) openModal('gallery');
-    } else if (tab === 'guide') {
-      if (openModal) openModal('guide');
-    } else if (tab === 'more') {
-      if (openModal) openModal('info');
-    }
-  };
+  const filteredOffers = useMemo(() => {
+    if (!searchQuery.trim()) return offers;
+    const q = searchQuery.toLowerCase();
+    return offers.filter(
+      o => o.titleEn.toLowerCase().includes(q) || 
+           o.titleAr.includes(q) || 
+           o.features.some(f => f.toLowerCase().includes(q))
+    );
+  }, [searchQuery]);
+
+  const filteredAttractions = useMemo(() => {
+    if (!searchQuery.trim()) return attractions;
+    const q = searchQuery.toLowerCase();
+    return attractions.filter(
+      a => a.titleEn.toLowerCase().includes(q) || a.titleAr.includes(q)
+    );
+  }, [searchQuery]);
 
   return (
-    <div className={`kids-area-page ${previewMode === 'mobile' ? 'force-mobile-mode' : ''} ${previewMode === 'desktop' ? 'force-desktop-mode' : ''}`}>
-
-      {/* Floating Device Preview Toggle for easy testing */}
-      <div className="ka-preview-toggle-bar">
-        <button 
-          className={`ka-preview-btn ${previewMode === 'auto' ? 'active' : ''}`}
-          onClick={() => setPreviewMode('auto')}
-          title="Responsive Auto Mode"
-        >
-          Auto (Screen)
-        </button>
-        <button 
-          className={`ka-preview-btn ${previewMode === 'mobile' ? 'active' : ''}`}
-          onClick={() => setPreviewMode('mobile')}
-          title="Force Mobile Preview"
-        >
-          <Smartphone size={14} /> Mobile View
-        </button>
-        <button 
-          className={`ka-preview-btn ${previewMode === 'desktop' ? 'active' : ''}`}
-          onClick={() => setPreviewMode('desktop')}
-          title="Force Desktop View"
-        >
-          <Monitor size={14} /> Desktop View
-        </button>
+    <div className="mobile-zone-page kids-area-screen">
+      {/* Search Bar matching reference */}
+      <div className="zone-search-wrapper">
+        <div className="zone-search-box">
+          <svg 
+            className="search-lens-svg" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="#7a9299" 
+            strokeWidth="2.5"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input 
+            type="text"
+            className="zone-search-input"
+            placeholder="Search for rides, offers, and more..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button 
+              className="search-clear-btn" 
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* ═════════════════════════════════════════════════════════════════════
-          A. MOBILE VIEW (Matches user reference screenshot pixel-for-pixel)
-      ═════════════════════════════════════════════════════════════════════ */}
-      <div className="ka-mobile-layout">
-        
-        {/* 1. Mobile Header with Floating Search */}
-        <header className="ka-mob-top-section">
-          {/* Dark Teal Top Bar */}
-          <div className="ka-mob-teal-bar">
-            <div className="ka-mob-header-top">
-              <div className="ka-mob-brand" onClick={() => setActiveTab('lobby')}>
-                <img 
-                  src="/photo/mobile-challenge/header-logo.png" 
-                  alt="American Dream Ismailia" 
-                  className="ka-mob-brand-logo" 
-                />
-              </div>
-              <div className="ka-mob-header-actions">
-                <button 
-                  className="ka-mob-icon-btn" 
-                  onClick={() => openModal && openModal('account')}
-                  aria-label="User profile"
-                >
-                  <User size={22} color="#ffffff" strokeWidth={2} />
-                </button>
-                <button 
-                  className="ka-mob-icon-btn" 
-                  onClick={() => openModal && openModal('menu')}
-                  aria-label="Menu"
-                >
-                  <Menu size={26} color="#ffffff" strokeWidth={2.2} />
-                </button>
-              </div>
-            </div>
-          </div>
+      {/* Zone Hero Banner: Kids Area (fixed, does not move automatically) */}
+      <RunningHeroBanner slideIndex={0} setActiveTab={setActiveTab} />
 
-          {/* Floating Search Bar (straddles the teal bar and white category section) */}
-          <div className="ka-mob-floating-search-wrap">
-            <div className="ka-mob-search-bar">
-              <Search size={17} className="ka-mob-search-icon" />
-              <input 
-                type="text"
-                placeholder="Search for rides, offers, and more..."
-                className="ka-mob-search-input"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+      {/* Section Header: Kids Area Offers | عروض منطقة الأطفال */}
+      <div className="zone-section-header">
+        <div className="section-title-combo">
+          <span className="title-part-en">Kids Area Offers</span>
+          <span className="title-divider">|</span>
+          <span className="title-part-ar">عروض منطقة الأطفال</span>
+        </div>
+        <div className="section-header-actions">
+          <span className="age-pill-badge">Ages 1 – 3</span>
+          <button 
+            className="see-all-link"
+            onClick={() => openModal('all-offers', { zone: 'Kids Area', offers })}
+          >
+            See All &gt;
+          </button>
+        </div>
+      </div>
+
+      {/* 2x2 Offer Cards Grid */}
+      <div className="offers-grid-2x2">
+        {filteredOffers.map((offer) => (
+          <div key={offer.id} className="offer-card-item">
+            {/* Top Cyan Save Badge */}
+            <div className="offer-save-badge">{offer.saveBadge}</div>
+
+            {/* Collage Thumbnail */}
+            <div className="offer-thumb-container">
+              <img 
+                src={offer.thumb} 
+                alt={offer.titleEn} 
+                className="offer-thumb-img" 
               />
             </div>
-          </div>
 
-          {/* Category Filter Pills (on light background) */}
-          <div className="ka-mob-categories-scroll">
-            {mobileCategories.map((cat) => {
-              const isActive = mobileCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  className={`ka-mob-cat-pill ${isActive ? 'active' : ''}`}
-                  onClick={() => setMobileCategory(cat)}
-                >
-                  {cat}
-                </button>
-              );
-            })}
-          </div>
-        </header>
+            <div className="offer-content">
+              <h4 className="offer-en-title">{offer.titleEn}</h4>
+              <p className="offer-ar-title">{offer.titleAr}</p>
 
-        {/* 2. Mobile Content Area */}
-        <main className="ka-mob-main">
-
-          {/* ── CASE 1: CHALLENGE ZONE (Exact screenshot view) ── */}
-          {(mobileCategory === 'Challenge Zone' || mobileCategory === 'All') && (
-            <div className="ka-mob-zone-section">
-              {/* Hero Banner */}
-              <div className="ka-mob-hero-wrap">
+              {/* Offer Details */}
+              <div className="offer-meta-row">
                 <img 
-                  src="/photo/mobile-challenge/challenge-hero-banner.png" 
-                  alt="Challenge Zone - Test Your Skills Make More Memories!" 
-                  className="ka-mob-hero-img"
+                  src="/photo/kid-area-pic/icon/Icon.png" 
+                  alt="age" 
+                  className="meta-icon-img" 
                 />
+                <span className="meta-text">{offer.age}</span>
               </div>
 
-              {/* Challenge Zone Offers */}
-              <section id="mob-offers-section" className="ka-mob-section">
-                <h2 className="ka-mob-section-title">
-                  Challenge Zone Offers <span className="ka-mob-divider">|</span> عروض منطقة التحدي
-                </h2>
-
-                {/* Main Challenge Pass Card */}
-                <div className="ka-mob-offer-card">
-                  {/* Left: 4-Games Collage */}
-                  <div className="ka-mob-offer-media">
-                    <img 
-                      src="/photo/mobile-challenge/offer-collage.png" 
-                      alt="VR, Shooting, Basketball, Car Racing - Choose any 4 games"
-                      className="ka-mob-offer-collage"
-                    />
+              <div className="offer-features-list">
+                {offer.features.map((feat, fidx) => (
+                  <div key={fidx} className="offer-feature-item">
+                    {fidx === 0 && (
+                      <img 
+                        src="/photo/kid-area-pic/icon/Vector (3).png" 
+                        alt="feat" 
+                        className="feat-vector-icon" 
+                      />
+                    )}
+                    <span className="feat-text">{feat}</span>
                   </div>
-
-                  {/* Right: Offer Details */}
-                  <div className="ka-mob-offer-body">
-                    <div className="ka-mob-offer-top">
-                      <div>
-                        <h3 className="ka-mob-offer-name">Challenge Pass</h3>
-                        <p className="ka-mob-offer-sub">Pick any 4 games</p>
-                      </div>
-
-                      {/* Tilted "Save 60 EGP" Sticker Badge matching reference */}
-                      <div className="ka-mob-badge-tag">
-                        <span className="ka-mob-tag-pin" />
-                        <span className="ka-mob-tag-save">Save</span>
-                        <span className="ka-mob-tag-amount">60 EGP</span>
-                      </div>
-                    </div>
-
-                    {/* 2x2 Features Grid */}
-                    <div className="ka-mob-features-grid">
-                      <div className="ka-mob-feat-item">
-                        <Gamepad2 size={13} className="ka-mob-feat-icon" />
-                        <span>VR</span>
-                      </div>
-                      <div className="ka-mob-feat-item">
-                        <span className="ka-mob-feat-emoji">🏀</span>
-                        <span>Basketball</span>
-                      </div>
-                      <div className="ka-mob-feat-item">
-                        <Crosshair size={13} className="ka-mob-feat-icon" />
-                        <span>Shooting</span>
-                      </div>
-                      <div className="ka-mob-feat-item">
-                        <Car size={13} className="ka-mob-feat-icon" />
-                        <span>Car Racing</span>
-                      </div>
-                    </div>
-
-                    {/* Price Row */}
-                    <div className="ka-mob-pricing-row">
-                      <span className="ka-mob-price-main">EGP 100</span>
-                      <span className="ka-mob-price-strike">EGP 160</span>
-                    </div>
-
-                    {/* Get This Offer Button */}
-                    <button 
-                      className="ka-mob-btn-offer"
-                      onClick={() => handleBookPackage('Challenge Pass (Pick any 4 games)', 100)}
-                    >
-                      <Ticket size={15} />
-                      <span>Get This Offer</span>
-                    </button>
-                  </div>
-                </div>
-              </section>
-
-              {/* Extra Games Section */}
-              <section className="ka-mob-section">
-                <h2 className="ka-mob-section-title">
-                  Extra Games <span className="ka-mob-divider">|</span> الألعاب الإضافية
-                </h2>
-
-                {/* 3-Column Grid */}
-                <div className="ka-mob-games-grid">
-                  {extraGames.map((game) => (
-                    <div key={game.id} className="ka-mob-game-card">
-                      <div className="ka-mob-game-img-wrap">
-                        <img 
-                          src={game.img} 
-                          alt={game.title} 
-                          className="ka-mob-game-img" 
-                        />
-                      </div>
-                      <div className="ka-mob-game-details">
-                        <h4 className="ka-mob-game-title">{game.title}</h4>
-                        <p className="ka-mob-game-price">{game.price}</p>
-                        <button 
-                          className="ka-mob-btn-play"
-                          onClick={() => handleBookPackage(game.title, game.priceNum)}
-                        >
-                          <Ticket size={11} />
-                          <span>Play Now</span>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* Safety & Rules Banner */}
-              <div className="ka-mob-safety-banner">
-                <div className="ka-mob-safety-icon-wrap">
-                  <ShieldCheck size={24} color="#0097a7" />
-                </div>
-                <div className="ka-mob-safety-text">
-                  <p className="ka-mob-safety-en">Ages vary by game. Safety and height rules apply.</p>
-                  <p className="ka-mob-safety-ar">تختلف الأعمار من لعبة لأخرى. تطبق قواعد السلامة والطول.</p>
-                </div>
+                ))}
               </div>
-            </div>
-          )}
 
-          {/* ── CASE 2: KIDS AREA (Mobile Adaptation of Kids Area) ── */}
-          {mobileCategory === 'Kids Area' && (
-            <div className="ka-mob-zone-section">
-              {/* Kids Area Hero Banner */}
-              <div className="ka-mob-hero-wrap">
+              {/* Price Row */}
+              <div className="offer-pricing-row">
+                <span className="price-current">{offer.price}</span>
+                <span className="price-orig">{offer.origPrice}</span>
+              </div>
+
+              {/* Get Offer Button */}
+              <button 
+                className="get-offer-btn"
+                onClick={() => openModal('booking', {
+                  name: `${offer.titleEn} (${offer.titleAr})`,
+                  price: offer.price,
+                  priceNum: offer.priceNum,
+                  discount: offer.saveBadge,
+                  details: offer.features.join(', ')
+                })}
+              >
                 <img 
-                  src="/photo/kid-area-pic/hero-banner.png" 
-                  alt="Kids Area - A world of fun, laughter, and endless smiles" 
-                  className="ka-mob-hero-img"
+                  src="/photo/kid-area-pic/icon/Vector (3).png" 
+                  alt="ticket" 
+                  className="btn-ticket-vector-icon" 
                 />
-              </div>
-
-              {/* Kids Area Gallery Grid */}
-              <div className="ka-mob-gallery-grid">
-                <img src="/photo/kid-area-pic/gallery-1.png" alt="Toy puzzle birds" className="ka-mob-gallery-img" />
-                <img src="/photo/kid-area-pic/gallery-2.png" alt="Wooden alphabet train" className="ka-mob-gallery-img" />
-                <img src="/photo/kid-area-pic/gallery-3.png" alt="Sensory activity board" className="ka-mob-gallery-img" />
-                <img src="/photo/kid-area-pic/gallery-4.png" alt="American Dream Kids Character" className="ka-mob-gallery-img" />
-              </div>
-
-              {/* 360 Virtual Dome Banner */}
-              <div className="ka-mob-dome-wrap" onClick={() => openModal && openModal('tickets')}>
-                <img src="/photo/kid-area-pic/dome-360.png" alt="360° Dome" className="ka-mob-dome-img" />
-              </div>
-
-              {/* Kids Area Weekend Packages */}
-              <section className="ka-mob-section">
-                <h2 className="ka-mob-section-title">
-                  Weekend Packages <span className="ka-mob-divider">|</span> باقات نهاية الأسبوع
-                </h2>
-                <div className="ka-mob-pkg-card">
-                  <div className="ka-mob-pkg-header">
-                    <div>
-                      <span className="ka-mob-badge-popular">POPULAR</span>
-                      <h3 className="ka-mob-pkg-name">Kids Area Package (1 Child)</h3>
-                      <p className="ka-mob-pkg-time">1 Child / 1 Hr • Age: 1-12 y</p>
-                    </div>
-                    <div className="ka-mob-pkg-price-box">
-                      <span className="ka-mob-pkg-price">EGP 150</span>
-                    </div>
-                  </div>
-                  <button 
-                    className="ka-mob-btn-offer"
-                    onClick={() => handleBookPackage('Kids Area (Weekend - 1 Child)', 150)}
-                  >
-                    <Ticket size={15} />
-                    <span>BOOK THIS PACKAGE</span>
-                  </button>
-                </div>
-
-                <div className="ka-mob-pkg-card" style={{ marginTop: '10px' }}>
-                  <div className="ka-mob-pkg-header">
-                    <div>
-                      <span className="ka-mob-badge-family">FAMILY PACK</span>
-                      <h3 className="ka-mob-pkg-name">Kids Area Package (Brothers)</h3>
-                      <p className="ka-mob-pkg-time">2 Children / 1 Hr • Age: 1-12 y</p>
-                    </div>
-                    <div className="ka-mob-pkg-price-box">
-                      <span className="ka-mob-pkg-price">EGP 250</span>
-                    </div>
-                  </div>
-                  <button 
-                    className="ka-mob-btn-offer"
-                    onClick={() => handleBookPackage('Kids Area (Weekend - 2 Children)', 250)}
-                  >
-                    <Ticket size={15} />
-                    <span>BOOK THIS PACKAGE</span>
-                  </button>
-                </div>
-              </section>
-
-              {/* Safety banner */}
-              <div className="ka-mob-safety-banner">
-                <div className="ka-mob-safety-icon-wrap">
-                  <ShieldCheck size={24} color="#0097a7" />
-                </div>
-                <div className="ka-mob-safety-text">
-                  <p className="ka-mob-safety-en">Supervised play area with trained safety facilitators.</p>
-                  <p className="ka-mob-safety-ar">منطقة لعب آمنة ومراقبة بإشراف متخصصين.</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ── CASE 3: OTHER ZONES (Fun Park & Adventure Zone) ── */}
-          {(mobileCategory === 'Fun Park' || mobileCategory === 'Adventure Zone') && (
-            <div className="ka-mob-zone-section">
-              <div className="ka-mob-empty-zone">
-                <img 
-                  src={mobileCategory === 'Fun Park' ? '/photo/kid-area-pic/Junior GP Speedway.png' : '/photo/kid-area-pic/Laser & Tactical Arena.png'} 
-                  alt={mobileCategory} 
-                  className="ka-mob-hero-img" 
-                />
-                <h3 className="ka-mob-section-title" style={{ marginTop: '16px' }}>{mobileCategory}</h3>
-                <p style={{ fontSize: '0.85rem', color: '#64748b' }}>Experience the ultimate rides and challenges!</p>
-                <button 
-                  className="ka-mob-btn-offer" 
-                  style={{ marginTop: '12px' }}
-                  onClick={() => openModal && openModal('tickets')}
-                >
-                  <Ticket size={15} />
-                  <span>View All Tickets & Passes</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-        </main>
-
-        {/* 3. Fixed Bottom Navigation Bar */}
-        <nav className="ka-mob-bottom-nav">
-          <button 
-            className={`ka-mob-nav-item ${mobileNavTab === 'home' ? 'active' : ''}`}
-            onClick={() => handleMobileNavClick('home')}
-          >
-            <Home size={20} className="ka-mob-nav-icon" />
-            <span className="ka-mob-nav-label">Home</span>
-            {mobileNavTab === 'home' && <span className="ka-mob-tab-indicator" />}
-          </button>
-
-          <button 
-            className={`ka-mob-nav-item ${mobileNavTab === 'offers' ? 'active' : ''}`}
-            onClick={() => handleMobileNavClick('offers')}
-          >
-            <Ticket size={20} className="ka-mob-nav-icon" />
-            <span className="ka-mob-nav-label">Offers</span>
-            {mobileNavTab === 'offers' && <span className="ka-mob-tab-indicator" />}
-          </button>
-
-          <button 
-            className={`ka-mob-nav-item ${mobileNavTab === 'guide' ? 'active' : ''}`}
-            onClick={() => handleMobileNavClick('guide')}
-          >
-            <MapPin size={20} className="ka-mob-nav-icon" />
-            <span className="ka-mob-nav-label">Park Guide</span>
-            {mobileNavTab === 'guide' && <span className="ka-mob-tab-indicator" />}
-          </button>
-
-          <button 
-            className={`ka-mob-nav-item ${mobileNavTab === 'gallery' ? 'active' : ''}`}
-            onClick={() => handleMobileNavClick('gallery')}
-          >
-            <ImageIcon size={20} className="ka-mob-nav-icon" />
-            <span className="ka-mob-nav-label">Gallery</span>
-            {mobileNavTab === 'gallery' && <span className="ka-mob-tab-indicator" />}
-          </button>
-
-          <button 
-            className={`ka-mob-nav-item ${mobileNavTab === 'more' ? 'active' : ''}`}
-            onClick={() => handleMobileNavClick('more')}
-          >
-            <MoreHorizontal size={20} className="ka-mob-nav-icon" />
-            <span className="ka-mob-nav-label">More</span>
-            {mobileNavTab === 'more' && <span className="ka-mob-tab-indicator" />}
-          </button>
-        </nav>
-
-      </div>
-
-      {/* ═════════════════════════════════════════════════════════════════════
-          B. DESKTOP VIEW (Preserved full desktop experience)
-      ═════════════════════════════════════════════════════════════════════ */}
-      <div className="ka-desktop-layout">
-        {/* 1. Main Navigation Bar */}
-        <header className="ka-header">
-          <div className="ka-header-inner">
-            <div className="ka-brand" onClick={() => setActiveTab('lobby')} title="Back to Lobby">
-              <img src="/photo/kid-area-pic/logo.png" alt="American Dream" className="ka-brand-logo" />
-            </div>
-
-            <nav className="ka-nav-links">
-              <button className="ka-nav-link" onClick={() => setActiveTab('lobby')}>Home</button>
-              <button className="ka-nav-link active">Play Zones</button>
-              <button className="ka-nav-link" onClick={() => setActiveTab('menu')}>Restruant & Cafe</button>
-              <button className="ka-nav-link" onClick={() => setActiveTab('events')}>Event & Halls</button>
-              <button className="ka-nav-link">Trips</button>
-            </nav>
-
-            <div className="ka-nav-actions">
-              <button className="ka-btn-book-us" onClick={() => openModal && openModal('tickets')}>
-                About us
+                <span>Get Offer</span>
               </button>
             </div>
           </div>
-        </header>
-
-        {/* 2. Secondary Category Sub-Nav */}
-        <div className="ka-subnav">
-          <div className="ka-subnav-inner">
-            {desktopCategories.map((cat) => {
-              const isActive = activeCategory === cat.name;
-              return (
-                <button
-                  key={cat.name}
-                  className={`ka-subnav-pill ${isActive ? 'active' : ''}`}
-                  onClick={() => handleCategoryClick(cat)}
-                >
-                  {cat.icon === 'home' && <Home size={14} className="ka-subnav-icon" />}
-                  {cat.icon === 'video' && <Video size={14} className="ka-subnav-icon" />}
-                  {cat.icon.startsWith('/') && (
-                    <img
-                      src={cat.icon}
-                      alt=""
-                      className={`ka-subnav-img-icon ${isActive ? 'invert-white' : ''}`}
-                    />
-                  )}
-                  <span>{cat.name}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 3. Main Hero & Gallery (Desktop) */}
-        <div className="ka-light-container">
-          <div className="ka-content-wrapper">
-            <div className="ka-hero-banner-wrapper">
-              <img
-                src="/photo/kid-area-pic/hero-banner.png"
-                alt="Kids Area - A world of fun, laughter, and endless smiles"
-                className="ka-hero-banner-img"
-              />
-            </div>
-
-            <div className="ka-gallery-grid">
-              <div className="ka-gallery-card">
-                <img src="/photo/kid-area-pic/gallery-1.png" alt="Toy puzzle birds" className="ka-gallery-img" />
-              </div>
-              <div className="ka-gallery-card">
-                <img src="/photo/kid-area-pic/gallery-2.png" alt="Wooden alphabet train" className="ka-gallery-img" />
-              </div>
-              <div className="ka-gallery-card">
-                <img src="/photo/kid-area-pic/gallery-3.png" alt="Sensory activity board" className="ka-gallery-img" />
-              </div>
-              <div className="ka-gallery-card">
-                <img src="/photo/kid-area-pic/gallery-4.png" alt="American Dream Kids Character" className="ka-gallery-img" />
-              </div>
-            </div>
-
-            <div className="ka-dome-banner-wrapper" onClick={() => openModal && openModal('tickets')}>
-              <img
-                src="/photo/kid-area-pic/dome-360.png"
-                alt="Explore 360° Dome"
-                className="ka-dome-banner-img"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 4. Desktop Offers Section */}
-        <section className="ka-offers-section">
-          <div className="ka-offers-wrapper">
-            {/* Week-end Offers */}
-            <div className="ka-offers-group">
-              <div className="ka-offers-header">
-                <div className="ka-offers-title-col">
-                  <span className="ka-offers-eyebrow">PERSONALISED PACKAGES FOR YOU</span>
-                  <h2 className="ka-offers-title">Select Your Offers</h2>
-                </div>
-                <div className="ka-offers-term-col">
-                  <h3 className="ka-offers-term">(Week-end)</h3>
-                </div>
-                <div className="ka-offers-subtitle-col">
-                  <p className="ka-offers-subtext">More games. More fun. More memories.</p>
-                </div>
-              </div>
-
-              <div className="ka-pricing-grid">
-                {/* Weekend Card 1 */}
-                <div className="ka-pricing-card">
-                  <div className="ka-card-thumb-wrap">
-                    <img src="/photo/kid-area-pic/offer-thumb.png" alt="Kids Area Package" className="ka-card-thumb" />
-                    <span className="ka-card-age-badge">1-12 y</span>
-                  </div>
-                  <div className="ka-card-body">
-                    <span className="ka-badge ka-badge--popular">POPULAR</span>
-                    <h4 className="ka-card-title">Kids Area Package</h4>
-                    <p className="ka-card-subtitle">1 Child / 1 Hr</p>
-                    <ul className="ka-checklist">
-                      <li>
-                        <img src="/photo/kid-area-pic/check-icon.png" alt="✓" className="ka-check-icon" />
-                        <span>All-Day Kids Area Admission</span>
-                      </li>
-                      <li>
-                        <img src="/photo/kid-area-pic/check-icon.png" alt="✓" className="ka-check-icon" />
-                        <span>1 Plaster Shape Coloring Activity</span>
-                      </li>
-                      <li>
-                        <img src="/photo/kid-area-pic/check-icon.png" alt="✓" className="ka-check-icon" />
-                        <span>1 Drawing & Coloring Sheet</span>
-                      </li>
-                      <li>
-                        <img src="/photo/kid-area-pic/check-icon.png" alt="✓" className="ka-check-icon" />
-                        <span>Party Included</span>
-                      </li>
-                    </ul>
-                    <div className="ka-price-box">
-                      <span className="ka-price-label">STANDARD RATE</span>
-                      <div className="ka-price-row">
-                        <span className="ka-price-val">EGP 150</span>
-                        <span className="ka-price-per">/ 1 person</span>
-                      </div>
-                    </div>
-                    <button
-                      className="ka-btn-book"
-                      onClick={() => handleBookPackage('Kids Area Package (Weekend - 1 Child)', 150)}
-                    >
-                      <span>BOOK THIS PACKAGE</span>
-                      <ArrowRight size={16} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Weekend Card 2 */}
-                <div className="ka-pricing-card">
-                  <div className="ka-card-thumb-wrap">
-                    <img src="/photo/kid-area-pic/offer-thumb.png" alt="Kids Area Package" className="ka-card-thumb" />
-                    <span className="ka-card-age-badge">1-12 y</span>
-                  </div>
-                  <div className="ka-card-body">
-                    <span className="ka-badge ka-badge--family">FAMILY PACK</span>
-                    <h4 className="ka-card-title">Kids Area Package</h4>
-                    <p className="ka-card-subtitle">Brothers / 2 Children</p>
-                    <ul className="ka-checklist">
-                      <li>
-                        <img src="/photo/kid-area-pic/check-icon.png" alt="✓" className="ka-check-icon" />
-                        <span>All-Day Kids Area Admission for 2 Children</span>
-                      </li>
-                      <li>
-                        <img src="/photo/kid-area-pic/check-icon.png" alt="✓" className="ka-check-icon" />
-                        <span>2 Plaster Shape Coloring Activities</span>
-                      </li>
-                      <li>
-                        <img src="/photo/kid-area-pic/check-icon.png" alt="✓" className="ka-check-icon" />
-                        <span>2 Drawing & Coloring Sheets</span>
-                      </li>
-                      <li>
-                        <img src="/photo/kid-area-pic/check-icon.png" alt="✓" className="ka-check-icon" />
-                        <span>Party Included</span>
-                      </li>
-                    </ul>
-                    <div className="ka-price-box">
-                      <span className="ka-price-label">STANDARD RATE</span>
-                      <div className="ka-price-row">
-                        <span className="ka-price-val">EGP 250</span>
-                        <span className="ka-price-per">/ 2 person</span>
-                      </div>
-                    </div>
-                    <button
-                      className="ka-btn-book"
-                      onClick={() => handleBookPackage('Kids Area Package (Weekend - 2 Children)', 250)}
-                    >
-                      <span>BOOK THIS PACKAGE</span>
-                      <ArrowRight size={16} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Mid-week Offers */}
-            <div className="ka-offers-group" style={{ marginTop: '3.5rem' }}>
-              <div className="ka-offers-header">
-                <div className="ka-offers-title-col">
-                  <span className="ka-offers-eyebrow">PERSONALISED PACKAGES FOR YOU</span>
-                  <h2 className="ka-offers-title">Select Your Offers</h2>
-                </div>
-                <div className="ka-offers-term-col">
-                  <h3 className="ka-offers-term">(Mid-week)</h3>
-                </div>
-                <div className="ka-offers-subtitle-col">
-                  <p className="ka-offers-subtext">More games. More fun. More memories.</p>
-                </div>
-              </div>
-
-              <div className="ka-pricing-grid">
-                {/* Midweek Card 1 */}
-                <div className="ka-pricing-card">
-                  <div className="ka-card-thumb-wrap">
-                    <img src="/photo/kid-area-pic/offer-thumb.png" alt="Kids Area Package" className="ka-card-thumb" />
-                    <span className="ka-card-age-badge">1-12 y</span>
-                  </div>
-                  <div className="ka-card-body">
-                    <span className="ka-badge ka-badge--popular">PROMOTIONAL</span>
-                    <h4 className="ka-card-title">Kids Area Package</h4>
-                    <p className="ka-card-subtitle">1 Child / 1 Hr</p>
-                    <ul className="ka-checklist">
-                      <li>
-                        <img src="/photo/kid-area-pic/check-icon.png" alt="✓" className="ka-check-icon" />
-                        <span>All-Day Kids Area Admission</span>
-                      </li>
-                      <li>
-                        <img src="/photo/kid-area-pic/check-icon.png" alt="✓" className="ka-check-icon" />
-                        <span>1 Plaster Shape Coloring Activity</span>
-                      </li>
-                    </ul>
-                    <div className="ka-price-box">
-                      <span className="ka-price-label">STANDARD RATE</span>
-                      <div className="ka-price-row">
-                        <span className="ka-price-val">EGP 100</span>
-                        <span className="ka-price-per">/ 1 person</span>
-                      </div>
-                    </div>
-                    <button
-                      className="ka-btn-book"
-                      onClick={() => handleBookPackage('Kids Area Package (Mid-week - 1 Child)', 100)}
-                    >
-                      <span>BOOK THIS PACKAGE</span>
-                      <ArrowRight size={16} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Midweek Card 2 */}
-                <div className="ka-pricing-card">
-                  <div className="ka-card-thumb-wrap">
-                    <img src="/photo/kid-area-pic/offer-thumb.png" alt="Kids Area Package" className="ka-card-thumb" />
-                    <span className="ka-card-age-badge">1-12 y</span>
-                  </div>
-                  <div className="ka-card-body">
-                    <span className="ka-badge ka-badge--family">FAMILY PACK</span>
-                    <h4 className="ka-card-title">Kids Area Package</h4>
-                    <p className="ka-card-subtitle">Brothers / 2 Children</p>
-                    <ul className="ka-checklist">
-                      <li>
-                        <img src="/photo/kid-area-pic/check-icon.png" alt="✓" className="ka-check-icon" />
-                        <span>All-Day Kids Area Admission for 2 Children</span>
-                      </li>
-                    </ul>
-                    <div className="ka-price-box">
-                      <span className="ka-price-label">STANDARD RATE</span>
-                      <div className="ka-price-row">
-                        <span className="ka-price-val">EGP 150</span>
-                        <span className="ka-price-per">/ 2 person</span>
-                      </div>
-                    </div>
-                    <button
-                      className="ka-btn-book"
-                      onClick={() => handleBookPackage('Kids Area Package (Mid-week - 2 Children)', 150)}
-                    >
-                      <span>BOOK THIS PACKAGE</span>
-                      <ArrowRight size={16} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 5. Desktop Footer */}
-        <footer className="ka-footer">
-          <div className="ka-footer-inner">
-            <div className="ka-footer-brand" onClick={() => setActiveTab('lobby')}>
-              <img src="/photo/kid-area-pic/logo.png" alt="American Dream" className="ka-footer-logo" />
-            </div>
-
-            <div className="ka-footer-links">
-              <button className="ka-footer-link">About Us</button>
-              <button className="ka-footer-link">Contact</button>
-              <button className="ka-footer-link">Safety Rules</button>
-              <button className="ka-footer-link">Privacy Policy</button>
-            </div>
-
-            <div className="ka-footer-copy">
-              © 2026 American Dream Ismailia. All rights reserved.
-            </div>
-          </div>
-        </footer>
+        ))}
       </div>
 
+      {/* Explore Kids Area Section */}
+      <div className="zone-section-header" style={{ marginTop: '2rem' }}>
+        <h3 className="section-title-plain">Explore Kids Area</h3>
+        <button 
+          className="see-all-link"
+          onClick={() => openModal('all-attractions', { zone: 'Kids Area', attractions })}
+        >
+          See All &gt;
+        </button>
+      </div>
+
+      {/* 3 Attraction Cards */}
+      <div className="explore-attractions-row">
+        {filteredAttractions.map((attr) => (
+          <div 
+            key={attr.id} 
+            className="explore-attraction-card"
+            onClick={() => openModal('attraction-detail', attr)}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="attr-media-wrapper">
+              <img 
+                src={attr.img} 
+                alt={attr.titleEn} 
+                className="attr-card-img"
+                onError={(e) => {
+                  e.currentTarget.src = attr.fallbackImg;
+                }}
+              />
+              <div className="attr-overlay-labels">
+                <div className="attr-en-name">{attr.titleEn}</div>
+                <div className="attr-ar-name">{attr.titleAr}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* EXPLORE 360° Button matching screenshot */}
+      <div className="explore-360-btn-wrap">
+        <button 
+          className="explore-360-btn"
+          onClick={() => openModal('virtual-tour')}
+        >
+          <img 
+            src="/photo/kid-area-pic/icon/explore-360.png" 
+            alt="360" 
+            className="icon-360-img"
+            onError={(e) => {
+              // fallback SVG if png fails
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+          <span className="explore-360-text">EXPLORE 360°</span>
+        </button>
+      </div>
+
+      {/* Spacer for bottom nav dock */}
+      <div className="bottom-nav-spacer" />
     </div>
   );
 }

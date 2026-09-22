@@ -29,3 +29,7 @@ dist-ssr/
 *.njsproj
 *.sln
 *.sw?
+
+# Temporary / Scratch files and archives
+scratch_*
+*.zip

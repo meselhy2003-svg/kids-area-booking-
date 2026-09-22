@@ -1,23 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import LobbyHero from './components/LobbyHero';
+import MobileHeader from './components/MobileHeader';
+import MobileBottomNav from './components/MobileBottomNav';
+import MobileHomePage from './components/MobileHomePage';
 import KidsAreaPage from './components/KidsAreaPage';
-import MenuSection from './components/MenuSection';
-import PlaySection from './components/PlaySection';
-import EventsSection from './components/EventsSection';
-import Footer from './components/Footer';
-import Modals from './components/Modals';
+import MobileFunParkPage from './components/MobileFunParkPage';
+import MobileChallengePage from './components/MobileChallengePage';
+import MobileAdventurePage from './components/MobileAdventurePage';
+import MobilePackagePage from './components/MobilePackagePage';
+import MobileModals from './components/MobileModals';
+import './components/MobilePlayZone.css';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('lobby');
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'kids-area' | 'fun-park' | 'challenge' | 'adventure' | 'package'
   const [lang, setLang] = useState('en');
   const [modal, setModal] = useState({ isOpen: false, type: null, data: null });
 
-  // Handle document title & RTL attribute when language changes
+  // Update HTML title & RTL
   useEffect(() => {
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = lang;
-    document.title = lang === 'ar' ? 'أمريكان دريم الإسماعيلية - مدينة ألعاب الأطفال' : 'American Dream Ismailia - Kids Area & Fun Park';
+    document.title = lang === 'ar' 
+      ? 'بلاي زون أمريكان دريم - منطقة الأطفال والمرح' 
+      : 'PLAY ZONE - American Dream Ismailia';
   }, [lang]);
+
+  // Global listener for attraction booking
+  useEffect(() => {
+    const handleAttrBooking = (e) => {
+      const item = e.detail;
+      openModal('booking', {
+        name: item?.titleEn || 'Attraction Pass',
+        price: '50 EGP',
+        priceNum: 50,
+        discount: 'Zone Entry',
+        details: item?.desc || 'General entry to attraction'
+      });
+    };
+    window.addEventListener('open-booking-for', handleAttrBooking);
+    return () => window.removeEventListener('open-booking-for', handleAttrBooking);
+  }, []);
 
   const openModal = (type, data = null) => {
     setModal({ isOpen: true, type, data });
@@ -28,62 +49,82 @@ export default function App() {
   };
 
   return (
-    <div className="app-container">
+    <div className="mobile-app-shell">
+      {/* Top Mobile Header */}
+      <MobileHeader 
+        setActiveTab={setActiveTab}
+        onOpenMenu={() => openModal('menu-drawer')}
+        onOpenProfile={() => openModal('profile')}
+        lang={lang}
+      />
 
-      {/* Main Content Area */}
+      {/* Main Page Views */}
       <main style={{ flex: 1 }}>
-        {activeTab === 'lobby' && (
-          <LobbyHero 
-            lang={lang} 
-            openModal={openModal} 
-            setActiveTab={setActiveTab} 
+        {(activeTab === 'home' || activeTab === 'lobby') && (
+          <MobileHomePage 
+            setActiveTab={setActiveTab}
+            openModal={openModal}
+            lang={lang}
           />
         )}
 
         {activeTab === 'kids-area' && (
           <KidsAreaPage 
-            lang={lang} 
-            openModal={openModal} 
-            setActiveTab={setActiveTab} 
+            setActiveTab={setActiveTab}
+            openModal={openModal}
+            lang={lang}
           />
         )}
 
-        {activeTab === 'menu' && (
-          <MenuSection 
-            lang={lang} 
+        {activeTab === 'fun-park' && (
+          <MobileFunParkPage 
+            setActiveTab={setActiveTab}
+            openModal={openModal}
+            lang={lang}
           />
         )}
 
-        {activeTab === 'play' && (
-          <PlaySection 
-            lang={lang} 
-            openModal={openModal} 
+        {activeTab === 'challenge' && (
+          <MobileChallengePage 
+            setActiveTab={setActiveTab}
+            openModal={openModal}
+            lang={lang}
           />
         )}
 
-        {activeTab === 'events' && (
-          <EventsSection 
-            lang={lang} 
-            openModal={openModal} 
+        {activeTab === 'adventure' && (
+          <MobileAdventurePage 
+            setActiveTab={setActiveTab}
+            openModal={openModal}
+            lang={lang}
+          />
+        )}
+
+        {activeTab === 'package' && (
+          <MobilePackagePage 
+            setActiveTab={setActiveTab}
+            openModal={openModal}
+            lang={lang}
           />
         )}
       </main>
 
-      {/* Footer matching reference screenshot (KidsAreaPage includes its own dedicated footer) */}
-      {activeTab !== 'kids-area' && (
-        <Footer 
-          lang={lang} 
-          openModal={openModal} 
-        />
-      )}
+      {/* Fixed Curved Dock Bottom Navigation */}
+      <MobileBottomNav 
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        openModal={openModal}
+      />
 
-      {/* Global Interactive Modals */}
+      {/* Global Interactive Modals & Drawers */}
       {modal.isOpen && (
-        <Modals 
-          modalType={modal.type} 
-          modalData={modal.data} 
-          closeModal={closeModal} 
-          lang={lang} 
+        <MobileModals 
+          modalType={modal.type}
+          modalData={modal.data}
+          closeModal={closeModal}
+          setActiveTab={setActiveTab}
+          lang={lang}
+          setLang={setLang}
         />
       )}
     </div>

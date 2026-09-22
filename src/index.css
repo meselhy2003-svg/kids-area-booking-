@@ -1,7 +1,7 @@
 :root {
   --font-main: 'Outfit', sans-serif;
   --font-kids: 'Fredoka', cursive, sans-serif;
-  --font-arabic: 'Tajawal', sans-serif;
+  --font-arabic: 'Alexandria', 'Tajawal', sans-serif;
   
   --primary-teal: #0c6177;
   --primary-teal-light: #1693b3;
@@ -869,50 +869,93 @@ body {
   .nav-item {
     font-size: 0.9rem;
   }
+  /* Full-bleed mobile container with zero black spaces */
   .hero-container {
     height: 100vh;
-    min-height: 520px;
-  }
-  .hero-image-wrapper {
-    height: 100%;
-    width: 100%;
-    aspect-ratio: auto;
-  }
-  .hero-main-img {
-    height: 100%;
+    height: 100dvh;
     width: 100%;
     min-height: unset;
+    max-height: unset;
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-image-wrapper {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    aspect-ratio: auto;
+    position: relative;
+    overflow: hidden;
+    box-shadow: none;
+  }
+  .hero-main-img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    object-position: center center;
+    object-position: center 25%;
+    display: block;
   }
-  .girl-overlay {
-    width: 28%;
-    left: 12%;
-    bottom: 2%;
-  }
-  .boy-overlay {
-    width: 28%;
-    right: 12%;
-    bottom: 2%;
-  }
+
+  /* Main Park Sign: Bigger, commanding the upper arch like reference photo */
   .main-park-sign {
-    top: -3%;
+    position: absolute;
+    top: 0%;
     left: 50%;
-    width: 72%;
+    transform: translateX(-50%);
+    width: 108%;
+    max-width: unset;
+    z-index: 35;
   }
+
+  /* Entry & Exit Signs: Moved down to hang on visible chains below the main sign */
   .sign-btn--entry {
-    top: 38%;
-    left: 16%;
-    width: 28%;
+    top: 31.5%;
+    left: 16.5%;
+    width: 32%;
+    margin-bottom: 0;
+    z-index: 20;
   }
   .sign-btn--exit {
-    top: 38%;
-    right: 16%;
-    width: 28%;
+    top: 31.5%;
+    right: 16.5%;
+    width: 32%;
+    margin-bottom: 0;
+    z-index: 20;
   }
+
+  /* Characters: Increased size, bold and prominent in the foreground */
+  .girl-overlay {
+    width: clamp(155px, 42vw, 215px);
+    left: 4%;
+    bottom: clamp(60px, 9vh, 100px);
+    margin-left: 0;
+    z-index: 40;
+  }
+  .boy-overlay {
+    width: clamp(155px, 42vw, 215px);
+    right: 4%;
+    bottom: clamp(60px, 9vh, 100px);
+    z-index: 40;
+  }
+  .speech-bubble--girl {
+    top: -55px;
+    left: 10%;
+    font-size: 0.76rem;
+    padding: 0.45rem 0.8rem;
+    max-width: 160px;
+  }
+  .speech-bubble--boy {
+    top: -55px;
+    right: 10%;
+    font-size: 0.76rem;
+    padding: 0.45rem 0.8rem;
+    max-width: 160px;
+  }
+
   .hotspot-reception-neon {
-    top: 58%;
-    font-size: clamp(1.4rem, 5vw, 2.5rem);
+    top: 50%;
+    font-size: clamp(1.3rem, 5vw, 2.2rem);
   }
   .hero-controls {
     width: 92%;
