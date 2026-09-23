@@ -4,61 +4,31 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang, se
   const [activeSlide, setActiveSlide] = useState(0);
   const [viewType, setViewType] = useState('packages'); // 'packages' | 'tickets'
 
-  // Individual ticket adventure attractions
+  // Individual ticket adventure attractions (matching media_1790198436258.png)
   const ticketGames = [
     {
-      id: 'bumper-cars',
-      title: 'Bumper Cars Arena',
-      priceText: 'EGP 40 / ride',
+      id: 'pubg',
+      title: 'PUBG',
+      priceText: 'EGP 40 / ticket',
       price: 40,
-      image: '/photo/kid-area-pic/Family bumper car arena.png',
-      fallback: '/photo/kid-area-pic/family-bumper-cars.png',
-      badge: 'POPULAR'
+      image: '/photo/kid-area-pic/Laser & Tactical Arena.png',
+      fallback: '/photo/kid-area-pic/photo-vr-friends.png'
     },
     {
-      id: 'sky-bridge',
-      title: 'Suspended Sky Bridge',
-      priceText: 'EGP 50 / session',
-      price: 50,
-      image: '/photo/kid-area-pic/Young girl balancing on high rope suspension bridge.png',
-      fallback: '/photo/kid-area-pic/girl-rope-bridge.png',
-      badge: null
-    },
-    {
-      id: 'climbing-apex',
-      title: 'Apex Climbing Wall',
-      priceText: 'EGP 40 / climb',
-      price: 40,
-      image: '/photo/kid-area-pic/High ropes suspended course.png',
-      fallback: '/photo/kid-area-pic/high-ropes-course.png',
-      badge: null
-    },
-    {
-      id: 'ninja-warrior',
-      title: 'Ninja Warrior Obstacle',
+      id: 'bamber-ball',
+      title: 'Bamber Ball',
       priceText: 'EGP 50 / 30 min',
       price: 50,
-      image: '/photo/kid-area-pic/photo-vr-friends.png',
-      fallback: '/photo/kid-area-pic/graphic-composition.png',
-      badge: null
+      image: '/photo/kid-area-pic/Air Hockey Table.png',
+      fallback: '/photo/kid-area-pic/Fast-Paced Air Hockey.png'
     },
     {
-      id: 'tactical-laser',
-      title: 'PUBG Tactical Laser Arena',
-      priceText: 'EGP 50 / round',
+      id: 'car-bamber',
+      title: 'Car Bamber',
+      priceText: 'EGP 50 / 30 min',
       price: 50,
-      image: '/photo/kid-area-pic/Laser & Tactical Arena.png',
-      fallback: '/photo/kid-area-pic/laser-tactical-arena.png',
-      badge: 'ACTION'
-    },
-    {
-      id: 'bubble-ball',
-      title: 'Bubble Ball Knockout',
-      priceText: 'EGP 40 / session',
-      price: 40,
-      image: '/photo/kid-area-pic/Junior GP Speedway.png',
-      fallback: '/photo/kid-area-pic/junior-gp-speedway.png',
-      badge: null
+      image: '/photo/kid-area-pic/Billiards Pool Table.png',
+      fallback: '/photo/kid-area-pic/Bumper Collision Bay.png'
     }
   ];
 
@@ -102,7 +72,7 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang, se
       price: `${price} EGP`,
       priceNum: price,
       discount: 'Direct Booking',
-      details: details || 'Full access adventure pass'
+      details: details || 'Full access adventure ticket'
     });
   };
 
@@ -151,7 +121,7 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang, se
               {viewType === 'packages' ? (
                 <>Adventure Zone Area Offers <span className="text-separator">|</span> <span className="font-alexandria">عروض منطقة المغامرات</span></>
               ) : (
-                <>Adventure Zone Area Tickets <span className="text-separator">|</span> <span className="font-alexandria">عروض منطقة تذاكر المغامرات</span></>
+                <>Adventure Zone Area Tickets <span className="text-separator">|</span> <span className="font-alexandria">تذاكر منطقة المغامرات</span></>
               )}
             </h2>
             <div className="desktop-offers-filters">
@@ -215,7 +185,7 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang, se
                   <div className="pass-card-header-row">
                     <div>
                       <h3 className="pass-card-main-title">Adventure Pass</h3>
-                      <span className="pass-card-subtitle-cyan">All Game Experience</span>
+                      <span className="pass-card-subtitle-cyan">All Game Experiance</span>
                     </div>
                     <span className="pass-card-save-badge">Save 60 EGP</span>
                   </div>
@@ -266,7 +236,7 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang, se
             </div>
           )}
 
-          {/* VIEW B: TICKETS VIEW */}
+          {/* VIEW B: TICKETS VIEW (Matching media_1790198436258.png with exactly PUBG, Bamber Ball, Car Bamber) */}
           {viewType === 'tickets' && (
             <div className="desktop-ticket-games-grid">
               {filteredGames.map((game) => (
@@ -278,9 +248,6 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang, se
                       className="ticket-game-img"
                       onError={(e) => { e.target.src = game.fallback; }}
                     />
-                    {game.badge && (
-                      <span className="ticket-game-badge">{game.badge}</span>
-                    )}
                   </div>
 
                   <div className="ticket-game-info-body">
