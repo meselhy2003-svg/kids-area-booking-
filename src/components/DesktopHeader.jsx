@@ -9,7 +9,7 @@ export default function DesktopHeader({
   isDesktopView,
   setIsDesktopView
 }) {
-  const isPlayZonesActive = ['home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'vibes'].includes(activeTab);
+  const isPlayZonesActive = ['kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'vibes'].includes(activeTab);
 
   return (
     <header className="desktop-navbar">
