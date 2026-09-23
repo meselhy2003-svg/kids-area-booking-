@@ -1,0 +1,1389 @@
+/* ==========================================================================
+   DESKTOP PLAY ZONE CSS SYSTEM
+   Pixel-perfect computer view matching Play Zones Landing, Kids Area & Fun Park
+   ========================================================================== */
+
+/* App Shell for Computer View */
+.desktop-app-shell {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f1f5f9;
+  color: #0f172a;
+  font-family: var(--font-main, 'Outfit', sans-serif);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.desktop-page-container,
+.desktop-section-container,
+.desktop-nav-container,
+.desktop-subnav-container,
+.desktop-footer-container {
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ==========================================================================
+   1. DESKTOP TOP NAVBAR
+   ========================================================================== */
+.desktop-navbar {
+  height: 72px;
+  background-color: #012b32;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+}
+
+.desktop-nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.desktop-nav-brand {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.desktop-nav-logo-img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
+.desktop-nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.desktop-nav-link {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 0;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.desktop-nav-link:hover {
+  color: #ffd15c;
+}
+
+.desktop-nav-link.active {
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+.desktop-nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #f59e0b;
+  border-radius: 2px;
+}
+
+.desktop-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.desktop-lang-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.desktop-lang-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: #ffd15c;
+}
+
+.desktop-profile-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid #00a9c3;
+  color: #00b4d8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.desktop-profile-btn:hover {
+  background: #00a9c3;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.desktop-profile-svg {
+  width: 20px;
+  height: 20px;
+}
+
+.desktop-about-btn {
+  background: #00a9c3;
+  border: none;
+  color: #ffffff;
+  padding: 8px 20px;
+  border-radius: 24px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 10px rgba(0, 169, 195, 0.3);
+}
+
+.desktop-about-btn:hover {
+  background: #0093aa;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(0, 169, 195, 0.4);
+}
+
+/* ==========================================================================
+   2. DESKTOP SUBNAV & SEARCH STRIP
+   ========================================================================== */
+.desktop-subnav-section {
+  background-color: transparent;
+  padding: 24px 0 16px;
+}
+
+.desktop-subnav-pills {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.desktop-subnav-pill {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 30px;
+  padding: 9px 20px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.subnav-pill-icon {
+  width: 17px;
+  height: 17px;
+}
+
+.desktop-subnav-pill:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.desktop-subnav-pill.active {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+}
+
+.desktop-subnav-pill.active .subnav-pill-icon {
+  stroke: #ffffff;
+}
+
+.desktop-search-bar-wrap {
+  width: 100%;
+  height: 48px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.desktop-search-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.desktop-search-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 0.9rem;
+  color: #0f172a;
+  background: transparent;
+}
+
+.desktop-search-input::placeholder {
+  color: #94a3b8;
+}
+
+.desktop-search-clear {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* ==========================================================================
+   3. DESKTOP HERO ON PLAY ZONES LANDING (IMAGE 1)
+   ========================================================================== */
+.desktop-hero-section {
+  position: relative;
+  min-height: 540px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  margin-bottom: 48px;
+}
+
+.desktop-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.desktop-hero-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.desktop-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg, 
+    rgba(1, 43, 50, 0.65) 0%, 
+    rgba(1, 43, 50, 0.82) 65%,
+    rgba(1, 43, 50, 0.94) 100%
+  );
+}
+
+.desktop-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 60px 24px 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-hero-title {
+  font-size: 3.8rem;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  margin-bottom: 12px;
+}
+
+.highlight-cyan {
+  color: #00b4d8;
+}
+
+.highlight-amber {
+  color: #f59e0b;
+}
+
+.desktop-hero-subtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 400;
+  margin-bottom: 32px;
+}
+
+.desktop-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 48px;
+}
+
+.desktop-hero-btn {
+  padding: 13px 28px;
+  border-radius: 30px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  letter-spacing: 0.4px;
+}
+
+.desktop-hero-btn.primary {
+  background: #012b32;
+  border: 2px solid #00b4d8;
+  color: #00b4d8;
+  box-shadow: 0 4px 15px rgba(0, 180, 216, 0.25);
+}
+
+.desktop-hero-btn.primary:hover {
+  background: #00b4d8;
+  color: #012b32;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 180, 216, 0.4);
+}
+
+.desktop-hero-btn.secondary {
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.desktop-hero-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.desktop-btn-arrow {
+  width: 18px;
+  height: 18px;
+}
+
+.desktop-btn-play-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Frosted Glass Stat Badges */
+.desktop-hero-stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.desktop-stat-badge {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.desktop-stat-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.desktop-stat-icon-wrap svg {
+  width: 22px;
+  height: 22px;
+}
+
+.desktop-stat-icon-wrap.wrap-teal {
+  background: rgba(0, 180, 216, 0.15);
+}
+
+.desktop-stat-icon-wrap.wrap-amber {
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.desktop-stat-icon-wrap.wrap-cyan {
+  background: rgba(0, 169, 195, 0.15);
+}
+
+.desktop-stat-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-stat-text strong {
+  color: #ffffff;
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.desktop-stat-text span {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.78rem;
+}
+
+/* ==========================================================================
+   4. CHOOSE YOUR EXPERIENCE SECTION (2x2 GRID)
+   ========================================================================== */
+.desktop-section {
+  padding: 40px 0;
+}
+
+.desktop-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  gap: 20px;
+}
+
+.desktop-section-tag {
+  color: #ea580c;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.desktop-section-title {
+  color: #012b32;
+  font-size: 2.3rem;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.4px;
+}
+
+.desktop-section-subtitle {
+  color: #64748b;
+  font-size: 0.98rem;
+  margin-top: 6px;
+}
+
+.desktop-safety-pill {
+  background: #e0f2fe;
+  color: #0284c7;
+  padding: 9px 18px;
+  border-radius: 30px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.desktop-safety-icon {
+  width: 17px;
+  height: 17px;
+}
+
+.desktop-zones-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+}
+
+.desktop-zone-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-zone-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.09);
+  border-color: #cbd5e1;
+}
+
+.desktop-zone-img-wrap {
+  position: relative;
+  height: 230px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.desktop-zone-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.desktop-zone-card:hover .desktop-zone-img {
+  transform: scale(1.04);
+}
+
+.desktop-zone-tag-left {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(1, 43, 50, 0.85);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+}
+
+.desktop-zone-age-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(6px);
+  color: #0f172a;
+  padding: 5px 14px;
+  border-radius: 14px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.desktop-zone-body {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.desktop-zone-name {
+  color: #012b32;
+  font-size: 1.45rem;
+  font-weight: 900;
+  margin-bottom: 4px;
+  letter-spacing: -0.2px;
+}
+
+.desktop-zone-quote {
+  color: #00a9c3;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.desktop-zone-desc {
+  color: #475569;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.desktop-zone-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 16px;
+}
+
+.desktop-zone-time {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #64748b;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.desktop-clock-icon {
+  width: 15px;
+  height: 15px;
+  stroke: #f59e0b;
+}
+
+.desktop-zone-btn {
+  background: #f59e0b;
+  border: none;
+  color: #ffffff;
+  padding: 9px 18px;
+  border-radius: 24px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
+}
+
+.desktop-zone-btn:hover {
+  background: #d97706;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(245, 158, 11, 0.4);
+}
+
+.desktop-zone-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ==========================================================================
+   5. ONE PLACE. FOUR WAYS TO HAVE FUN (MOSAIC)
+   ========================================================================== */
+.desktop-center-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.desktop-mosaic-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr 1fr;
+  gap: 18px;
+  height: 380px;
+}
+
+.mosaic-card {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.mosaic-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.mosaic-card:hover img {
+  transform: scale(1.05);
+}
+
+.mosaic-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(1, 43, 50, 0.88) 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+}
+
+.mosaic-overlay h3 {
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.mosaic-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  height: 100%;
+}
+
+.right-card-top,
+.right-card-bottom {
+  flex: 1;
+}
+
+/* ==========================================================================
+   6. PLAY ZONE VIBES (9-PHOTO GALLERY)
+   ========================================================================== */
+.desktop-section-header-simple {
+  margin-bottom: 28px;
+}
+
+.desktop-vibes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.desktop-vibe-item {
+  height: 240px;
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.desktop-vibe-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.desktop-vibe-item:hover img {
+  transform: scale(1.06);
+}
+
+.desktop-vibe-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(1, 43, 50, 0.6);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  padding: 16px;
+  text-align: center;
+}
+
+.desktop-vibe-item:hover .desktop-vibe-hover-overlay {
+  opacity: 1;
+}
+
+.desktop-vibe-hover-overlay span {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+}
+
+/* ==========================================================================
+   7. READY TO PLAY? CTA BANNER
+   ========================================================================== */
+.desktop-cta-section {
+  padding: 40px 0 60px;
+}
+
+.desktop-cta-banner {
+  background: #012b32;
+  border-radius: 28px;
+  padding: 56px 40px;
+  text-align: center;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(1, 43, 50, 0.25);
+}
+
+.desktop-cta-badge {
+  background: #f59e0b;
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: inline-block;
+  margin-bottom: 14px;
+}
+
+.desktop-cta-title {
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin-bottom: 12px;
+}
+
+.desktop-cta-desc {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 600px;
+  margin: 0 auto 32px;
+}
+
+.desktop-cta-btn {
+  background: #f59e0b;
+  border: none;
+  color: #ffffff;
+  padding: 14px 34px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4);
+  transition: all 0.2s ease;
+  margin-bottom: 36px;
+}
+
+.desktop-cta-btn:hover {
+  background: #d97706;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(245, 158, 11, 0.5);
+}
+
+.desktop-ticket-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.desktop-cta-features {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  flex-wrap: wrap;
+}
+
+.desktop-cta-feat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.desktop-cta-feat svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* ==========================================================================
+   8. DEDICATED ZONE PAGES (KIDS AREA & FUN PARK)
+   ========================================================================== */
+.desktop-zone-page {
+  padding-bottom: 60px;
+}
+
+/* Zone Hero Banner */
+.desktop-zone-hero-banner {
+  min-height: 380px;
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 48px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  margin-bottom: 40px;
+}
+
+.kids-hero-banner {
+  background: url('/photo/kid-area-pic/kids-banner.png') center/cover no-repeat;
+}
+
+.funpark-hero-banner {
+  background: url('/photo/kid-area-pic/funpark-banner.png') center/cover no-repeat;
+}
+
+.challenge-hero-banner {
+  background: url('/photo/kid-area-pic/banner-challenge-zone.png') center/cover no-repeat;
+}
+
+.adventure-hero-banner {
+  background: url('/photo/kid-area-pic/running-banners/banner-adventure.png') center/cover no-repeat;
+}
+
+.package-hero-banner {
+  background: linear-gradient(135deg, #012b32 0%, #0c6177 100%);
+}
+
+.desktop-zone-hero-left {
+  max-width: 600px;
+  z-index: 2;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+
+.desktop-zone-hero-title {
+  font-size: 3.6rem;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.1;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+
+.desktop-zone-hero-tagline {
+  font-size: 1.25rem;
+  color: #ffffff;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.desktop-zone-hero-title-ar {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.desktop-zone-hero-tagline-ar {
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.desktop-zone-hero-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.desktop-hero-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.desktop-hero-dot.active {
+  background: #ffffff;
+  transform: scale(1.3);
+}
+
+/* Tilted Sticker Badge */
+.desktop-tilted-badge {
+  background: #f59e0b;
+  border-radius: 20px;
+  padding: 24px 28px;
+  transform: rotate(-10deg);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  z-index: 2;
+  animation: gentleBadgeFloat 3s ease-in-out infinite alternate;
+}
+
+@keyframes gentleBadgeFloat {
+  0% { transform: rotate(-10deg) translateY(0); }
+  100% { transform: rotate(-8deg) translateY(-6px); }
+}
+
+.desktop-tilted-badge span {
+  color: #ffffff;
+  font-size: 1.4rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: 0.6px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* Offers Section */
+.desktop-zone-section {
+  margin-bottom: 48px;
+}
+
+.desktop-section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.desktop-offers-heading {
+  color: #012b32;
+  font-size: 1.55rem;
+  font-weight: 900;
+}
+
+.text-separator {
+  color: #94a3b8;
+  margin: 0 8px;
+}
+
+.desktop-offers-filters {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.desktop-age-badge.dark-badge {
+  background: #012b32;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.desktop-see-all-link {
+  background: none;
+  border: none;
+  color: #00a9c3;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.desktop-see-all-link:hover {
+  color: #00889c;
+  text-decoration: underline;
+}
+
+/* 4 OFFERS GRID (FOR KIDS AREA) */
+.desktop-offers-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* 6 OFFERS GRID (3x2 FOR FUN PARK) */
+.desktop-offers-grid-3x2 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.desktop-offers-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.desktop-offer-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s ease;
+}
+
+.desktop-offer-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+.desktop-offer-img-box {
+  position: relative;
+  height: 160px;
+  width: 100%;
+}
+
+.desktop-offer-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.desktop-offer-save-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.desktop-offer-save-tag.badge-cyan {
+  background: #00b4d8;
+}
+
+.desktop-offer-save-tag.badge-blue {
+  background: #0284c7;
+}
+
+.desktop-offer-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.desktop-offer-title {
+  color: #0f172a;
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.desktop-offer-title-ar {
+  color: #64748b;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.desktop-offer-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+.desktop-spec-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #475569;
+}
+
+.desktop-spec-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.desktop-offer-extra-perk {
+  color: #0284c7;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.desktop-offer-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 12px;
+  gap: 8px;
+}
+
+.desktop-price-val {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.desktop-curr {
+  color: #012b32;
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.desktop-old-price {
+  color: #94a3b8;
+  font-size: 0.78rem;
+  text-decoration: line-through;
+}
+
+.desktop-get-offer-btn {
+  background: #f59e0b;
+  border: none;
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.desktop-get-offer-btn:hover {
+  background: #d97706;
+  transform: translateY(-1px);
+}
+
+.btn-ticket-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Explore Grid (3 Cards) */
+.desktop-explore-heading {
+  color: #012b32;
+  font-size: 1.45rem;
+  font-weight: 900;
+}
+
+.desktop-explore-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.desktop-explore-card {
+  height: 220px;
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.desktop-explore-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.desktop-explore-card:hover .desktop-explore-img {
+  transform: scale(1.05);
+}
+
+.desktop-explore-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(1, 43, 50, 0.88) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 18px;
+}
+
+.desktop-explore-title {
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.desktop-explore-title-ar {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+/* 360 Center Pill Button */
+.desktop-360-btn-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0 10px;
+}
+
+.desktop-360-pill-btn {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 30px;
+  padding: 12px 28px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #012b32;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.desktop-360-pill-btn:hover {
+  border-color: #f59e0b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.2);
+}
+
+.desktop-360-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Package Card Features */
+.desktop-package-features-list {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.desktop-package-features-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.feat-check-icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   9. DESKTOP FOOTER
+   ========================================================================== */
+.desktop-footer {
+  background-color: #012b32;
+  padding: 36px 0;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.desktop-footer-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.desktop-footer-logo-img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
+.desktop-footer-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.desktop-footer-link {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.86rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.desktop-footer-link:hover {
+  color: #ffd15c;
+}
+
+.desktop-footer-copy {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.82rem;
+}
