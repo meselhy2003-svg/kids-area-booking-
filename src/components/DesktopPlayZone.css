@@ -265,11 +265,13 @@
    ========================================================================== */
 .desktop-hero-section {
   position: relative;
-  min-height: 540px;
+  min-height: calc(100vh - 72px);
+  height: calc(100vh - 72px);
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
   overflow: hidden;
-  margin-bottom: 48px;
+  margin-bottom: 40px;
 }
 
 .desktop-hero-bg {
@@ -290,9 +292,10 @@
   inset: 0;
   background: linear-gradient(
     180deg, 
-    rgba(1, 43, 50, 0.65) 0%, 
-    rgba(1, 43, 50, 0.82) 65%,
-    rgba(1, 43, 50, 0.94) 100%
+    rgba(1, 43, 50, 0.45) 0%, 
+    rgba(1, 43, 50, 0.68) 45%,
+    rgba(241, 245, 249, 0.8) 85%,
+    #f1f5f9 100%
   );
 }
 
@@ -302,31 +305,36 @@
   max-width: 1240px;
   width: 100%;
   margin: 0 auto;
-  padding: 60px 24px 40px;
+  padding: 56px 24px 40px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
 }
 
 .desktop-hero-title {
-  font-size: 3.8rem;
+  font-size: 4.4rem;
   font-weight: 900;
-  color: #ffffff;
-  line-height: 1.1;
+  line-height: 1.06;
   letter-spacing: -0.5px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
-.highlight-cyan {
+.desktop-hero-title .title-white {
+  color: #ffffff;
+}
+
+.desktop-hero-title .hl-cyan {
   color: #00b4d8;
 }
 
-.highlight-amber {
+.desktop-hero-title .hl-gold {
   color: #f59e0b;
 }
 
 .desktop-hero-subtitle {
   font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 400;
   margin-bottom: 32px;
 }
@@ -335,7 +343,7 @@
   display: flex;
   align-items: center;
   gap: 18px;
-  margin-bottom: 48px;
+  margin-bottom: 40px;
 }
 
 .desktop-hero-btn {
@@ -353,27 +361,29 @@
 
 .desktop-hero-btn.primary {
   background: #012b32;
-  border: 2px solid #00b4d8;
-  color: #00b4d8;
-  box-shadow: 0 4px 15px rgba(0, 180, 216, 0.25);
+  border: 2px solid #012b32;
+  color: #ffffff;
 }
 
-.desktop-hero-btn.primary:hover {
-  background: #00b4d8;
-  color: #012b32;
+.desktop-hero-btn.primary.hero-glow-btn {
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.75), 0 0 10px rgba(245, 158, 11, 0.45);
+}
+
+.desktop-hero-btn.primary.hero-glow-btn:hover {
+  background: #023d47;
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.9), 0 0 15px rgba(245, 158, 11, 0.6);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 180, 216, 0.4);
 }
 
 .desktop-hero-btn.secondary {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.22);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   color: #ffffff;
 }
 
 .desktop-hero-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.32);
   transform: translateY(-2px);
 }
 
@@ -383,8 +393,8 @@
 }
 
 .desktop-btn-play-icon {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
 }
 
 /* Frosted Glass Stat Badges */
@@ -392,19 +402,67 @@
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
+  margin-top: auto;
 }
 
 .desktop-stat-badge {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 18px;
-  padding: 12px 20px;
+  padding: 14px 22px;
   display: flex;
   align-items: center;
-  gap: 14px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  gap: 16px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  flex: 1;
+  min-width: 250px;
+}
+
+.desktop-stat-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.desktop-stat-icon-wrap svg {
+  width: 22px;
+  height: 22px;
+}
+
+.desktop-stat-icon-wrap.wrap-teal-dark {
+  background: #012b32;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.desktop-stat-icon-wrap.wrap-amber-solid {
+  background: #f59e0b;
+}
+
+.desktop-stat-icon-wrap.wrap-white-solid {
+  background: #ffffff;
+}
+
+.desktop-stat-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-stat-text strong {
+  color: #0f172a;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.desktop-stat-text span {
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .desktop-stat-icon-wrap {
