@@ -1387,3 +1387,361 @@
   color: rgba(255, 255, 255, 0.55);
   font-size: 0.82rem;
 }
+
+/* ==========================================================================
+   10. ZONE VIEW TOGGLE (PACKAGES VS TICKETS)
+   ========================================================================== */
+.desktop-zone-view-toggle-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0 32px;
+}
+
+.desktop-zone-view-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 36px;
+  padding: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  gap: 6px;
+}
+
+.toggle-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 28px;
+  border-radius: 30px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #012b32;
+  transition: all 0.2s ease;
+}
+
+.toggle-tab-btn:hover {
+  background: #f8fafc;
+}
+
+.toggle-tab-btn.active {
+  background: #f59e0b;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+}
+
+.toggle-tab-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.toggle-tab-labels {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.toggle-tab-labels .tab-en {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.toggle-tab-labels .tab-ar {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   11. HORIZONTAL PASS CARD (CHALLENGE PASS & ADVENTURE PASS)
+   ========================================================================== */
+.desktop-horizontal-pass-container {
+  margin-bottom: 32px;
+}
+
+.desktop-horizontal-pass-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 24px;
+  display: flex;
+  gap: 36px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  min-height: 260px;
+  align-items: stretch;
+  transition: all 0.25s ease;
+}
+
+.desktop-horizontal-pass-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+.pass-card-left-img-wrap {
+  position: relative;
+  width: 440px;
+  min-width: 380px;
+  border-radius: 18px;
+  overflow: hidden;
+  height: 240px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.pass-card-composite-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pass-card-ribbon-badge {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  color: #012b32;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  padding: 6px 20px;
+  border-radius: 20px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  user-select: none;
+}
+
+.pass-card-right-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.pass-card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.pass-card-main-title {
+  color: #012b32;
+  font-size: 1.85rem;
+  font-weight: 900;
+  margin-bottom: 2px;
+  letter-spacing: -0.3px;
+}
+
+.pass-card-subtitle-cyan {
+  color: #00a9c3;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.pass-card-save-badge {
+  background: #00a9c3;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 14px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.pass-card-perks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 24px;
+  margin: 16px 0;
+}
+
+.pass-card-perk-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.pass-perk-icon {
+  width: 20px;
+  height: 20px;
+  stroke: #00a9c3;
+  flex-shrink: 0;
+}
+
+.pass-card-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.pass-check-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pass-check-svg {
+  width: 18px;
+  height: 18px;
+  stroke: #00a9c3;
+  flex-shrink: 0;
+}
+
+.pass-check-bold {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: 0.3px;
+}
+
+.pass-card-price-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 16px;
+  margin-top: auto;
+}
+
+.pass-price-group {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.pass-current-price {
+  color: #012b32;
+  font-size: 1.85rem;
+  font-weight: 900;
+}
+
+.pass-old-price {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  text-decoration: line-through;
+}
+
+.pass-get-offer-btn {
+  background: #f59e0b;
+  border: none;
+  color: #ffffff;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+}
+
+.pass-get-offer-btn:hover {
+  background: #d97706;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.45);
+}
+
+/* ==========================================================================
+   12. TICKETS VIEW GAMES GRID (MATCHING MEDIA_1790196521011.PNG)
+   ========================================================================== */
+.desktop-ticket-games-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-bottom: 32px;
+}
+
+.desktop-ticket-game-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.22s ease;
+}
+
+.desktop-ticket-game-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+.ticket-game-img-box {
+  position: relative;
+  height: 180px;
+  width: 100%;
+}
+
+.ticket-game-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ticket-game-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #0284c7;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 3px 9px;
+  border-radius: 6px;
+  letter-spacing: 0.4px;
+}
+
+.ticket-game-info-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ticket-game-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.ticket-game-price-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.ticket-game-play-btn {
+  background: #f59e0b;
+  border: none;
+  color: #ffffff;
+  padding: 9px 18px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  margin-top: 6px;
+}
+
+.ticket-game-play-btn:hover {
+  background: #d97706;
+  transform: translateY(-1px);
+}
+
+.play-btn-ticket-icon {
+  width: 14px;
+  height: 14px;
+}
+
