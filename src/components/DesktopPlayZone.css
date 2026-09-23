@@ -290,13 +290,9 @@
 .desktop-hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg, 
-    rgba(1, 43, 50, 0.45) 0%, 
-    rgba(1, 43, 50, 0.68) 45%,
-    rgba(241, 245, 249, 0.8) 85%,
-    #f1f5f9 100%
-  );
+  background: 
+    linear-gradient(90deg, rgba(1, 43, 50, 0.82) 0%, rgba(1, 43, 50, 0.52) 42%, rgba(1, 43, 50, 0.18) 100%),
+    linear-gradient(180deg, rgba(1, 43, 50, 0.3) 0%, rgba(1, 43, 50, 0.35) 45%, rgba(241, 245, 249, 0.85) 85%, #f1f5f9 100%);
 }
 
 .desktop-hero-content {
