@@ -24,10 +24,10 @@ export default function DesktopHomePage({ setActiveTab, openModal, lang }) {
       <section className="desktop-hero-section">
         <div className="desktop-hero-bg">
           <img 
-            src="/photo/kid-area-pic/hero-banner.png" 
+            src="/photo/kid-area-pic/Cinematic Full-Width Backdrop.png" 
             alt="Play Zone Wide View" 
             className="desktop-hero-bg-img"
-            onError={(e) => { e.target.src = '/photo/kid-area-pic/Background+Shadow.png'; }}
+            onError={(e) => { e.target.src = '/photo/kid-area-pic/cinematic-backdrop.png'; }}
           />
           <div className="desktop-hero-overlay" />
         </div>
@@ -90,16 +90,16 @@ export default function DesktopHomePage({ setActiveTab, openModal, lang }) {
             </button>
           </div>
 
-          {/* Frosted Glass Stat Badges (Exact text and styling from screenshot) */}
+          {/* Frosted Glass Stat Badges (Exact text and icons from photo/kid area pic/icon) */}
           <div className="desktop-hero-stats">
             <div className="desktop-stat-badge">
               <div className="desktop-stat-icon-wrap wrap-teal-dark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="4" y="4" width="6" height="16" rx="3" />
-                  <rect x="14" y="4" width="6" height="16" rx="3" />
-                  <circle cx="7" cy="10" r="1" fill="#ffffff" />
-                  <circle cx="17" cy="14" r="1" fill="#ffffff" />
-                </svg>
+                <img 
+                  src="/photo/kid-area-pic/icon/Icon11.png" 
+                  alt="4 Zones Icon" 
+                  className="desktop-stat-img"
+                  onError={(e) => { e.target.src = '/photo/kid-area-pic/icon/stat-zones.png'; }}
+                />
               </div>
               <div className="desktop-stat-text">
                 <strong>4 Distinct Zones</strong>
@@ -109,11 +109,12 @@ export default function DesktopHomePage({ setActiveTab, openModal, lang }) {
 
             <div className="desktop-stat-badge">
               <div className="desktop-stat-icon-wrap wrap-amber-solid">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
-                  <circle cx="7" cy="17" r="2" />
-                  <circle cx="17" cy="17" r="2" />
-                </svg>
+                <img 
+                  src="/photo/kid-area-pic/icon/Icon (8).png" 
+                  alt="50+ Games Icon" 
+                  className="desktop-stat-img"
+                  onError={(e) => { e.target.src = '/photo/kid-area-pic/icon/stat-games.png'; }}
+                />
               </div>
               <div className="desktop-stat-text">
                 <strong>50+ Games</strong>
@@ -123,12 +124,12 @@ export default function DesktopHomePage({ setActiveTab, openModal, lang }) {
 
             <div className="desktop-stat-badge">
               <div className="desktop-stat-icon-wrap wrap-white-solid">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#012b32" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
+                <img 
+                  src="/photo/kid-area-pic/icon/Icon (11)12.png" 
+                  alt="Family Fun Icon" 
+                  className="desktop-stat-img"
+                  onError={(e) => { e.target.src = '/photo/kid-area-pic/icon/stat-family.png'; }}
+                />
               </div>
               <div className="desktop-stat-text">
                 <strong>Family Fun</strong>
