@@ -431,6 +431,14 @@
   height: 22px;
 }
 
+.desktop-stat-icon-wrap img,
+.desktop-stat-icon-wrap .desktop-stat-img {
+  max-width: 24px;
+  max-height: 24px;
+  object-fit: contain;
+  display: block;
+}
+
 .desktop-stat-icon-wrap.wrap-teal-dark {
   background: #012b32;
   border: 1px solid rgba(255, 255, 255, 0.15);
