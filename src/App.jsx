@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+
+// Mobile Components
 import MobileHeader from './components/MobileHeader';
 import MobileBottomNav from './components/MobileBottomNav';
 import MobileHomePage from './components/MobileHomePage';
@@ -7,13 +9,44 @@ import MobileFunParkPage from './components/MobileFunParkPage';
 import MobileChallengePage from './components/MobileChallengePage';
 import MobileAdventurePage from './components/MobileAdventurePage';
 import MobilePackagePage from './components/MobilePackagePage';
+
+// Desktop Components
+import DesktopHeader from './components/DesktopHeader';
+import DesktopSubNav from './components/DesktopSubNav';
+import DesktopHomePage from './components/DesktopHomePage';
+import DesktopKidsAreaPage from './components/DesktopKidsAreaPage';
+import DesktopFunParkPage from './components/DesktopFunParkPage';
+import DesktopChallengePage from './components/DesktopChallengePage';
+import DesktopAdventurePage from './components/DesktopAdventurePage';
+import DesktopPackagePage from './components/DesktopPackagePage';
+import DesktopFooter from './components/DesktopFooter';
+
+// Shared Modals & Styles
 import MobileModals from './components/MobileModals';
 import './components/MobilePlayZone.css';
+import './components/DesktopPlayZone.css';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home'); // 'home' | 'kids-area' | 'fun-park' | 'challenge' | 'adventure' | 'package'
   const [lang, setLang] = useState('en');
   const [modal, setModal] = useState({ isOpen: false, type: null, data: null });
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Responsive desktop vs mobile detection
+  const [isDesktop, setIsDesktop] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth > 768;
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth > 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Update HTML title & RTL
   useEffect(() => {
@@ -48,6 +81,111 @@ export default function App() {
     setModal({ isOpen: false, type: null, data: null });
   };
 
+  // =========================================================================
+  // COMPUTER (DESKTOP) VIEW
+  // =========================================================================
+  if (isDesktop) {
+    const isSubnavVisible = activeTab !== 'home';
+
+    return (
+      <div className="desktop-app-shell">
+        {/* Top Navbar */}
+        <DesktopHeader 
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          openModal={openModal}
+          lang={lang}
+          setLang={setLang}
+          isDesktopView={isDesktop}
+          setIsDesktopView={setIsDesktop}
+        />
+
+        {/* Subnav & Search (for zone pages) */}
+        {isSubnavVisible && (
+          <DesktopSubNav 
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
+        )}
+
+        {/* Main Desktop Page Body */}
+        <main style={{ flex: 1 }}>
+          {activeTab === 'home' && (
+            <DesktopHomePage 
+              setActiveTab={setActiveTab}
+              openModal={openModal}
+              lang={lang}
+            />
+          )}
+
+          {activeTab === 'kids-area' && (
+            <DesktopKidsAreaPage 
+              setActiveTab={setActiveTab}
+              openModal={openModal}
+              lang={lang}
+              searchQuery={searchQuery}
+            />
+          )}
+
+          {activeTab === 'fun-park' && (
+            <DesktopFunParkPage 
+              setActiveTab={setActiveTab}
+              openModal={openModal}
+              lang={lang}
+              searchQuery={searchQuery}
+            />
+          )}
+
+          {activeTab === 'challenge' && (
+            <DesktopChallengePage 
+              setActiveTab={setActiveTab}
+              openModal={openModal}
+              lang={lang}
+              searchQuery={searchQuery}
+            />
+          )}
+
+          {activeTab === 'adventure' && (
+            <DesktopAdventurePage 
+              setActiveTab={setActiveTab}
+              openModal={openModal}
+              lang={lang}
+              searchQuery={searchQuery}
+            />
+          )}
+
+          {activeTab === 'package' && (
+            <DesktopPackagePage 
+              setActiveTab={setActiveTab}
+              openModal={openModal}
+              lang={lang}
+            />
+          )}
+        </main>
+
+        {/* Desktop Footer */}
+        <DesktopFooter openModal={openModal} />
+
+        {/* Global Interactive Modals (Work identically on Desktop) */}
+        {modal.isOpen && (
+          <MobileModals 
+            modalType={modal.type}
+            modalData={modal.data}
+            closeModal={closeModal}
+            setActiveTab={setActiveTab}
+            lang={lang}
+            setLang={setLang}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // MOBILE VIEW
+  // =========================================================================
   return (
     <div className="mobile-app-shell">
       {/* Top Mobile Header */}
