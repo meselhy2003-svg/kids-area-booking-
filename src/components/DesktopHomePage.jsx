@@ -34,20 +34,47 @@ export default function DesktopHomePage({ setActiveTab, openModal, lang }) {
 
         <div className="desktop-hero-content">
           <h1 className="desktop-hero-title">
-            PLAY. <span className="highlight-cyan">CHALLENGE.</span> <span className="highlight-amber">ADVENTURE.</span>
+            <span className="title-white">PLAY.</span>{' '}
+            <span className="title-word">
+              <span className="title-white">C</span>
+              <span className="hl-cyan">H</span>
+              <span className="title-white">A</span>
+              <span className="hl-gold">L</span>
+              <span className="hl-gold">L</span>
+              <span className="title-white">E</span>
+              <span className="hl-cyan">N</span>
+              <span className="hl-cyan">G</span>
+              <span className="hl-gold">E</span>
+              <span className="title-white">.</span>
+            </span>
+            <br />
+            <span className="title-word">
+              <span className="title-white">A</span>
+              <span className="hl-gold">D</span>
+              <span className="hl-gold">V</span>
+              <span className="hl-gold">E</span>
+              <span className="hl-gold">N</span>
+              <span className="hl-cyan">T</span>
+              <span className="title-white">U</span>
+              <span className="title-white">R</span>
+              <span className="title-white">E</span>
+              <span className="title-white">.</span>
+            </span>
           </h1>
+          
           <p className="desktop-hero-subtitle">
-            Choose your zone and start your experience
+            Choose your zone and start your experience.
           </p>
 
           <div className="desktop-hero-actions">
             <button 
-              className="desktop-hero-btn primary"
+              className="desktop-hero-btn primary hero-glow-btn"
               onClick={scrollToExperience}
             >
               <span>EXPLORE ALL ZONES</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="desktop-btn-arrow">
-                <polyline points="9 18 15 12 9 6" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
               </svg>
             </button>
 
@@ -55,46 +82,48 @@ export default function DesktopHomePage({ setActiveTab, openModal, lang }) {
               className="desktop-hero-btn secondary"
               onClick={() => openModal('video-tour')}
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="desktop-btn-play-icon">
-                <polygon points="5 3 19 12 5 21 5 3" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="desktop-btn-play-icon">
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" />
               </svg>
-              <span>WATCH VIDEO TOUR</span>
+              <span>Watch Video Tour</span>
             </button>
           </div>
 
-          {/* Frosted Glass Stat Badges */}
+          {/* Frosted Glass Stat Badges (Exact text and styling from screenshot) */}
           <div className="desktop-hero-stats">
             <div className="desktop-stat-badge">
-              <div className="desktop-stat-icon-wrap wrap-teal">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="7" height="7" />
-                  <rect x="14" y="3" width="7" height="7" />
-                  <rect x="14" y="14" width="7" height="7" />
-                  <rect x="3" y="14" width="7" height="7" />
+              <div className="desktop-stat-icon-wrap wrap-teal-dark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="4" y="4" width="6" height="16" rx="3" />
+                  <rect x="14" y="4" width="6" height="16" rx="3" />
+                  <circle cx="7" cy="10" r="1" fill="#ffffff" />
+                  <circle cx="17" cy="14" r="1" fill="#ffffff" />
                 </svg>
               </div>
               <div className="desktop-stat-text">
-                <strong>4 Themed Zones</strong>
-                <span>Ages 1 to 16 welcome</span>
+                <strong>4 Distinct Zones</strong>
+                <span>from toddlers to daredevils</span>
               </div>
             </div>
 
             <div className="desktop-stat-badge">
-              <div className="desktop-stat-icon-wrap wrap-amber">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="m10 15 5-3-5-3v6Z" fill="#f59e0b" />
+              <div className="desktop-stat-icon-wrap wrap-amber-solid">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+                  <circle cx="7" cy="17" r="2" />
+                  <circle cx="17" cy="17" r="2" />
                 </svg>
               </div>
               <div className="desktop-stat-text">
                 <strong>50+ Games</strong>
-                <span>Arcade, soft play &amp; sports</span>
+                <span>Modern arcades &amp; kinetic thrill</span>
               </div>
             </div>
 
             <div className="desktop-stat-badge">
-              <div className="desktop-stat-icon-wrap wrap-cyan">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#00a9c3" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <div className="desktop-stat-icon-wrap wrap-white-solid">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#012b32" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                   <circle cx="9" cy="7" r="4" />
                   <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -103,7 +132,7 @@ export default function DesktopHomePage({ setActiveTab, openModal, lang }) {
               </div>
               <div className="desktop-stat-text">
                 <strong>Family Fun</strong>
-                <span>Safe, supervised environment</span>
+                <span>Safe certified for all ages</span>
               </div>
             </div>
           </div>
