@@ -2,89 +2,143 @@ import React, { useState } from 'react';
 
 export default function DesktopChallengePage({ setActiveTab, openModal, lang, searchQuery }) {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [viewType, setViewType] = useState('packages'); // 'packages' | 'tickets'
 
-  const offers = [
+  // Individual ticket attractions (matching media_1790196521011.png)
+  const ticketGames = [
     {
-      id: 'vr-arena',
-      title: 'VR Arena Champion',
-      titleAr: 'تذكرة محاكي الواقع الافتراضي',
-      saveBadge: 'SAVE 60 EGP',
-      badgeColor: 'badge-cyan',
-      image: '/photo/kid-area-pic/Kid wearing VR headset in neon arcade.png',
-      fallback: '/photo/kid-area-pic/kid-vr-headset.png',
-      age: 'All Ages & Adults',
-      bundle: '3 Immersive VR Simulator Sessions + 1 Free Arcade Pass',
-      price: 120,
-      oldPrice: 180
+      id: 'shooting-1',
+      title: 'Shooting',
+      priceText: 'EGP 40 / ticket',
+      price: 40,
+      image: '/photo/kid-area-pic/Laser & Tactical Arena.png',
+      fallback: '/photo/kid-area-pic/Photo 3_ VR Arena Friends.png',
+      badge: null
     },
     {
-      id: 'arcade-combo',
-      title: 'Arcade Rush Duo',
-      titleAr: 'باقة ثنائي ألعاب الفيديو والأركيد',
-      saveBadge: 'SAVE 100 EGP',
-      badgeColor: 'badge-blue',
-      image: '/photo/kid-area-pic/Fast-Paced Air Hockey.png',
-      fallback: '/photo/kid-area-pic/game-air-hockey-table.png',
-      age: 'All Ages & Adults',
-      bundle: 'Air Hockey tournament + 20 Arcade Tokens for 2 players',
-      price: 180,
-      oldPrice: 280
+      id: 'basketball',
+      title: 'Basketball',
+      priceText: 'EGP 40 / ticket',
+      price: 40,
+      image: '/photo/kid-area-pic/Air Hockey Table.png',
+      fallback: '/photo/kid-area-pic/Fast-Paced Air Hockey.png',
+      badge: null
     },
     {
-      id: 'racing-squad',
-      title: 'Grand Prix Squad',
-      titleAr: 'باقة سباق السيارات للأصدقاء',
-      saveBadge: 'SAVE 120 EGP',
-      badgeColor: 'badge-cyan',
-      image: '/photo/kid-area-pic/High-Octane Racing.png',
-      fallback: '/photo/kid-area-pic/high-octane-racing.png',
-      age: 'Ages 8+ & Adults',
-      bundle: '4 Linked Racing Simulators + Podium Medals & Photo',
-      price: 240,
-      oldPrice: 360
+      id: 'boxing-1',
+      title: 'Boxing Machine',
+      priceText: 'EGP 40 / ticket',
+      price: 40,
+      image: '/photo/kid-area-pic/Boxing Punch Machine.png',
+      fallback: '/photo/kid-area-pic/Boxing Punch Machine (1).png',
+      badge: null
+    },
+    {
+      id: 'pingpong',
+      title: 'Ping Pong',
+      priceText: 'EGP 50 / 30 min',
+      price: 50,
+      image: '/photo/kid-area-pic/Table Tennis Ping Pong.png',
+      fallback: '/photo/kid-area-pic/Table Tennis Ping Pong.png',
+      badge: null
+    },
+    {
+      id: 'ps4-1',
+      title: 'PS4',
+      priceText: 'EGP 50 / 30 min',
+      price: 50,
+      image: '/photo/kid-area-pic/PS4 PlayStation Gaming.png',
+      fallback: '/photo/kid-area-pic/PS4 PlayStation Gaming.png',
+      badge: 'PS4'
+    },
+    {
+      id: 'boxing-2',
+      title: 'Boxing Machine',
+      priceText: 'EGP 50 / ticket',
+      price: 50,
+      image: '/photo/kid-area-pic/Boxing Punch Machine (1).png',
+      fallback: '/photo/kid-area-pic/Boxing Punch Machine.png',
+      badge: null
+    },
+    {
+      id: 'shooting-vr',
+      title: 'VR Shooting Arena',
+      priceText: 'EGP 40 / ticket',
+      price: 40,
+      image: '/photo/kid-area-pic/Laser & Tactical Arena.png',
+      fallback: '/photo/kid-area-pic/Photo 3_ VR Arena Friends.png',
+      badge: null
+    },
+    {
+      id: 'airhockey',
+      title: 'Air Hockey',
+      priceText: 'EGP 50 / 30 min',
+      price: 50,
+      image: '/photo/kid-area-pic/Air Hockey Table (1).png',
+      fallback: '/photo/kid-area-pic/Air Hockey Table.png',
+      badge: null
+    },
+    {
+      id: 'billiards',
+      title: 'Billiards',
+      priceText: 'EGP 50 / 30 min',
+      price: 50,
+      image: '/photo/kid-area-pic/Billiards Pool Table.png',
+      fallback: '/photo/kid-area-pic/Billiards Pool Table.png',
+      badge: null
+    },
+    {
+      id: 'ps4-2',
+      title: 'PS4',
+      priceText: 'EGP 50 / 30 min',
+      price: 50,
+      image: '/photo/kid-area-pic/PS4 PlayStation Gaming.png',
+      fallback: '/photo/kid-area-pic/PS4 PlayStation Gaming.png',
+      badge: 'PS4'
     }
   ];
 
   const exploreItems = [
     {
-      id: 'vr-sim',
-      title: 'VR Dome Simulator',
-      titleAr: 'قبة الواقع الافتراضي',
-      image: '/photo/kid-area-pic/Photo 3_ VR Arena Friends.png',
-      fallback: '/photo/kid-area-pic/kid-vr-headset.png',
-      desc: '360-degree high definition virtual reality games and team simulations.'
+      id: 'climbing',
+      title: 'Climbing',
+      titleAr: 'تسلق',
+      image: '/photo/kid-area-pic/ball-pit-thumb.png',
+      fallback: '/photo/kid-area-pic/explore-ballpit.png',
+      desc: 'Multi-level climbing challenges and auto-belay vertical walls.'
     },
     {
-      id: 'neon-airhockey',
-      title: 'Neon Air Hockey Battle',
-      titleAr: 'تحدي الهوكي الهوائي النيون',
-      image: '/photo/kid-area-pic/Photo 8_ Neon Air Hockey.png',
-      fallback: '/photo/kid-area-pic/fast-paced-air-hockey.png',
-      desc: 'Glow-in-the-dark high-speed air puck tables with tournament scoring.'
+      id: 'trampoline',
+      title: 'Mega Trampoline',
+      titleAr: 'ترامبولين',
+      image: '/photo/kid-area-pic/soft-play-thumb.png',
+      fallback: '/photo/kid-area-pic/explore-softplay.png',
+      desc: 'High bounce interconnected trampoline arenas and foam plunge pits.'
     },
     {
-      id: 'racing-arcade',
-      title: 'Motorcycle & Car Arcade',
-      titleAr: 'حلبة سباق الدراجات والسيارات',
-      image: '/photo/kid-area-pic/High-Octane Racing.png',
-      fallback: '/photo/kid-area-pic/game-motorcycle-arcade.png',
-      desc: 'Force-feedback motion steering cabs and head-to-head multiplayer tracks.'
+      id: 'art-workshop',
+      title: 'Art Workshop',
+      titleAr: 'ورش الرسم والألوان',
+      image: '/photo/kid-area-pic/art-workshop-thumb.png',
+      fallback: '/photo/kid-area-pic/explore-artworkshop.png',
+      desc: 'Pottery sculpting, coloring workshops, and creative hands-on craft sessions.'
     }
   ];
 
-  const filteredOffers = offers.filter(o => {
+  // Filter games based on search query
+  const filteredGames = ticketGames.filter(g => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
-    return o.title.toLowerCase().includes(q) || o.titleAr.includes(q) || o.bundle.toLowerCase().includes(q);
+    return g.title.toLowerCase().includes(q) || g.priceText.toLowerCase().includes(q);
   });
 
-  const handleBooking = (offer) => {
+  const handleBooking = (title, price, details) => {
     openModal('booking', {
-      name: `${offer.title} - ${offer.titleAr}`,
-      price: `${offer.price} EGP`,
-      priceNum: offer.price,
-      discount: offer.saveBadge,
-      details: offer.bundle
+      name: title,
+      price: `${price} EGP`,
+      priceNum: price,
+      discount: 'Direct Booking',
+      details: details || 'Full access ticket to attraction'
     });
   };
 
@@ -92,14 +146,15 @@ export default function DesktopChallengePage({ setActiveTab, openModal, lang, se
     <div className="desktop-page desktop-zone-page">
       <div className="desktop-page-container">
         
-        {/* HERO BANNER */}
+        {/* 1. HERO ZONE BANNER WITH TILTED BADGE */}
         <div className="desktop-zone-hero-banner challenge-hero-banner">
           <div className="desktop-zone-hero-left">
-            <h1 className="desktop-zone-hero-title">Challenge Zone</h1>
-            <h2 className="desktop-zone-hero-tagline">Skill, competition, and gaming adrenaline!</h2>
+            <h1 className="desktop-zone-hero-title">CHALLENGE  ZONE</h1>
+            <h2 className="desktop-zone-hero-tagline">Challenge yourself, beat your score, and have fun</h2>
             <h3 className="desktop-zone-hero-title-ar font-alexandria">منطقة التحدي</h3>
-            <p className="desktop-zone-hero-tagline-ar font-alexandria">ألعاب الفيديو والواقع الافتراضي والتحديات الحماسية</p>
+            <p className="desktop-zone-hero-tagline-ar font-alexandria">تحدي نفسك، حطم رقمك القياسي، واستمتع باللعب</p>
             
+            {/* Carousel Dots */}
             <div className="desktop-zone-hero-dots">
               {[0, 1, 2].map((i) => (
                 <button
@@ -112,6 +167,7 @@ export default function DesktopChallengePage({ setActiveTab, openModal, lang, se
             </div>
           </div>
 
+          {/* Right Tilted Sticker Badge */}
           <div className="desktop-tilted-badge">
             <span>PLAY</span>
             <span>EXPLORE</span>
@@ -120,85 +176,180 @@ export default function DesktopChallengePage({ setActiveTab, openModal, lang, se
           </div>
         </div>
 
-        {/* OFFERS SECTION */}
+        {/* 2. SECTION HEADER & TOGGLE */}
         <section className="desktop-zone-section offers-section">
           <div className="desktop-section-header-row">
             <h2 className="desktop-offers-heading">
-              Challenge Zone Offers <span className="text-separator">|</span> <span className="font-alexandria">عروض منطقة التحدي</span>
+              {viewType === 'packages' ? (
+                <>Challenge Zone Area Offers <span className="text-separator">|</span> <span className="font-alexandria">عروض منطقة التحدي</span></>
+              ) : (
+                <>Challenge Zone Area Tickets <span className="text-separator">|</span> <span className="font-alexandria">عروض منطقة تذاكر</span></>
+              )}
             </h2>
             <div className="desktop-offers-filters">
               <span className="desktop-age-badge dark-badge">All Ages</span>
+            </div>
+          </div>
+
+          {/* TOGGLE SWITCH: Packages vs Tickets */}
+          <div className="desktop-zone-view-toggle-wrap">
+            <div className="desktop-zone-view-toggle">
               <button 
-                className="desktop-see-all-link"
-                onClick={() => openModal('booking', { name: 'Challenge Zone Unlimited Pass', price: '180 EGP', priceNum: 180 })}
+                className={`toggle-tab-btn ${viewType === 'packages' ? 'active' : ''}`}
+                onClick={() => setViewType('packages')}
               >
-                See All &gt;
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="toggle-tab-icon">
+                  <rect x="2" y="7" width="20" height="14" rx="2" />
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                </svg>
+                <div className="toggle-tab-labels">
+                  <span className="tab-en">Packages</span>
+                  <span className="tab-ar font-alexandria">الباقات</span>
+                </div>
+              </button>
+
+              <button 
+                className={`toggle-tab-btn ${viewType === 'tickets' ? 'active' : ''}`}
+                onClick={() => setViewType('tickets')}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="toggle-tab-icon">
+                  <rect x="2" y="6" width="20" height="12" rx="3" />
+                  <line x1="6" y1="12" x2="6.01" y2="12" />
+                  <line x1="18" y1="12" x2="18.01" y2="12" />
+                </svg>
+                <div className="toggle-tab-labels">
+                  <span className="tab-en">Tickets</span>
+                  <span className="tab-ar font-alexandria">التذاكر</span>
+                </div>
               </button>
             </div>
           </div>
 
-          <div className="desktop-offers-grid-3">
-            {filteredOffers.map((offer) => (
-              <div key={offer.id} className="desktop-offer-card">
-                <div className="desktop-offer-img-box">
+          {/* VIEW A: PACKAGES VIEW (Matching media_1790196506528.png) */}
+          {viewType === 'packages' && (
+            <div className="desktop-horizontal-pass-container">
+              <div className="desktop-horizontal-pass-card">
+                {/* Left 4-split composite image */}
+                <div className="pass-card-left-img-wrap">
                   <img 
-                    src={offer.image} 
-                    alt={offer.title} 
-                    className="desktop-offer-img"
-                    onError={(e) => { e.target.src = offer.fallback; }}
+                    src="/photo/kid-area-pic/Graphic Composition.png" 
+                    alt="Challenge Pass Games" 
+                    className="pass-card-composite-img"
+                    onError={(e) => { e.target.src = '/photo/mobile-challenge/offer-collage.png'; }}
                   />
-                  <span className={`desktop-offer-save-tag ${offer.badgeColor}`}>
-                    {offer.saveBadge}
-                  </span>
+                  <div className="pass-card-ribbon-badge">
+                    <span>&#9733; CHOOSE ANY 4 GAMES &#9733;</span>
+                  </div>
                 </div>
 
-                <div className="desktop-offer-body">
-                  <h3 className="desktop-offer-title">{offer.title}</h3>
-                  <h4 className="desktop-offer-title-ar font-alexandria">{offer.titleAr}</h4>
+                {/* Right Offer Details */}
+                <div className="pass-card-right-body">
+                  <div className="pass-card-header-row">
+                    <div>
+                      <h3 className="pass-card-main-title">Challenge Pass</h3>
+                      <span className="pass-card-subtitle-cyan">Pick any 4 games</span>
+                    </div>
+                    <span className="pass-card-save-badge">Save 60 EGP</span>
+                  </div>
 
-                  <div className="desktop-offer-specs">
-                    <div className="desktop-spec-row">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="desktop-spec-icon">
-                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                        <circle cx="12" cy="7" r="4" />
+                  {/* 4 Games Grid with Cyan Icons */}
+                  <div className="pass-card-perks-grid">
+                    <div className="pass-card-perk-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="#00a9c3" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="pass-perk-icon">
+                        <rect x="2" y="6" width="20" height="12" rx="3" />
+                        <path d="M6 12h4M8 10v4M16 11h.01M18 13h.01" />
                       </svg>
-                      <span>{offer.age}</span>
+                      <span>VR</span>
                     </div>
 
-                    <div className="desktop-spec-row bundle-row">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="desktop-spec-icon">
-                        <rect x="3" y="4" width="18" height="18" rx="2" />
-                        <line x1="16" y1="2" x2="16" y2="6" />
-                        <line x1="8" y1="2" x2="8" y2="6" />
-                        <line x1="3" y1="10" x2="21" y2="10" />
+                    <div className="pass-card-perk-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="#00a9c3" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="pass-perk-icon">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 2a14.5 14.5 0 0 0 0 20M2 12h20" />
                       </svg>
-                      <span>{offer.bundle}</span>
+                      <span>Basketball</span>
+                    </div>
+
+                    <div className="pass-card-perk-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="#00a9c3" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="pass-perk-icon">
+                        <circle cx="12" cy="12" r="10" />
+                        <circle cx="12" cy="12" r="6" />
+                        <circle cx="12" cy="12" r="2" />
+                      </svg>
+                      <span>Shooting</span>
+                    </div>
+
+                    <div className="pass-card-perk-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="#00a9c3" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="pass-perk-icon">
+                        <circle cx="12" cy="12" r="10" />
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="m4.93 4.93 4.24 4.24M14.83 14.83l4.24 4.24M14.83 9.17l4.24-4.24M4.93 19.07l4.24-4.24" />
+                      </svg>
+                      <span>Car Racing</span>
                     </div>
                   </div>
 
-                  <div className="desktop-offer-price-row">
-                    <div className="desktop-price-val">
-                      <strong className="desktop-curr">EGP {offer.price}</strong>
-                      {offer.oldPrice && <span className="desktop-old-price">EGP {offer.oldPrice}</span>}
+                  {/* Price & Action Button */}
+                  <div className="pass-card-price-action-row">
+                    <div className="pass-price-group">
+                      <strong className="pass-current-price">EGP 100</strong>
+                      <span className="pass-old-price">EGP 160</span>
                     </div>
 
                     <button 
-                      className="desktop-get-offer-btn"
-                      onClick={() => handleBooking(offer)}
+                      className="pass-get-offer-btn"
+                      onClick={() => handleBooking('Challenge Pass - باقة التحدي (4 ألعاب)', 100, 'Pick any 4 games: VR, Basketball, Shooting, Car Racing')}
                     >
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="btn-ticket-icon">
                         <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
                       </svg>
-                      <span>Get Offer</span>
+                      <span>Get This Offer</span>
                     </button>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
+
+          {/* VIEW B: TICKETS VIEW (Matching media_1790196521011.png) */}
+          {viewType === 'tickets' && (
+            <div className="desktop-ticket-games-grid">
+              {filteredGames.map((game) => (
+                <div key={game.id} className="desktop-ticket-game-card">
+                  <div className="ticket-game-img-box">
+                    <img 
+                      src={game.image} 
+                      alt={game.title} 
+                      className="ticket-game-img"
+                      onError={(e) => { e.target.src = game.fallback; }}
+                    />
+                    {game.badge && (
+                      <span className="ticket-game-badge">{game.badge}</span>
+                    )}
+                  </div>
+
+                  <div className="ticket-game-info-body">
+                    <h4 className="ticket-game-title">{game.title}</h4>
+                    <span className="ticket-game-price-label">{game.priceText}</span>
+
+                    <button 
+                      className="ticket-game-play-btn"
+                      onClick={() => handleBooking(`${game.title} Pass`, game.price, game.priceText)}
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="play-btn-ticket-icon">
+                        <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+                      </svg>
+                      <span>Play Now</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
         </section>
 
-        {/* EXPLORE SECTION */}
+        {/* 3. EXPLORE CHALLENGE ZONE SECTION */}
         <section className="desktop-zone-section explore-section">
           <div className="desktop-section-header-row">
             <h2 className="desktop-explore-heading">Explore Challenge Zone</h2>
@@ -210,6 +361,7 @@ export default function DesktopChallengePage({ setActiveTab, openModal, lang, se
             </button>
           </div>
 
+          {/* 3 FEATURE CARDS */}
           <div className="desktop-explore-grid-3">
             {exploreItems.map((item) => (
               <div 
@@ -237,7 +389,7 @@ export default function DesktopChallengePage({ setActiveTab, openModal, lang, se
           </div>
         </section>
 
-        {/* 360 BUTTON */}
+        {/* 4. EXPLORE 360° CENTER BUTTON */}
         <div className="desktop-360-btn-wrap">
           <button 
             className="desktop-360-pill-btn"
