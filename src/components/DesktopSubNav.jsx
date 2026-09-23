@@ -130,21 +130,6 @@ export default function DesktopSubNav({ activeTab, setActiveTab, searchQuery, se
             )}
           </div>
         )}
-            className="desktop-search-input"
-            placeholder="Search for rides, offers, and more..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button 
-              className="desktop-search-clear"
-              onClick={() => setSearchQuery('')}
-              title="Clear search"
-            >
-              ✕
-            </button>
-          )}
-        </div>
       </div>
     </div>
   );
