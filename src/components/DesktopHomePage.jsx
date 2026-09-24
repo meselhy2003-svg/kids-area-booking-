@@ -329,40 +329,28 @@ export default function DesktopHomePage({ setActiveTab, openModal, lang }) {
             <span className="desktop-section-tag">THE ULTIMATE DESTINATION</span>
             <h2 className="desktop-section-title">ONE PLACE. FOUR WAYS TO HAVE FUN.</h2>
             <p className="desktop-section-subtitle">
-              From toddlers to teens, and parents too - there's something for everyone
+              From little adventures to exciting challenges, there's something for everyone.
             </p>
           </div>
 
           <div className="desktop-mosaic-grid">
             {/* Left Card: High-Octane Racing */}
             <div className="mosaic-card left-card" onClick={() => setActiveTab('challenge')}>
-              <img src="/photo/kid-area-pic/High-Octane Racing.png" alt="High-Octane Racing" />
-              <div className="mosaic-overlay">
-                <h3>High-Octane Racing</h3>
-              </div>
+              <img src="/photo/kid-area-pic/mosaic-card-1.png" alt="High-Octane Racing" />
             </div>
 
             {/* Center Card: Family Dining Table */}
             <div className="mosaic-card center-card" onClick={() => openModal('restaurant-menu')}>
-              <img src="/photo/kid-area-pic/Family birthday party celebration with cake.png" alt="Family Milestones & Laughter" />
-              <div className="mosaic-overlay">
-                <h3>Family Milestones &amp; Laughter</h3>
-              </div>
+              <img src="/photo/kid-area-pic/mosaic-card-2.png" alt="Family Milestones & Laughter" />
             </div>
 
             {/* Right Column (2 stacked cards) */}
             <div className="mosaic-right-col">
               <div className="mosaic-card right-card-top" onClick={() => setActiveTab('challenge')}>
-                <img src="/photo/kid-area-pic/Fast-Paced Air Hockey.png" alt="Fast-Paced Air Hockey" />
-                <div className="mosaic-overlay">
-                  <h3>Fast-Paced Air Hockey</h3>
-                </div>
+                <img src="/photo/kid-area-pic/mosaic-card-3.png" alt="Fast-Paced Air Hockey" />
               </div>
               <div className="mosaic-card right-card-bottom" onClick={() => setActiveTab('adventure')}>
-                <img src="/photo/kid-area-pic/High ropes suspended course.png" alt="High Ropes & Climbing" />
-                <div className="mosaic-overlay">
-                  <h3>Suspended Ropes &amp; Climbing</h3>
-                </div>
+                <img src="/photo/kid-area-pic/mosaic-card-4.png" alt="Climbing Walls" />
               </div>
             </div>
           </div>
