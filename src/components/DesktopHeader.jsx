@@ -15,17 +15,22 @@ export default function DesktopHeader({
     <header className="desktop-navbar">
       <div className="desktop-nav-container">
         {/* Brand Logo */}
-        <div 
+        <a 
+          href="#home"
           className="desktop-nav-brand" 
-          onClick={() => setActiveTab('home')}
+          onClick={(e) => {
+            e.preventDefault();
+            setActiveTab('home');
+          }}
           title="American Dream Ismailia"
+          aria-label="American Dream Home"
         >
           <img 
             src="/photo/logo/logo nav bar and footer.png" 
             alt="American Dream Logo" 
             className="desktop-nav-logo-img" 
           />
-        </div>
+        </a>
 
         {/* Center Main Nav Links */}
         <nav className="desktop-nav-menu">
