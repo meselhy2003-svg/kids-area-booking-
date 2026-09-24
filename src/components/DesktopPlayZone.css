@@ -782,37 +782,81 @@
 }
 
 /* ==========================================================================
-   6. PLAY ZONE VIBES (9-PHOTO GALLERY)
+   6. PLAY ZONE VIBES (3-COLUMN MASONRY GALLERY)
    ========================================================================== */
-.desktop-section-header-simple {
+.desktop-vibes-header {
   margin-bottom: 28px;
 }
 
-.desktop-vibes-grid {
+.desktop-vibes-tag {
+  color: #f59e0b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.desktop-vibes-title {
+  color: #012b32;
+  font-size: 2.3rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.desktop-vibes-desc {
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.desktop-vibes-columns {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
 }
 
-.desktop-vibe-item {
-  height: 240px;
+.desktop-vibes-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.desktop-vibe-card {
   border-radius: 18px;
   overflow: hidden;
   position: relative;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  background: #e2e8f0;
 }
 
-.desktop-vibe-item img {
+.desktop-vibe-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.4s ease;
+  display: block;
 }
 
-.desktop-vibe-item:hover img {
+.desktop-vibe-card:hover img {
   transform: scale(1.06);
 }
+
+.desktop-vibe-card.h-slide { height: 210px; }
+.desktop-vibe-card.h-ropes { height: 290px; }
+.desktop-vibe-card.h-cafe { height: 200px; }
+
+.desktop-vibe-card.h-skeeball { height: 280px; }
+.desktop-vibe-card.h-carousel { height: 220px; }
+.desktop-vibe-card.h-airhockey { height: 200px; }
+
+.desktop-vibe-card.h-vr { height: 220px; }
+.desktop-vibe-card.h-birthday { height: 280px; }
+.desktop-vibe-card.h-toddler { height: 200px; }
 
 .desktop-vibe-hover-overlay {
   position: absolute;
@@ -828,7 +872,7 @@
   text-align: center;
 }
 
-.desktop-vibe-item:hover .desktop-vibe-hover-overlay {
+.desktop-vibe-card:hover .desktop-vibe-hover-overlay {
   opacity: 1;
 }
 
@@ -847,9 +891,9 @@
 }
 
 .desktop-cta-banner {
-  background: #012b32;
-  border-radius: 28px;
-  padding: 56px 40px;
+  background: linear-gradient(135deg, #012b32 0%, #033a43 100%);
+  border-radius: 24px;
+  padding: 56px 40px 48px;
   text-align: center;
   color: #ffffff;
   position: relative;
@@ -857,17 +901,14 @@
   box-shadow: 0 10px 30px rgba(1, 43, 50, 0.25);
 }
 
-.desktop-cta-badge {
-  background: #f59e0b;
-  color: #ffffff;
-  font-size: 0.76rem;
+.desktop-cta-tag {
+  color: #f59e0b;
+  font-size: 0.78rem;
   font-weight: 800;
-  padding: 5px 14px;
-  border-radius: 14px;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
   display: inline-block;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .desktop-cta-title {
@@ -889,7 +930,7 @@
   border: none;
   color: #ffffff;
   padding: 14px 34px;
-  border-radius: 30px;
+  border-radius: 9999px;
   font-size: 1rem;
   font-weight: 800;
   cursor: pointer;
@@ -898,7 +939,7 @@
   gap: 10px;
   box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4);
   transition: all 0.2s ease;
-  margin-bottom: 36px;
+  margin-bottom: 28px;
 }
 
 .desktop-cta-btn:hover {
@@ -908,19 +949,19 @@
 }
 
 .desktop-ticket-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
-.desktop-cta-features {
+.desktop-cta-features-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 36px;
+  gap: 20px;
   flex-wrap: wrap;
 }
 
-.desktop-cta-feat {
+.desktop-cta-feat-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -929,9 +970,15 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-.desktop-cta-feat svg {
-  width: 17px;
-  height: 17px;
+.feat-gold-dot {
+  color: #f59e0b;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.feat-sep {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1rem;
 }
 
 /* ==========================================================================
