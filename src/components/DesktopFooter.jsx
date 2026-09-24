@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function DesktopFooter({ openModal }) {
+export default function DesktopFooter({ openModal, setActiveTab }) {
   return (
     <footer className="desktop-footer">
       <div className="desktop-footer-container">
