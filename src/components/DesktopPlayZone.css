@@ -722,6 +722,11 @@
 /* ==========================================================================
    5. ONE PLACE. FOUR WAYS TO HAVE FUN (MOSAIC)
    ========================================================================== */
+.desktop-section.four-ways-section {
+  padding-top: 50px;
+  padding-bottom: clamp(100px, 9vw, 150px);
+}
+
 .desktop-center-header {
   text-align: center;
   margin-bottom: 36px;
@@ -740,6 +745,12 @@
   overflow: hidden;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mosaic-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
 }
 
 .mosaic-card img {
@@ -784,6 +795,11 @@
 /* ==========================================================================
    6. PLAY ZONE VIBES (3-COLUMN MASONRY GALLERY)
    ========================================================================== */
+.desktop-section.vibes-section {
+  padding-top: 20px;
+  padding-bottom: 70px;
+}
+
 .desktop-vibes-header {
   margin-bottom: 28px;
 }
