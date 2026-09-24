@@ -1002,6 +1002,22 @@
   margin-bottom: 40px;
 }
 
+.desktop-zone-hero-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg, 
+    rgba(2, 36, 48, 0.94) 0%, 
+    rgba(2, 36, 48, 0.88) 25%, 
+    rgba(2, 36, 48, 0.58) 44%, 
+    rgba(2, 36, 48, 0.15) 60%, 
+    rgba(2, 36, 48, 0) 74%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
 .kids-hero-banner {
   background: url('/photo/kid-area-pic/kids-banner.png') center/cover no-repeat;
 }
