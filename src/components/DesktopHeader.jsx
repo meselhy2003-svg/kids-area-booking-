@@ -68,15 +68,6 @@ export default function DesktopHeader({
 
         {/* Right Nav Actions */}
         <div className="desktop-nav-right">
-          {/* Language Switch */}
-          <button 
-            className="desktop-lang-btn"
-            onClick={() => setLang(prev => (prev === 'en' ? 'ar' : 'en'))}
-            title={lang === 'en' ? 'Switch to Arabic' : 'التحويل للإنجليزية'}
-          >
-            {lang === 'en' ? 'العربية' : 'EN'}
-          </button>
-
           {/* Profile Circle Icon */}
           <button 
             className="desktop-profile-btn"
