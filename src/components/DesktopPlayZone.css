@@ -27,11 +27,19 @@
   padding: 0 24px;
 }
 
+/* High-Quality Image Rendering across all desktop pages */
+.desktop-app-shell img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
 /* ==========================================================================
    1. DESKTOP TOP NAVBAR
    ========================================================================== */
 .desktop-navbar {
-  height: 72px;
+  height: 84px;
   background-color: #012b32;
   position: sticky;
   top: 0;
@@ -54,9 +62,14 @@
 }
 
 .desktop-nav-logo-img {
-  height: 48px;
+  height: 66px;
   width: auto;
   object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.desktop-nav-logo-img:hover {
+  transform: scale(1.05);
 }
 
 .desktop-nav-menu {
