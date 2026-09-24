@@ -166,7 +166,7 @@ export default function App() {
         </main>
 
         {/* Desktop Footer */}
-        <DesktopFooter openModal={openModal} />
+        <DesktopFooter openModal={openModal} setActiveTab={setActiveTab} />
 
         {/* Global Interactive Modals (Work identically on Desktop) */}
         {modal.isOpen && (
