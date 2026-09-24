@@ -6,16 +6,22 @@ export default function DesktopHomePage({ setActiveTab, openModal, lang }) {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const vibesPhotos = [
-    { src: '/photo/kid-area-pic/Kids sliding into colorful ball pit.png', title: 'Ball Pit Joy' },
-    { src: '/photo/kid-area-pic/Air Hockey Table.png', title: 'Family Air Hockey' },
-    { src: '/photo/kid-area-pic/Photo 3_ VR Arena Friends.png', title: 'VR Arena Squad' },
-    { src: '/photo/kid-area-pic/girl-rope-bridge.png', title: 'Rope Course Adventure' },
-    { src: '/photo/kid-area-pic/Classic illuminated carousel ride.png', title: 'Illuminated Carousel' },
-    { src: '/photo/kid-area-pic/Family birthday party celebration with cake.png', title: 'Birthday Milestones' },
-    { src: '/photo/kid-area-pic/thumb-bg-eeeee.png', title: 'Cafe Treats' },
-    { src: '/photo/kid-area-pic/Photo 8_ Neon Air Hockey.png', title: 'Neon Arcade Battle' },
-    { src: '/photo/kid-area-pic/Toddler laughing in soft ball pit.png', title: 'Little Explorers' }
+  const vibesColumns = [
+    [
+      { src: '/photo/kid-area-pic/Kids sliding into colorful ball pit.png', title: 'Ball Pit Joy', className: 'h-slide' },
+      { src: '/photo/kid-area-pic/Young girl balancing on high rope suspension bridge.png', title: 'Rope Course Adventure', className: 'h-ropes' },
+      { src: '/photo/kid-area-pic/Image.png', title: 'Cafe Treats & Shakes', className: 'h-cafe' }
+    ],
+    [
+      { src: '/photo/kid-area-pic/Family celebrating victory at skeeball.png', title: 'Skeeball High Scores', className: 'h-skeeball' },
+      { src: '/photo/kid-area-pic/Classic illuminated carousel ride.png', title: 'Illuminated Carousel', className: 'h-carousel' },
+      { src: '/photo/kid-area-pic/Photo 8_ Neon Air Hockey.png', title: 'Neon Arcade Battle', className: 'h-airhockey' }
+    ],
+    [
+      { src: '/photo/kid-area-pic/Photo 3_ VR Arena Friends.png', title: 'VR Arena Squad', className: 'h-vr' },
+      { src: '/photo/kid-area-pic/Family birthday party celebration with cake.png', title: 'Birthday Milestones', className: 'h-birthday' },
+      { src: '/photo/kid-area-pic/toddler-rainbow-slide.png', title: 'Little Explorers Slide', className: 'h-toddler' }
+    ]
   ];
 
   return (
