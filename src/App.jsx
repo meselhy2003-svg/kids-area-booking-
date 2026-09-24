@@ -53,8 +53,8 @@ export default function App() {
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = lang;
     document.title = lang === 'ar' 
-      ? 'بلاي زون أمريكان دريم - منطقة الأطفال والمرح' 
-      : 'PLAY ZONE - American Dream Ismailia';
+      ? 'أمريكان دريم - منطقة الأطفال والمرح' 
+      : 'American Dream Ismailia';
   }, [lang]);
 
   // Global listener for attraction booking
