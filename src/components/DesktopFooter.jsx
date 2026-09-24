@@ -5,13 +5,22 @@ export default function DesktopFooter({ openModal }) {
     <footer className="desktop-footer">
       <div className="desktop-footer-container">
         {/* Left: Brand Logo */}
-        <div className="desktop-footer-brand">
+        <a 
+          href="#home"
+          className="desktop-footer-brand" 
+          onClick={(e) => {
+            e.preventDefault();
+            setActiveTab && setActiveTab('home');
+          }}
+          title="American Dream Ismailia"
+          aria-label="American Dream Home"
+        >
           <img 
             src="/photo/logo/logo nav bar and footer.png" 
             alt="American Dream Logo" 
             className="desktop-footer-logo-img" 
           />
-        </div>
+        </a>
 
         {/* Center: Legal & Info Links */}
         <div className="desktop-footer-links">
