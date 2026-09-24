@@ -7,7 +7,8 @@ used = {}
 for f in files:
     with open(os.path.join(components_dir, f), 'r', encoding='utf-8') as fh:
         text = fh.read()
-        matches = re.findall(r'src=["\']([^"\']+\.(?:png|jpg|jpeg|webp))["\']', text)
+        # Find any string containing /photo/ or photo/
+        matches = re.findall(r'[\'"]([^\'"]*photo[^\'"]*\.(?:png|jpg|jpeg|webp))[\'"]', text, re.IGNORECASE)
         for m in matches:
             if m not in used:
                 used[m] = []
@@ -27,4 +28,4 @@ for img_path, refs in sorted(used.items()):
         except:
             dims = "ERR"
     
-    print(f"{img_path:55} | Dims: {dims:10} | In: {', '.join(set(refs))}")
+    print(f"{img_path:60} | Dims: {dims:10} | In: {', '.join(set(refs))}")
