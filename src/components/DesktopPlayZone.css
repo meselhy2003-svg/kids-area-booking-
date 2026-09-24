@@ -1512,9 +1512,14 @@
 }
 
 .desktop-footer-logo-img {
-  height: 48px;
+  height: 72px;
   width: auto;
   object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.desktop-footer-logo-img:hover {
+  transform: scale(1.05);
 }
 
 .desktop-footer-links {
