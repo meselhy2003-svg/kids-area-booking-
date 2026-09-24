@@ -372,27 +372,31 @@ export default function DesktopHomePage({ setActiveTab, openModal, lang }) {
       {/* 4. PLAY ZONE VIBES */}
       <section className="desktop-section vibes-section" id="play-zone-vibes">
         <div className="desktop-section-container">
-          <div className="desktop-section-header-simple">
-            <span className="desktop-section-tag">PHOTO MOMENTS</span>
-            <h2 className="desktop-section-title">PLAY ZONE VIBES</h2>
-            <p className="desktop-section-subtitle">
-              Real moments, real smiles, captured right here across our four incredible zones.
+          <div className="desktop-vibes-header">
+            <span className="desktop-vibes-tag">MOMENTS THAT MATTER</span>
+            <h2 className="desktop-vibes-title">PLAY ZONE VIBES</h2>
+            <p className="desktop-vibes-desc">
+              Real smiles, high scores, and unforgettable family memories captured in real-time.
             </p>
           </div>
 
-          {/* 9-PHOTO GALLERY GRID */}
-          <div className="desktop-vibes-grid">
-            {vibesPhotos.map((item, idx) => (
-              <div 
-                key={idx} 
-                className="desktop-vibe-item"
-                onClick={() => openModal('lightbox', item.src)}
-                title={`Click to view: ${item.title}`}
-              >
-                <img src={item.src} alt={item.title} loading="lazy" />
-                <div className="desktop-vibe-hover-overlay">
-                  <span>{item.title}</span>
-                </div>
+          {/* 3-COLUMN MASONRY GALLERY */}
+          <div className="desktop-vibes-columns">
+            {vibesColumns.map((col, cIdx) => (
+              <div key={cIdx} className="desktop-vibes-col">
+                {col.map((item, rIdx) => (
+                  <div 
+                    key={rIdx} 
+                    className={`desktop-vibe-card ${item.className}`}
+                    onClick={() => openModal('lightbox', item.src)}
+                    title={`Click to view: ${item.title}`}
+                  >
+                    <img src={item.src} alt={item.title} loading="lazy" />
+                    <div className="desktop-vibe-hover-overlay">
+                      <span>{item.title}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
@@ -404,7 +408,7 @@ export default function DesktopHomePage({ setActiveTab, openModal, lang }) {
         <div className="desktop-section-container">
           <div className="desktop-cta-banner">
             <div className="desktop-cta-content">
-              <span className="desktop-cta-badge">SPECIAL OFFERS</span>
+              <span className="desktop-cta-tag">ARE YOU READY?</span>
               <h2 className="desktop-cta-title">READY TO PLAY?</h2>
               <p className="desktop-cta-desc">
                 Your next adventure starts here. Secure your passes online and skip the line.
@@ -414,25 +418,27 @@ export default function DesktopHomePage({ setActiveTab, openModal, lang }) {
                 className="desktop-cta-btn"
                 onClick={() => setActiveTab('package')}
               >
-                <span>Get Recharged Online</span>
+                <span>View Packages &amp; Offers</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="desktop-ticket-icon">
-                  <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
-                  <path d="M13 5v2M13 17v2M13 11v2" />
+                  <rect x="2" y="4" width="20" height="16" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                 </svg>
               </button>
 
-              <div className="desktop-cta-features">
-                <span className="desktop-cta-feat">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Instant Booking Confirmation
+              <div className="desktop-cta-features-row">
+                <span className="desktop-cta-feat-item">
+                  <span className="feat-gold-dot">⊙</span>
+                  <span>Instant digital pass delivery</span>
                 </span>
-                <span className="desktop-cta-feat">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  100% Secure Checkout
+                <span className="feat-sep">•</span>
+                <span className="desktop-cta-feat-item">
+                  <span className="feat-gold-dot">⊙</span>
+                  <span>Flexible rescheduling</span>
                 </span>
-                <span className="desktop-cta-feat">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Flexible Rescheduling
+                <span className="feat-sep">•</span>
+                <span className="desktop-cta-feat-item">
+                  <span className="feat-gold-dot">⊙</span>
+                  <span>Best price guarantee</span>
                 </span>
               </div>
             </div>
