@@ -1,28 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 
-// Mobile Components
+// Mobile Components (Lazy Loaded)
+const MobileHomePage = lazy(() => import('./pages/mobile/MobileHomePage'));
+const KidsAreaPage = lazy(() => import('./pages/mobile/KidsAreaPage'));
+const MobileFunParkPage = lazy(() => import('./pages/mobile/MobileFunParkPage'));
+const MobileChallengePage = lazy(() => import('./pages/mobile/MobileChallengePage'));
+const MobileAdventurePage = lazy(() => import('./pages/mobile/MobileAdventurePage'));
+const MobilePackagePage = lazy(() => import('./pages/mobile/MobilePackagePage'));
+
+// Desktop Components (Lazy Loaded)
+const DesktopHomePage = lazy(() => import('./pages/desktop/DesktopHomePage'));
+const DesktopKidsAreaPage = lazy(() => import('./pages/desktop/DesktopKidsAreaPage'));
+const DesktopFunParkPage = lazy(() => import('./pages/desktop/DesktopFunParkPage'));
+const DesktopChallengePage = lazy(() => import('./pages/desktop/DesktopChallengePage'));
+const DesktopAdventurePage = lazy(() => import('./pages/desktop/DesktopAdventurePage'));
+const DesktopPackagePage = lazy(() => import('./pages/desktop/DesktopPackagePage'));
+
+// Synchronous Layout & UI Components
 import MobileHeader from './components/MobileHeader';
 import MobileBottomNav from './components/MobileBottomNav';
-import MobileHomePage from './components/MobileHomePage';
-import KidsAreaPage from './components/KidsAreaPage';
-import MobileFunParkPage from './components/MobileFunParkPage';
-import MobileChallengePage from './components/MobileChallengePage';
-import MobileAdventurePage from './components/MobileAdventurePage';
-import MobilePackagePage from './components/MobilePackagePage';
-
-// Desktop Components
 import DesktopHeader from './components/DesktopHeader';
 import DesktopSubNav from './components/DesktopSubNav';
-import DesktopHomePage from './components/DesktopHomePage';
-import DesktopKidsAreaPage from './components/DesktopKidsAreaPage';
-import DesktopFunParkPage from './components/DesktopFunParkPage';
-import DesktopChallengePage from './components/DesktopChallengePage';
-import DesktopAdventurePage from './components/DesktopAdventurePage';
-import DesktopPackagePage from './components/DesktopPackagePage';
 import DesktopFooter from './components/DesktopFooter';
-
-// Shared Modals & Styles
 import MobileModals from './components/MobileModals';
+import LoadingScreen from './components/common/LoadingScreen';
+
+// Styles
 import './components/MobilePlayZone.css';
 import './components/DesktopPlayZone.css';
 
@@ -31,6 +34,7 @@ export default function App() {
   const [lang, setLang] = useState('en');
   const [modal, setModal] = useState({ isOpen: false, type: null, data: null });
   const [searchQuery, setSearchQuery] = useState('');
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   // Responsive desktop vs mobile detection
   const [isDesktop, setIsDesktop] = useState(() => {
@@ -81,190 +85,201 @@ export default function App() {
     setModal({ isOpen: false, type: null, data: null });
   };
 
-  // =========================================================================
-  // COMPUTER (DESKTOP) VIEW
-  // =========================================================================
-  if (isDesktop) {
-    const isSubnavVisible = activeTab !== 'home';
-
-    return (
-      <div className="desktop-app-shell">
-        {/* Top Navbar */}
-        <DesktopHeader 
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          openModal={openModal}
-          lang={lang}
-          setLang={setLang}
-          isDesktopView={isDesktop}
-          setIsDesktopView={setIsDesktop}
-        />
-
-        {/* Subnav & Search (for zone pages) */}
-        {isSubnavVisible && (
-          <DesktopSubNav 
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
-        )}
-
-        {/* Main Desktop Page Body */}
-        <main style={{ flex: 1 }}>
-          {activeTab === 'home' && (
-            <DesktopHomePage 
-              setActiveTab={setActiveTab}
-              openModal={openModal}
-              lang={lang}
-            />
-          )}
-
-          {activeTab === 'kids-area' && (
-            <DesktopKidsAreaPage 
-              setActiveTab={setActiveTab}
-              openModal={openModal}
-              lang={lang}
-              searchQuery={searchQuery}
-            />
-          )}
-
-          {activeTab === 'fun-park' && (
-            <DesktopFunParkPage 
-              setActiveTab={setActiveTab}
-              openModal={openModal}
-              lang={lang}
-              searchQuery={searchQuery}
-            />
-          )}
-
-          {activeTab === 'challenge' && (
-            <DesktopChallengePage 
-              setActiveTab={setActiveTab}
-              openModal={openModal}
-              lang={lang}
-              searchQuery={searchQuery}
-            />
-          )}
-
-          {activeTab === 'adventure' && (
-            <DesktopAdventurePage 
-              setActiveTab={setActiveTab}
-              openModal={openModal}
-              lang={lang}
-              searchQuery={searchQuery}
-            />
-          )}
-
-          {activeTab === 'package' && (
-            <DesktopPackagePage 
-              setActiveTab={setActiveTab}
-              openModal={openModal}
-              lang={lang}
-            />
-          )}
-        </main>
-
-        {/* Desktop Footer */}
-        <DesktopFooter openModal={openModal} setActiveTab={setActiveTab} />
-
-        {/* Global Interactive Modals (Work identically on Desktop) */}
-        {modal.isOpen && (
-          <MobileModals 
-            modalType={modal.type}
-            modalData={modal.data}
-            closeModal={closeModal}
-            setActiveTab={setActiveTab}
-            lang={lang}
-            setLang={setLang}
-          />
-        )}
-      </div>
-    );
-  }
-
-  // =========================================================================
-  // MOBILE VIEW
-  // =========================================================================
   return (
-    <div className="mobile-app-shell">
-      {/* Top Mobile Header */}
-      <MobileHeader 
-        setActiveTab={setActiveTab}
-        onOpenMenu={() => openModal('menu-drawer')}
-        onOpenProfile={() => openModal('profile')}
-        lang={lang}
-      />
-
-      {/* Main Page Views */}
-      <main style={{ flex: 1 }}>
-        {(activeTab === 'home' || activeTab === 'lobby') && (
-          <MobileHomePage 
-            setActiveTab={setActiveTab}
-            openModal={openModal}
-            lang={lang}
-          />
-        )}
-
-        {activeTab === 'kids-area' && (
-          <KidsAreaPage 
-            setActiveTab={setActiveTab}
-            openModal={openModal}
-            lang={lang}
-          />
-        )}
-
-        {activeTab === 'fun-park' && (
-          <MobileFunParkPage 
-            setActiveTab={setActiveTab}
-            openModal={openModal}
-            lang={lang}
-          />
-        )}
-
-        {activeTab === 'challenge' && (
-          <MobileChallengePage 
-            setActiveTab={setActiveTab}
-            openModal={openModal}
-            lang={lang}
-          />
-        )}
-
-        {activeTab === 'adventure' && (
-          <MobileAdventurePage 
-            setActiveTab={setActiveTab}
-            openModal={openModal}
-            lang={lang}
-          />
-        )}
-
-        {activeTab === 'package' && (
-          <MobilePackagePage 
-            setActiveTab={setActiveTab}
-            openModal={openModal}
-            lang={lang}
-          />
-        )}
-      </main>
-
-      {/* Fixed Curved Dock Bottom Navigation */}
-      <MobileBottomNav 
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        openModal={openModal}
-      />
-
-      {/* Global Interactive Modals & Drawers */}
-      {modal.isOpen && (
-        <MobileModals 
-          modalType={modal.type}
-          modalData={modal.data}
-          closeModal={closeModal}
-          setActiveTab={setActiveTab}
+    <>
+      {/* 1. INITIAL WEBSITE PRELOADER & SPLASH SCREEN */}
+      {isInitialLoading && (
+        <LoadingScreen 
+          fullscreen={true}
           lang={lang}
-          setLang={setLang}
+          onFinish={() => setIsInitialLoading(false)}
         />
       )}
-    </div>
+
+      {/* ========================================================================= */}
+      {/* COMPUTER (DESKTOP) VIEW */}
+      {/* ========================================================================= */}
+      {isDesktop ? (
+        <div className="desktop-app-shell">
+          {/* Top Navbar */}
+          <DesktopHeader 
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            openModal={openModal}
+            lang={lang}
+            setLang={setLang}
+            isDesktopView={isDesktop}
+            setIsDesktopView={setIsDesktop}
+          />
+
+          {/* Subnav & Search (for zone pages) */}
+          {activeTab !== 'home' && (
+            <DesktopSubNav 
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
+          )}
+
+          {/* Main Desktop Page Body with Lazy Loading Suspense Fallback */}
+          <main style={{ flex: 1 }}>
+            <Suspense fallback={<LoadingScreen fullscreen={false} lang={lang} />}>
+              {activeTab === 'home' && (
+                <DesktopHomePage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'kids-area' && (
+                <DesktopKidsAreaPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                  searchQuery={searchQuery}
+                />
+              )}
+
+              {activeTab === 'fun-park' && (
+                <DesktopFunParkPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                  searchQuery={searchQuery}
+                />
+              )}
+
+              {activeTab === 'challenge' && (
+                <DesktopChallengePage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                  searchQuery={searchQuery}
+                />
+              )}
+
+              {activeTab === 'adventure' && (
+                <DesktopAdventurePage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                  searchQuery={searchQuery}
+                />
+              )}
+
+              {activeTab === 'package' && (
+                <DesktopPackagePage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+            </Suspense>
+          </main>
+
+          {/* Desktop Footer */}
+          <DesktopFooter openModal={openModal} setActiveTab={setActiveTab} />
+
+          {/* Global Interactive Modals */}
+          {modal.isOpen && (
+            <MobileModals 
+              modalType={modal.type}
+              modalData={modal.data}
+              closeModal={closeModal}
+              setActiveTab={setActiveTab}
+              lang={lang}
+              setLang={setLang}
+            />
+          )}
+        </div>
+      ) : (
+        /* ========================================================================= */
+        /* MOBILE VIEW */
+        /* ========================================================================= */
+        <div className="mobile-app-shell">
+          {/* Top Mobile Header */}
+          <MobileHeader 
+            setActiveTab={setActiveTab}
+            onOpenMenu={() => openModal('menu-drawer')}
+            onOpenProfile={() => openModal('profile')}
+            lang={lang}
+          />
+
+          {/* Main Page Views with Lazy Loading Suspense Fallback */}
+          <main style={{ flex: 1 }}>
+            <Suspense fallback={<LoadingScreen fullscreen={false} lang={lang} />}>
+              {(activeTab === 'home' || activeTab === 'lobby') && (
+                <MobileHomePage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'kids-area' && (
+                <KidsAreaPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'fun-park' && (
+                <MobileFunParkPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'challenge' && (
+                <MobileChallengePage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'adventure' && (
+                <MobileAdventurePage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'package' && (
+                <MobilePackagePage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+            </Suspense>
+          </main>
+
+          {/* Fixed Curved Dock Bottom Navigation */}
+          <MobileBottomNav 
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            openModal={openModal}
+          />
+
+          {/* Global Interactive Modals & Drawers */}
+          {modal.isOpen && (
+            <MobileModals 
+              modalType={modal.type}
+              modalData={modal.data}
+              closeModal={closeModal}
+              setActiveTab={setActiveTab}
+              lang={lang}
+              setLang={setLang}
+            />
+          )}
+        </div>
+      )}
+    </>
   );
 }
