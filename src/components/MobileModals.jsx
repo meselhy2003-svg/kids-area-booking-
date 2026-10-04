@@ -8,7 +8,8 @@ export default function MobileModals({
   closeModal, 
   setActiveTab, 
   lang, 
-  setLang 
+  setLang,
+  openModal 
 }) {
   const { user, isAuthenticated, login, register, logout, addPassToWallet } = useAuth();
 
@@ -159,20 +160,22 @@ export default function MobileModals({
           {!bookingSuccess ? (
             <form onSubmit={handleConfirmBooking} className="booking-form-content">
               <div className="booking-header">
-                <span className="booking-badge">{modalData?.discount || 'Special Offer'}</span>
-                <h3 className="booking-title">{modalData?.name || 'Play Zone Pass'}</h3>
-                {modalData?.details && (
-                  <p className="booking-details-text">{modalData.details}</p>
+                <span className="booking-badge">{lang === 'ar' ? (modalData?.discountAr || modalData?.discount || 'عرض خاص') : (modalData?.discount || 'Special Offer')}</span>
+                <h3 className="booking-title">{lang === 'ar' ? (modalData?.nameAr || modalData?.name || 'تذكرة أمريكان دريم') : (modalData?.name || 'Play Zone Pass')}</h3>
+                {(modalData?.details || modalData?.detailsAr) && (
+                  <p className="booking-details-text">{lang === 'ar' ? (modalData?.detailsAr || modalData?.details) : modalData?.details}</p>
                 )}
                 <div className="booking-price-tag">
-                  {modalData?.price || '100 EGP'} 
-                  <span className="per-person"> / person</span>
+                  {lang === 'ar' ? (modalData?.priceAr || modalData?.price || '١٠٠ ج.م') : (modalData?.price || '100 EGP')} 
+                  <span className="per-person">{lang === 'ar' ? ' / للفرد' : ' / person'}</span>
                 </div>
               </div>
 
               {/* Quantity Counter */}
               <div className="booking-section-group">
-                <label className="booking-label">Tickets Quantity:</label>
+                <label className="booking-label">
+                  {lang === 'ar' ? 'عدد التذاكر:' : 'Tickets Quantity:'}
+                </label>
                 <div className="qty-counter-row">
                   <button 
                     type="button" 
@@ -194,12 +197,14 @@ export default function MobileModals({
 
               {/* Visit Date Selection */}
               <div className="booking-section-group">
-                <label className="booking-label">Select Visit Day:</label>
+                <label className="booking-label">
+                  {lang === 'ar' ? 'اختر يوم الزيارة:' : 'Select Visit Day:'}
+                </label>
                 <div className="date-pills-row">
                   {[
-                    { id: 'today', label: 'Today (اليوم)' },
-                    { id: 'tomorrow', label: 'Tomorrow (غداً)' },
-                    { id: 'weekend', label: 'Weekend (الجمعة)' }
+                    { id: 'today', label: lang === 'ar' ? 'اليوم' : 'Today' },
+                    { id: 'tomorrow', label: lang === 'ar' ? 'غداً' : 'Tomorrow' },
+                    { id: 'weekend', label: lang === 'ar' ? 'نهاية الأسبوع' : 'Weekend' }
                   ].map((d) => (
                     <button
                       key={d.id}
@@ -215,11 +220,13 @@ export default function MobileModals({
 
               {/* Contact Info */}
               <div className="booking-section-group">
-                <label className="booking-label">Parent / Guest Name:</label>
+                <label className="booking-label">
+                  {lang === 'ar' ? 'اسم ولي الأمر / الزائر:' : 'Parent / Guest Name:'}
+                </label>
                 <input 
                   type="text" 
                   required
-                  placeholder="Enter full name"
+                  placeholder={lang === 'ar' ? 'الاسم بالكامل' : 'Enter full name'}
                   className="booking-text-input"
                   value={guestName}
                   onChange={(e) => setGuestName(e.target.value)}
@@ -227,11 +234,13 @@ export default function MobileModals({
               </div>
 
               <div className="booking-section-group">
-                <label className="booking-label">Mobile Phone (WhatsApp):</label>
+                <label className="booking-label">
+                  {lang === 'ar' ? 'رقم الهاتف (واتساب):' : 'Mobile Phone (WhatsApp):'}
+                </label>
                 <input 
                   type="tel" 
                   required
-                  placeholder="e.g. 01012345678"
+                  placeholder="010XXXXXXXX"
                   className="booking-text-input"
                   value={guestPhone}
                   onChange={(e) => setGuestPhone(e.target.value)}
@@ -240,30 +249,34 @@ export default function MobileModals({
 
               {/* Live Price Summary */}
               <div className="booking-total-box">
-                <div className="total-label">Total Payable:</div>
+                <div className="total-label">
+                  {lang === 'ar' ? 'الإجمالي المطلوب:' : 'Total Payable:'}
+                </div>
                 <div className="total-amount">
-                  {(modalData?.priceNum ? modalData.priceNum * ticketQty : 100 * ticketQty)} EGP
+                  {(modalData?.priceNum ? modalData.priceNum * ticketQty : 100 * ticketQty)} {lang === 'ar' ? 'ج.م' : 'EGP'}
                 </div>
               </div>
 
               <button type="submit" className="booking-submit-btn">
-                🎟️ &nbsp; Confirm &amp; Reserve Online
+                🎟️ &nbsp; {lang === 'ar' ? 'تأكيد وحجز التذكرة أونلاين' : 'Confirm & Reserve Online'}
               </button>
             </form>
           ) : (
             <div className="booking-confirmation-view">
               <div className="confirm-icon-circle">✓</div>
-              <h3 className="confirm-title">Booking Confirmed!</h3>
+              <h3 className="confirm-title">{lang === 'ar' ? 'تم تأكيد الحجز بنجاح!' : 'Booking Confirmed!'}</h3>
               <p className="confirm-subtitle">
-                Your ticket voucher is ready. It has also been saved to your profile passes. Show this code or barcode at reception.
+                {lang === 'ar' 
+                  ? 'تذكرتك جاهزة الآن وتم حفظها في حسابك. يمكنك إبراز هذا الكود عند شباك الاستقبال.' 
+                  : 'Your ticket voucher is ready. It has also been saved to your profile passes. Show this code or barcode at reception.'}
               </p>
 
               <div className="booking-pass-card">
-                <div className="pass-code-label">RESERVATION PASS CODE</div>
+                <div className="pass-code-label">{lang === 'ar' ? 'كود حجز التذكرة' : 'RESERVATION PASS CODE'}</div>
                 <div className="pass-code-val">{bookingCode}</div>
                 <div className="pass-details-row">
-                  <span><strong>Guest:</strong> {guestName || user?.name || 'Valued Visitor'}</span>
-                  <span><strong>Tickets:</strong> {ticketQty}x Pass</span>
+                  <span><strong>{lang === 'ar' ? 'الاسم:' : 'Guest:'}</strong> {guestName || user?.name || (lang === 'ar' ? 'زائر عزيز' : 'Valued Visitor')}</span>
+                  <span><strong>{lang === 'ar' ? 'التذاكر:' : 'Tickets:'}</strong> {ticketQty}x {lang === 'ar' ? 'تذكرة' : 'Pass'}</span>
                 </div>
                 <div className="pass-zone-title">{modalData?.name}</div>
               </div>
@@ -273,7 +286,7 @@ export default function MobileModals({
                 className="confirm-done-btn"
                 onClick={closeModal}
               >
-                Done &amp; Return to Park
+                {lang === 'ar' ? 'تم • العودة للمنطقة' : 'Done & Return to Park'}
               </button>
             </div>
           )}
@@ -281,15 +294,15 @@ export default function MobileModals({
       )}
 
       {/* 2. 360 VIRTUAL TOUR MODAL */}
-      {modalType === 'virtual-tour' && (
+      {(modalType === 'virtual-tour' || modalType === 'tour') && (
         <div 
           className="mobile-modal-sheet tour-sheet"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="tour-header">
             <div className="tour-title-wrap">
-              <span className="tour-badge">INTERACTIVE 360°</span>
-              <h3>Play Zone Virtual Tour</h3>
+              <span className="tour-badge">{lang === 'ar' ? 'تفاعلية ٣٦٠°' : 'INTERACTIVE 360°'}</span>
+              <h3>{lang === 'ar' ? 'جولة افتراضية ٣٦٠° في أمريكان دريم' : 'Play Zone Virtual Tour'}</h3>
             </div>
             <button className="tour-close-btn" onClick={closeModal}>✕</button>
           </div>
@@ -311,7 +324,7 @@ export default function MobileModals({
             >
               <img 
                 src="/photo/kid-area-pic/dome-360.png" 
-                alt="360 View" 
+                alt={lang === 'ar' ? 'عرض ٣٦٠°' : '360 View'} 
                 className="tour-pan-img" 
                 onError={(e) => {
                   e.currentTarget.src = '/photo/kid-area-pic/360 Virtual Dome Card (~32% width_ 4 columns).png';
@@ -320,7 +333,7 @@ export default function MobileModals({
             </div>
 
             <div className="tour-hint-overlay">
-              <span>↔ Drag left &amp; right to look around 360°</span>
+              <span>{lang === 'ar' ? '↔ اسحب يميناً ويساراً للاستكشاف بزاوية ٣٦٠°' : '↔ Drag left & right to look around 360°'}</span>
             </div>
 
             {/* Virtual Zone Jump Buttons */}
@@ -329,25 +342,25 @@ export default function MobileModals({
                 className="tour-pill"
                 onClick={() => { closeModal(); setActiveTab('kids-area'); }}
               >
-                Kids Area
+                {lang === 'ar' ? 'منطقة الأطفال' : 'Kids Area'}
               </button>
               <button 
                 className="tour-pill"
                 onClick={() => { closeModal(); setActiveTab('fun-park'); }}
               >
-                Fun Park
+                {lang === 'ar' ? 'فن بارك' : 'Fun Park'}
               </button>
               <button 
                 className="tour-pill"
                 onClick={() => { closeModal(); setActiveTab('challenge'); }}
               >
-                Arcade VR
+                {lang === 'ar' ? 'ألعاب التحدي والـ VR' : 'Arcade VR'}
               </button>
               <button 
                 className="tour-pill"
                 onClick={() => { closeModal(); setActiveTab('adventure'); }}
               >
-                High Ropes
+                {lang === 'ar' ? 'مسار الحبال والمغامرات' : 'High Ropes'}
               </button>
             </div>
           </div>
@@ -367,9 +380,51 @@ export default function MobileModals({
                 alt="Play Zone" 
                 className="drawer-logo-img" 
               />
-              <span className="drawer-brand-name">PLAY ZONE</span>
+              <span className="drawer-brand-name">
+                {lang === 'ar' ? 'أمريكان دريم' : 'PLAY ZONE'}
+              </span>
             </div>
             <button className="drawer-close-btn" onClick={closeModal}>✕</button>
+          </div>
+
+          {/* Language Switcher in Drawer */}
+          <div className="drawer-lang-toggle" style={{ display: 'flex', gap: '8px', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: '12px', margin: '0 16px 14px' }}>
+            <button 
+              type="button"
+              className={`drawer-lang-btn ${lang === 'ar' ? 'active' : ''}`}
+              onClick={() => setLang && setLang('ar')}
+              style={{
+                flex: 1,
+                padding: '8px 10px',
+                borderRadius: '8px',
+                border: lang === 'ar' ? '1.5px solid #00a9c3' : '1px solid rgba(255,255,255,0.15)',
+                background: lang === 'ar' ? 'rgba(0, 169, 195, 0.25)' : 'transparent',
+                color: lang === 'ar' ? '#00b4d8' : '#e2e8f0',
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                cursor: 'pointer'
+              }}
+            >
+              🇪🇬 العربية (مصر)
+            </button>
+            <button 
+              type="button"
+              className={`drawer-lang-btn ${lang === 'en' ? 'active' : ''}`}
+              onClick={() => setLang && setLang('en')}
+              style={{
+                flex: 1,
+                padding: '8px 10px',
+                borderRadius: '8px',
+                border: lang === 'en' ? '1.5px solid #00a9c3' : '1px solid rgba(255,255,255,0.15)',
+                background: lang === 'en' ? 'rgba(0, 169, 195, 0.25)' : 'transparent',
+                color: lang === 'en' ? '#00b4d8' : '#e2e8f0',
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                cursor: 'pointer'
+              }}
+            >
+              🇬🇧 English
+            </button>
           </div>
 
           <div className="drawer-nav-links">
@@ -378,8 +433,9 @@ export default function MobileModals({
               onClick={() => { closeModal(); setActiveTab('home'); }}
             >
               <img src="/photo/kid-area-pic/icon/home-icon.png" alt="Home" className="drawer-icon" />
-              <span className="drawer-item-title-en">Home</span>
-              <span className="drawer-item-title-ar font-alexandria">(الرئيسية)</span>
+              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
+                {lang === 'ar' ? 'الرئيسية' : 'Home'}
+              </span>
             </button>
 
             <button 
@@ -387,8 +443,9 @@ export default function MobileModals({
               onClick={() => { closeModal(); setActiveTab('kids-area'); }}
             >
               <img src="/photo/kid-area-pic/icon/kids-icon.png" alt="Kids Area" className="drawer-icon" />
-              <span className="drawer-item-title-en">Kids Area</span>
-              <span className="drawer-item-title-ar font-alexandria">(منطقة الأطفال)</span>
+              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
+                {lang === 'ar' ? 'منطقة الأطفال' : 'Kids Area'}
+              </span>
             </button>
 
             <button 
@@ -396,8 +453,9 @@ export default function MobileModals({
               onClick={() => { closeModal(); setActiveTab('fun-park'); }}
             >
               <img src="/photo/kid-area-pic/icon/funpark-icon.png" alt="Fun Park" className="drawer-icon" />
-              <span className="drawer-item-title-en">Fun Park</span>
-              <span className="drawer-item-title-ar font-alexandria">(منطقة المرح)</span>
+              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
+                {lang === 'ar' ? 'فن بارك' : 'Fun Park'}
+              </span>
             </button>
 
             <button 
@@ -405,8 +463,9 @@ export default function MobileModals({
               onClick={() => { closeModal(); setActiveTab('challenge'); }}
             >
               <img src="/photo/kid-area-pic/icon/challenge-icon.png" alt="Challenge" className="drawer-icon" />
-              <span className="drawer-item-title-en">Challenge Zone</span>
-              <span className="drawer-item-title-ar font-alexandria">(الآركيد وVR)</span>
+              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
+                {lang === 'ar' ? 'منطقة التحدي والآركيد' : 'Challenge Zone'}
+              </span>
             </button>
 
             <button 
@@ -414,8 +473,9 @@ export default function MobileModals({
               onClick={() => { closeModal(); setActiveTab('adventure'); }}
             >
               <img src="/photo/kid-area-pic/icon/adventure-icon.png" alt="Adventure" className="drawer-icon" />
-              <span className="drawer-item-title-en">Adventure Zone</span>
-              <span className="drawer-item-title-ar font-alexandria">(الحبال والتسلق)</span>
+              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
+                {lang === 'ar' ? 'منطقة المغامرات والحبال' : 'Adventure Zone'}
+              </span>
             </button>
 
             <button 
@@ -423,8 +483,59 @@ export default function MobileModals({
               onClick={() => { closeModal(); setActiveTab('package'); }}
             >
               <img src="/photo/kid-area-pic/icon/package-icon.png" alt="Packages" className="drawer-icon" />
-              <span className="drawer-item-title-en">Party &amp; Birthday Packages</span>
-              <span className="drawer-item-title-ar font-alexandria">(الباقات)</span>
+              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
+                {lang === 'ar' ? 'باقات الألعاب والتوفير' : 'Party & Birthday Packages'}
+              </span>
+            </button>
+
+            <button 
+              className="drawer-nav-item"
+              onClick={() => { closeModal(); setActiveTab('events'); }}
+            >
+              <img src="/photo/kid area pic/icon/Icon (14).png" alt="Events" className="drawer-icon" />
+              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
+                {lang === 'ar' ? 'الحفلات والقاعات' : 'Events & Halls'}
+              </span>
+            </button>
+
+            <button 
+              className="drawer-nav-item"
+              onClick={() => { closeModal(); openModal ? openModal('restaurant-menu') : null; }}
+            >
+              <img src="/photo/kid area pic/icon/Icon (12)dadd.png" alt="Restaurant" className="drawer-icon" />
+              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
+                {lang === 'ar' ? 'المطعم والكافيه' : 'Restaurant & Cafe'}
+              </span>
+            </button>
+
+            <button 
+              className="drawer-nav-item"
+              onClick={() => { closeModal(); setActiveTab('trips'); }}
+            >
+              <img src="/photo/kid area pic/icon/cart.png" alt="Trips" className="drawer-icon" />
+              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
+                {lang === 'ar' ? 'رحلات المدارس والمجموعات' : 'School & Group Trips'}
+              </span>
+            </button>
+
+            <button 
+              className="drawer-nav-item"
+              onClick={() => { closeModal(); setActiveTab('cart'); }}
+            >
+              <img src="/photo/kid area pic/icon/cart.png" alt="Cart" className="drawer-icon" />
+              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
+                {lang === 'ar' ? 'سلة الحجز والتذاكر' : 'My Cart & Passes'}
+              </span>
+            </button>
+
+            <button 
+              className="drawer-nav-item"
+              onClick={() => { closeModal(); setActiveTab('about'); }}
+            >
+              <img src="/photo/logo/logo nav bar and footer.png" alt="About" className="drawer-icon" />
+              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
+                {lang === 'ar' ? 'عن الحديقة والآراء' : 'About Us & Reviews'}
+              </span>
             </button>
           </div>
 
@@ -438,28 +549,32 @@ export default function MobileModals({
                   <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                   <circle cx="12" cy="10" r="3" />
                 </svg>
-                Location:
+                {lang === 'ar' ? 'الموقع:' : 'Location:'}
               </span>
-              <span className="info-val">American Dream Park, Ismailia</span>
+              <span className="info-val">
+                {lang === 'ar' ? 'أمريكان دريم بارك، الإسماعيلية' : 'American Dream Park, Ismailia'}
+              </span>
             </div>
             <div className="info-row">
               <span className="info-label">
                 <svg className="drawer-info-icon icon-yellow" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
+                  <circle cx="12" cy="10" r="10" />
                   <polyline points="12 6 12 12 16 14" />
                 </svg>
-                Working Hours:
+                {lang === 'ar' ? 'مواعيد العمل:' : 'Working Hours:'}
               </span>
-              <span className="info-val">10:00 AM – 11:30 PM Daily</span>
+              <span className="info-val">
+                {lang === 'ar' ? 'يومياً: ١٠:٠٠ ص – ١١:٣٠ م' : '10:00 AM – 11:30 PM Daily'}
+              </span>
             </div>
             <div className="info-row">
               <span className="info-label">
                 <svg className="drawer-info-icon icon-cyan" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                 </svg>
-                Support Hotline:
+                {lang === 'ar' ? 'خدمة العملاء:' : 'Support Hotline:'}
               </span>
-              <span className="info-val">19876 / 01023456789</span>
+              <span className="info-val">٠١٠١٢٣٤٥٦٧٨</span>
             </div>
           </div>
         </div>
@@ -485,8 +600,8 @@ export default function MobileModals({
                     className="profile-avatar-img" 
                   />
                 </div>
-                <h3 className="profile-name">{user?.name || 'American Dream Guest'}</h3>
-                <span className="profile-membership">{user?.membership || 'VIP Member • Gold Club'}</span>
+                <h3 className="profile-name">{user?.name || (lang === 'ar' ? 'زائر أمريكان دريم' : 'American Dream Guest')}</h3>
+                <span className="profile-membership">{user?.membership || (lang === 'ar' ? 'عضو مميز • النادي الذهبي' : 'VIP Member • Gold Club')}</span>
                 {user?.phone && (
                   <span style={{ fontSize: '0.8rem', color: '#7a9299', marginTop: '4px' }}>
                     📱 {user.phone}
@@ -501,15 +616,15 @@ export default function MobileModals({
                   style={{ cursor: 'pointer' }}
                 >
                   <span className="stat-value">{user?.activePasses?.length || 0}</span>
-                  <span className="stat-label">Active Passes</span>
+                  <span className="stat-label">{lang === 'ar' ? 'تذاكر سارية' : 'Active Passes'}</span>
                 </div>
                 <div className="profile-stat-box">
                   <span className="stat-value">{user?.points || 340}</span>
-                  <span className="stat-label">Play Points</span>
+                  <span className="stat-label">{lang === 'ar' ? 'نقاط اللعب' : 'Play Points'}</span>
                 </div>
                 <div className="profile-stat-box">
                   <span className="stat-value">{user?.zoneVisits || 4}</span>
-                  <span className="stat-label">Zone Visits</span>
+                  <span className="stat-label">{lang === 'ar' ? 'مرات الزيارة' : 'Zone Visits'}</span>
                 </div>
               </div>
 
@@ -527,7 +642,9 @@ export default function MobileModals({
                     </svg>
                   </div>
                   <span className="profile-btn-text">
-                    View &amp; Recharge Wristband ({user?.activePasses?.length || 0} passes)
+                    {lang === 'ar' 
+                      ? `عرض وشحن الأسورة الذكية (${user?.activePasses?.length || 0} تذاكر)` 
+                      : `View & Recharge Wristband (${user?.activePasses?.length || 0} passes)`}
                   </span>
                 </button>
 
@@ -546,7 +663,9 @@ export default function MobileModals({
                       <path d="M14 14h3v3h-3zM18 18h3v3h-3zM14 20h3M20 14v3" />
                     </svg>
                   </div>
-                  <span className="profile-btn-text">Kids Area Fast Entry QR</span>
+                  <span className="profile-btn-text">
+                    {lang === 'ar' ? 'رمز الدخول السريع QR للألعاب' : 'Kids Area Fast Entry QR'}
+                  </span>
                 </button>
 
                 <button 
@@ -559,7 +678,9 @@ export default function MobileModals({
                     </svg>
                   </div>
                   <span className="profile-btn-text">
-                    {isAuthenticated ? 'Switch Account / Re-login' : 'Sign In / Register'}
+                    {isAuthenticated 
+                      ? (lang === 'ar' ? 'تبديل الحساب / تسجيل الدخول' : 'Switch Account / Re-login') 
+                      : (lang === 'ar' ? 'تسجيل الدخول / إنشاء حساب' : 'Sign In / Register')}
                   </span>
                 </button>
 
@@ -575,7 +696,9 @@ export default function MobileModals({
                     <div className="profile-btn-icon-wrap" style={{ background: 'rgba(239, 68, 68, 0.15)' }}>
                       <span style={{ fontSize: '1.1rem' }}>🚪</span>
                     </div>
-                    <span className="profile-btn-text" style={{ color: '#ef4444' }}>Log Out</span>
+                    <span className="profile-btn-text" style={{ color: '#ef4444' }}>
+                      {lang === 'ar' ? 'تسجيل الخروج' : 'Log Out'}
+                    </span>
                   </button>
                 )}
               </div>
@@ -590,20 +713,22 @@ export default function MobileModals({
                   onClick={() => setProfileView('profile')}
                   style={{ background: 'transparent', border: 'none', color: '#00a9c3', fontSize: '1rem', cursor: 'pointer' }}
                 >
-                  ← Back
+                  {lang === 'ar' ? '← رجوع' : '← Back'}
                 </button>
-                <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#06283d' }}>My Active Passes</h3>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#06283d' }}>
+                  {lang === 'ar' ? 'تذاكري السارية' : 'My Active Passes'}
+                </h3>
               </div>
 
               {(!user?.activePasses || user.activePasses.length === 0) ? (
                 <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#7a9299' }}>
-                  <p>No active passes yet.</p>
+                  <p>{lang === 'ar' ? 'لا توجد تذاكر نشطة حالياً.' : 'No active passes yet.'}</p>
                   <button 
                     className="booking-submit-btn"
                     style={{ marginTop: '1rem' }}
                     onClick={() => { closeModal(); setActiveTab('kids-area'); }}
                   >
-                    Book Your First Pass
+                    {lang === 'ar' ? 'احجز تذكرتك الأولى الآن' : 'Book Your First Pass'}
                   </button>
                 </div>
               ) : (
@@ -612,18 +737,18 @@ export default function MobileModals({
                     <div 
                       key={idx} 
                       className="booking-pass-card"
-                      style={{ margin: 0, textAlign: 'left' }}
+                      style={{ margin: 0, textAlign: lang === 'ar' ? 'right' : 'left' }}
                     >
-                      <div className="pass-code-label">CODE: {pass.code}</div>
+                      <div className="pass-code-label">{lang === 'ar' ? 'الكود:' : 'CODE:'} {pass.code}</div>
                       <div className="pass-zone-title" style={{ fontSize: '1.1rem', marginTop: '4px' }}>
                         {pass.name}
                       </div>
                       <div className="pass-details-row" style={{ marginTop: '8px' }}>
-                        <span><strong>Qty:</strong> {pass.quantity}x Pass</span>
-                        <span><strong>Status:</strong> <span style={{ color: '#10b981' }}>{pass.status || 'Active'}</span></span>
+                        <span><strong>{lang === 'ar' ? 'الكمية:' : 'Qty:'}</strong> {pass.quantity}x {lang === 'ar' ? 'تذكرة' : 'Pass'}</span>
+                        <span><strong>{lang === 'ar' ? 'الحالة:' : 'Status:'}</strong> <span style={{ color: '#10b981' }}>{pass.status === 'Active' || !pass.status ? (lang === 'ar' ? 'سارية' : 'Active') : pass.status}</span></span>
                       </div>
                       <div style={{ fontSize: '0.8rem', color: '#7a9299', marginTop: '4px' }}>
-                        {pass.date || 'Valid Today'} • {pass.price}
+                        {pass.date === 'Valid Today' ? (lang === 'ar' ? 'صالحة اليوم' : 'Valid Today') : pass.date} • {pass.price}
                       </div>
                     </div>
                   ))}
@@ -640,9 +765,11 @@ export default function MobileModals({
                   onClick={() => setProfileView('profile')}
                   style={{ background: 'transparent', border: 'none', color: '#00a9c3', fontSize: '1rem', cursor: 'pointer' }}
                 >
-                  ← Back
+                  {lang === 'ar' ? '← رجوع' : '← Back'}
                 </button>
-                <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#06283d' }}>Fast Entry QR</h3>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#06283d' }}>
+                  {lang === 'ar' ? 'رمز الدخول السريع QR' : 'Fast Entry QR'}
+                </h3>
               </div>
 
               <div style={{ 
@@ -667,10 +794,10 @@ export default function MobileModals({
               </div>
 
               <div style={{ fontSize: '1rem', fontWeight: 600, color: '#06283d' }}>
-                {user?.name || 'American Dream Member'}
+                {user?.name || (lang === 'ar' ? 'عضو أمريكان دريم' : 'American Dream Member')}
               </div>
               <p style={{ fontSize: '0.82rem', color: '#7a9299', margin: '6px 0 16px' }}>
-                Scan at turnstile barrier gate for instant contact-free entry.
+                {lang === 'ar' ? 'امسح الرمز عند البوابة الإلكترونية للدخول المباشر السريع دون انتظار.' : 'Scan at turnstile barrier gate for instant contact-free entry.'}
               </p>
             </div>
           )}
@@ -683,9 +810,11 @@ export default function MobileModals({
                   onClick={() => setProfileView('profile')}
                   style={{ background: 'transparent', border: 'none', color: '#00a9c3', fontSize: '1rem', cursor: 'pointer' }}
                 >
-                  ← Back
+                  {lang === 'ar' ? '← رجوع' : '← Back'}
                 </button>
-                <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#06283d' }}>Sign In to Account</h3>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#06283d' }}>
+                  {lang === 'ar' ? 'تسجيل الدخول إلى الحساب' : 'Sign In to Account'}
+                </h3>
               </div>
 
               {authMsg && (
@@ -696,11 +825,13 @@ export default function MobileModals({
 
               <form onSubmit={handleAuthLogin} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div>
-                  <label className="booking-label">Mobile Number or Email:</label>
+                  <label className="booking-label">
+                    {lang === 'ar' ? 'رقم الهاتف أو البريد الإلكتروني:' : 'Mobile Number or Email:'}
+                  </label>
                   <input 
                     type="text" 
                     required 
-                    placeholder="01012345678 or user@domain.com"
+                    placeholder={lang === 'ar' ? '01012345678 أو البريد' : '01012345678 or user@domain.com'}
                     className="booking-text-input"
                     value={authIdentifier}
                     onChange={(e) => setAuthIdentifier(e.target.value)}
@@ -708,11 +839,13 @@ export default function MobileModals({
                 </div>
 
                 <div>
-                  <label className="booking-label">Password:</label>
+                  <label className="booking-label">
+                    {lang === 'ar' ? 'كلمة المرور:' : 'Password:'}
+                  </label>
                   <input 
                     type="password" 
                     required 
-                    placeholder="Enter password"
+                    placeholder={lang === 'ar' ? 'أدخل كلمة المرور' : 'Enter password'}
                     className="booking-text-input"
                     value={authPassword}
                     onChange={(e) => setAuthPassword(e.target.value)}
@@ -720,17 +853,17 @@ export default function MobileModals({
                 </div>
 
                 <button type="submit" className="booking-submit-btn" style={{ marginTop: '8px' }}>
-                  Sign In
+                  {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
                 </button>
 
                 <div style={{ textAlign: 'center', marginTop: '8px', fontSize: '0.88rem' }}>
-                  Don't have an account?{' '}
+                  {lang === 'ar' ? 'ليس لديك حساب؟ ' : "Don't have an account? "}
                   <button 
                     type="button" 
                     onClick={() => { setProfileView('register'); setAuthMsg(''); }}
                     style={{ background: 'none', border: 'none', color: '#00a9c3', fontWeight: 600, cursor: 'pointer' }}
                   >
-                    Register New Account
+                    {lang === 'ar' ? 'إنشاء حساب جديد' : 'Register New Account'}
                   </button>
                 </div>
               </form>
@@ -745,9 +878,11 @@ export default function MobileModals({
                   onClick={() => setProfileView('profile')}
                   style={{ background: 'transparent', border: 'none', color: '#00a9c3', fontSize: '1rem', cursor: 'pointer' }}
                 >
-                  ← Back
+                  {lang === 'ar' ? '← رجوع' : '← Back'}
                 </button>
-                <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#06283d' }}>Create New Account</h3>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#06283d' }}>
+                  {lang === 'ar' ? 'إنشاء حساب جديد' : 'Create New Account'}
+                </h3>
               </div>
 
               {authMsg && (
@@ -758,11 +893,13 @@ export default function MobileModals({
 
               <form onSubmit={handleAuthRegister} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div>
-                  <label className="booking-label">Your Full Name:</label>
+                  <label className="booking-label">
+                    {lang === 'ar' ? 'الاسم بالكامل:' : 'Your Full Name:'}
+                  </label>
                   <input 
                     type="text" 
                     required 
-                    placeholder="e.g. Sara Mohamed"
+                    placeholder={lang === 'ar' ? 'مثال: سارة محمد' : 'e.g. Sara Mohamed'}
                     className="booking-text-input"
                     value={authName}
                     onChange={(e) => setAuthName(e.target.value)}
@@ -770,11 +907,13 @@ export default function MobileModals({
                 </div>
 
                 <div>
-                  <label className="booking-label">Mobile Number (WhatsApp):</label>
+                  <label className="booking-label">
+                    {lang === 'ar' ? 'رقم الهاتف (واتساب):' : 'Mobile Number (WhatsApp):'}
+                  </label>
                   <input 
                     type="tel" 
                     required 
-                    placeholder="e.g. 01098765432"
+                    placeholder="01098765432"
                     className="booking-text-input"
                     value={authPhone}
                     onChange={(e) => setAuthPhone(e.target.value)}
@@ -782,7 +921,9 @@ export default function MobileModals({
                 </div>
 
                 <div>
-                  <label className="booking-label">Email (Optional):</label>
+                  <label className="booking-label">
+                    {lang === 'ar' ? 'البريد الإلكتروني (اختياري):' : 'Email (Optional):'}
+                  </label>
                   <input 
                     type="email" 
                     placeholder="name@example.com"
@@ -793,11 +934,13 @@ export default function MobileModals({
                 </div>
 
                 <div>
-                  <label className="booking-label">Password:</label>
+                  <label className="booking-label">
+                    {lang === 'ar' ? 'كلمة المرور:' : 'Password:'}
+                  </label>
                   <input 
                     type="password" 
                     required 
-                    placeholder="Create a password"
+                    placeholder={lang === 'ar' ? 'أنشئ كلمة مرور' : 'Create a password'}
                     className="booking-text-input"
                     value={authPassword}
                     onChange={(e) => setAuthPassword(e.target.value)}
@@ -805,17 +948,17 @@ export default function MobileModals({
                 </div>
 
                 <button type="submit" className="booking-submit-btn" style={{ marginTop: '8px' }}>
-                  Create Account (+100 Bonus Points)
+                  {lang === 'ar' ? 'إنشاء الحساب (+١٠٠ نقطة ترحيبية)' : 'Create Account (+100 Bonus Points)'}
                 </button>
 
                 <div style={{ textAlign: 'center', marginTop: '8px', fontSize: '0.88rem' }}>
-                  Already registered?{' '}
+                  {lang === 'ar' ? 'لديك حساب بالفعل؟ ' : 'Already registered? '}
                   <button 
                     type="button" 
                     onClick={() => { setProfileView('login'); setAuthMsg(''); }}
                     style={{ background: 'none', border: 'none', color: '#00a9c3', fontWeight: 600, cursor: 'pointer' }}
                   >
-                    Sign In
+                    {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
                   </button>
                 </div>
               </form>
@@ -836,7 +979,7 @@ export default function MobileModals({
           <div className="attraction-detail-hero">
             <img 
               src={modalData?.img || modalData?.fallbackImg} 
-              alt={modalData?.titleEn} 
+              alt={lang === 'ar' ? (modalData?.titleAr || modalData?.title) : (modalData?.titleEn || modalData?.title)} 
               className="attr-detail-hero-img" 
               onError={(e) => {
                 e.currentTarget.src = modalData?.fallbackImg;
@@ -845,14 +988,23 @@ export default function MobileModals({
           </div>
 
           <div className="attraction-detail-body">
-            <h3 className="attr-detail-title">{modalData?.titleEn}</h3>
-            <h4 className="attr-detail-title-ar">{modalData?.titleAr}</h4>
-            <p className="attr-detail-desc">{modalData?.desc}</p>
+            <h3 className="attr-detail-title">
+              {lang === 'ar' ? (modalData?.titleAr || modalData?.title) : (modalData?.titleEn || modalData?.title)}
+            </h3>
+            <p className="attr-detail-desc">
+              {lang === 'ar' ? (modalData?.descAr || modalData?.desc) : modalData?.desc}
+            </p>
 
             <div className="attr-safety-checklist">
-              <div className="checklist-item">✓ Fully sanitized and cleaned every 2 hours</div>
-              <div className="checklist-item">✓ Trained safety supervisors present at all times</div>
-              <div className="checklist-item">✓ Grip socks required (available at reception)</div>
+              <div className="checklist-item">
+                {lang === 'ar' ? '✓ تعقيم وتطهير شامل للألعاب كل ساعتين' : '✓ Fully sanitized and cleaned every 2 hours'}
+              </div>
+              <div className="checklist-item">
+                {lang === 'ar' ? '✓ مشرفون ومدربون معتمدون للسلامة طوال الوقت' : '✓ Trained safety supervisors present at all times'}
+              </div>
+              <div className="checklist-item">
+                {lang === 'ar' ? '✓ جوارب مانعة للانزلاق إلزامية (متوفرة بالاستقبال)' : '✓ Grip socks required (available at reception)'}
+              </div>
             </div>
 
             <button 
@@ -865,7 +1017,7 @@ export default function MobileModals({
                 }, 100);
               }}
             >
-              Book Entry Pass For This Attraction
+              {lang === 'ar' ? 'حجز تذكرة الدخول لهذه اللعبة' : 'Book Entry Pass For This Attraction'}
             </button>
           </div>
         </div>
@@ -889,9 +1041,13 @@ export default function MobileModals({
 
             <div className="lightbox-img-wrap">
               <img 
-                src={modalData.images[lightboxIndex]?.src} 
+                src={modalData.images[lightboxIndex]?.src || modalData.images[lightboxIndex]?.url} 
                 alt={modalData.images[lightboxIndex]?.title} 
                 className="lightbox-main-img" 
+                onError={(e) => {
+                  const fallback = modalData.images[lightboxIndex]?.fallbackSrc;
+                  if (fallback) e.currentTarget.src = fallback;
+                }}
               />
               <div className="lightbox-caption">
                 {modalData.images[lightboxIndex]?.title} ({lightboxIndex + 1} / {modalData.images.length})
@@ -916,9 +1072,275 @@ export default function MobileModals({
         >
           <div className="sheet-drag-handle" />
           <button className="sheet-close-x" onClick={closeModal}>✕</button>
-          <h3 className="info-modal-title">{modalData?.title}</h3>
-          <p className="info-modal-body">{modalData?.text}</p>
-          <button className="confirm-done-btn" onClick={closeModal}>Close</button>
+          <h3 className="info-modal-title">{lang === 'ar' ? (modalData?.titleAr || modalData?.title) : modalData?.title}</h3>
+          <p className="info-modal-body">{lang === 'ar' ? (modalData?.textAr || modalData?.text) : modalData?.text}</p>
+          <button className="confirm-done-btn" onClick={closeModal}>
+            {lang === 'ar' ? 'إغلاق' : 'Close'}
+          </button>
+        </div>
+      )}
+
+      {/* 8. ABOUT AMERICAN DREAM MODAL */}
+      {modalType === 'about-info' && (
+        <div 
+          className="mobile-modal-sheet info-sheet"
+          style={{ maxWidth: '640px', padding: '0', overflow: 'hidden' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button className="sheet-close-x" onClick={closeModal} style={{ zIndex: 10, background: 'rgba(0,0,0,0.5)', color: '#fff' }}>✕</button>
+          <div style={{ height: '200px', width: '100%', position: 'relative' }}>
+            <img 
+              src="/photo/kid area pic/American Dream Ismailia luxury event hall architecture setup.png" 
+              alt={lang === 'ar' ? 'أمريكان دريم بالإسماعيلية' : 'American Dream Ismailia'} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 40%, #0d2847 100%)' }} />
+            <h3 style={{ position: 'absolute', bottom: '16px', left: lang === 'ar' ? 'auto' : '24px', right: lang === 'ar' ? '24px' : 'auto', color: '#fff', fontSize: '1.4rem', fontWeight: 800, margin: 0 }}>
+              {lang === 'ar' ? 'عن أمريكان دريم بالإسماعيلية' : 'About American Dream Ismailia'}
+            </h3>
+          </div>
+          <div style={{ padding: '24px 28px', color: '#1e293b' }}>
+            <p style={{ fontSize: '0.92rem', lineHeight: '1.65', color: '#475569', margin: '0 0 20px' }}>
+              {lang === 'ar' ? (
+                <>يقع <strong>أمريكان دريم</strong> مباشرة على ضفاف قناة السويس الهادئة بالإسماعيلية، وهو منتجع ترفيهي وعائلي فاخر متكامل. يجمع بين مناطق ألعاب داخلية وخارجية واسعة، ألعاب واقع افتراضي حديثة، قاعات احتفالات كبرى للأفراح والمناسبات، ومطاعم شاطئية بإطلالة بحرية خلابة، لنصنع تجارب لا تُنسى لجميع الأعمار.</>
+              ) : (
+                <>Located right on the tranquil waterfront of the historic Suez Canal in Ismailia, <strong>American Dream</strong> is a premier luxury entertainment and family resort. Combining expansive indoor & outdoor Play Zones, cutting-edge VR arcades, grand event celebration halls, and open-air seaside dining, we craft memorable experiences for guests of all ages.</>
+              )}
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '24px' }}>
+              {lang === 'ar' ? (
+                <>
+                  <div style={{ background: '#f0fdfa', border: '1px solid #ccfbf1', padding: '12px 14px', borderRadius: '12px' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f766e' }}>٤ مناطق ألعاب</div>
+                    <div style={{ fontSize: '0.78rem', color: '#115e59' }}>منطقة الأطفال، فن بارك، التحدي، والمغامرات</div>
+                  </div>
+                  <div style={{ background: '#fefce8', border: '1px solid #fef08a', padding: '12px 14px', borderRadius: '12px' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#a16207' }}>٤٥٠ فرد</div>
+                    <div style={{ fontSize: '0.78rem', color: '#854d0e' }}>قاعة كبرى وأفراح على ضفاف القناة</div>
+                  </div>
+                  <div style={{ background: '#f0f9ff', border: '1px solid #e0f2fe', padding: '12px 14px', borderRadius: '12px' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0369a1' }}>قناة السويس</div>
+                    <div style={{ fontSize: '0.78rem', color: '#075985' }}>إطلالة شاطئية وجلسات وقت الغروب</div>
+                  </div>
+                  <div style={{ background: '#fdf2f8', border: '1px solid #fce7f3', padding: '12px 14px', borderRadius: '12px' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#be185d' }}>١٠٠٪ أمان</div>
+                    <div style={{ fontSize: '0.78rem', color: '#9d174d' }}>مشرفون معتمدون وتعقيم دوري مستمر</div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ background: '#f0fdfa', border: '1px solid #ccfbf1', padding: '12px 14px', borderRadius: '12px' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f766e' }}>4 Zones</div>
+                    <div style={{ fontSize: '0.78rem', color: '#115e59' }}>Kids Area, Fun Park, VR & Adventure</div>
+                  </div>
+                  <div style={{ background: '#fefce8', border: '1px solid #fef08a', padding: '12px 14px', borderRadius: '12px' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#a16207' }}>450 Guests</div>
+                    <div style={{ fontSize: '0.78rem', color: '#854d0e' }}>Waterfront Grand Ballroom & Halls</div>
+                  </div>
+                  <div style={{ background: '#f0f9ff', border: '1px solid #e0f2fe', padding: '12px 14px', borderRadius: '12px' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0369a1' }}>Suez Canal</div>
+                    <div style={{ fontSize: '0.78rem', color: '#075985' }}>Seaside Lounge & Sunset Views</div>
+                  </div>
+                  <div style={{ background: '#fdf2f8', border: '1px solid #fce7f3', padding: '12px 14px', borderRadius: '12px' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#be185d' }}>100% Safe</div>
+                    <div style={{ fontSize: '0.78rem', color: '#9d174d' }}>Certified Supervisors & Sanitization</div>
+                  </div>
+                </>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                type="button"
+                className="confirm-done-btn"
+                style={{ flex: 1, background: '#00a8cc' }}
+                onClick={() => { closeModal(); setActiveTab('events'); }}
+              >
+                {lang === 'ar' ? 'استكشف الحفلات والقاعات' : 'Explore Events & Halls'}
+              </button>
+              <button 
+                type="button"
+                className="confirm-done-btn"
+                style={{ flex: 1, background: '#e2e8f0', color: '#334155' }}
+                onClick={closeModal}
+              >
+                {lang === 'ar' ? 'إغلاق' : 'Close'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 9. RESTAURANT & CAFE MENU MODAL */}
+      {modalType === 'restaurant-menu' && (
+        <div 
+          className="mobile-modal-sheet info-sheet"
+          style={{ maxWidth: '640px', padding: '0', overflow: 'hidden' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button className="sheet-close-x" onClick={closeModal} style={{ zIndex: 10, background: 'rgba(0,0,0,0.5)', color: '#fff' }}>✕</button>
+          <div style={{ height: '210px', width: '100%', position: 'relative' }}>
+            <img 
+              src="/photo/kid area pic/Image.png" 
+              alt={lang === 'ar' ? 'المطعم والكافيه' : 'Restaurant & Cafe'} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 35%, #0d2847 100%)' }} />
+            <div style={{ position: 'absolute', bottom: '16px', left: lang === 'ar' ? 'auto' : '24px', right: lang === 'ar' ? '24px' : 'auto' }}>
+              <span style={{ background: '#f59e0b', color: '#fff', fontSize: '0.72rem', fontWeight: 800, padding: '3px 10px', borderRadius: '12px', textTransform: 'uppercase' }}>
+                {lang === 'ar' ? 'مطاعم على ضفاف القناة' : 'Waterfront Dining'}
+              </span>
+              <h3 style={{ color: '#fff', fontSize: '1.45rem', fontWeight: 800, margin: '6px 0 0' }}>
+                {lang === 'ar' ? 'المطعم والكافيه' : 'Restaurant & Cafe'}
+              </h3>
+            </div>
+          </div>
+          <div style={{ padding: '24px 28px', color: '#1e293b' }}>
+            <p style={{ fontSize: '0.9rem', color: '#64748b', margin: '0 0 18px', lineHeight: 1.5 }}>
+              {lang === 'ar' 
+                ? 'استمتع بأشهى العصائر والمثلجات، القهوة المختصة، برجر سماش فاخر، وأطباق متنوعة مع إطلالة بانورامية على قناة السويس.' 
+                : 'Enjoy handcrafted shakes, artisan coffees, gourmet smash burgers, and Mediterranean delicacies while relaxing with Suez Canal views.'}
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '22px' }}>
+              {(lang === 'ar' ? [
+                { name: 'ميلك شيك فراولة عملاق مع صوص', desc: 'كريمة مخفوقة وفارماسيل كاندي وكرز', price: '٩٥ ج.م' },
+                { name: 'فشار كراميل طازج عائلي', desc: 'فشار ذهبي مقرمش بالكراميل الغني', price: '٦٥ ج.م' },
+                { name: 'أمريكان دريم تشيز برجر سماش', desc: 'شريحتان لحم أنجوس مع شيدر وصوص سري', price: '١٦٠ ج.م' },
+                { name: 'عصير مانجو أو برتقال فريش طبيعي', desc: 'عصير فواكه طازجة طبيعية ١٠٠٪ مثلجة', price: '٧٠ ج.م' }
+              ] : [
+                { name: 'Monster Strawberry Sundae Shake', desc: 'Whipped cream, rainbow sprinkles & cherry on top', price: '95 EGP' },
+                { name: 'Loaded Caramel Popcorn Bucket', desc: 'Fresh kettle-popped sweet golden corn bucket', price: '65 EGP' },
+                { name: 'American Dream Cheesy Smash Burger', desc: 'Double Angus beef patty, cheddar & secret sauce', price: '160 EGP' },
+                { name: 'Fresh Seaside Mango / Orange Cocktail', desc: 'Freshly squeezed natural tropical juice', price: '70 EGP' }
+              ]).map((item, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#0f172a' }}>{item.name}</div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748b' }}>{item.desc}</div>
+                  </div>
+                  <div style={{ fontWeight: 800, color: '#f59e0b', fontSize: '0.95rem', whiteSpace: 'nowrap', marginInlineStart: '12px' }}>{item.price}</div>
+                </div>
+              ))}
+            </div>
+            <button 
+              type="button"
+              className="confirm-done-btn"
+              style={{ width: '100%', background: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)' }}
+              onClick={closeModal}
+            >
+              {lang === 'ar' ? 'حجز طاولة / اطلب الآن' : 'Reserve A Table / Order Now'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 10. SAFETY GUIDELINES MODAL */}
+      {modalType === 'safety-guidelines' && (
+        <div 
+          className="mobile-modal-sheet info-sheet"
+          style={{ maxWidth: '600px' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="sheet-drag-handle" />
+          <button className="sheet-close-x" onClick={closeModal}>✕</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '1.6rem' }}>🛡️</span>
+            <h3 className="info-modal-title" style={{ margin: 0 }}>
+              {lang === 'ar' ? 'قواعد وتعليمات السلامة بالحديقة' : 'Park & Event Safety Rules'}
+            </h3>
+          </div>
+          <p style={{ color: '#64748b', fontSize: '0.88rem', margin: '0 0 18px' }}>
+            {lang === 'ar' 
+              ? 'لضمان تجربة آمنة ومبهجة لكل طفل، ولي أمر، وزائر:' 
+              : 'To guarantee a safe, happy experience for every child, parent, and guest:'}
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+            {(lang === 'ar' ? [
+              'مشرفون ومدربون معتمدون: فريق سلامة متخصص متواجد في كافة مناطق اللعب.',
+              'جوارب مانعة للانزلاق إلزامية: يجب ارتداء الجوارب داخل منطقة الألعاب والمطاطيات والترامبولين.',
+              'بروتوكولات التعقيم: دورات تعقيم وتطهير شاملة للألعاب كل ساعتين بأعلى معايير النظافة.',
+              'أمان ضفاف القناة: محيط قناة السويس مؤمّن بسياج حماية مدعم وكاميرات مراقبة على مدار الساعة.',
+              'فحص الطول والسن: تطبيق إرشادات السن والطول المناسبين في مسار الحبال وسيارات الكارتينج.'
+            ] : [
+              'Certified Animators & Supervisors: Dedicated safety team stationed across all active play zones.',
+              'Grip Socks Obligatory: Non-slip socks must be worn inside soft play, slides, and trampoline areas.',
+              'Sanitization Protocols: Deep medical-grade disinfection cycles scheduled every 2 hours.',
+              'Waterfront Safety: Suez Canal perimeter is secured by heavy-duty reinforced railings and 24/7 CCTV.',
+              'Age & Height Checks: Safe height & weight guidelines enforced on the ropes courses and go-karts.'
+            ]).map((rule, idx) => (
+              <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.88rem', color: '#334155', lineHeight: 1.5 }}>
+                <span style={{ color: '#10b981', fontWeight: 800 }}>✓</span>
+                <span>{rule}</span>
+              </div>
+            ))}
+          </div>
+          <button className="confirm-done-btn" onClick={closeModal} style={{ background: '#00a8cc' }}>
+            {lang === 'ar' ? 'موافق وفهمت التعليمات' : 'I Understand & Agree'}
+          </button>
+        </div>
+      )}
+
+      {/* 11. ADVENTURE TRIPS & FAST PASS MODAL */}
+      {modalType === 'trip-pass' && (
+        <div 
+          className="mobile-modal-sheet info-sheet"
+          style={{ maxWidth: '580px' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="sheet-drag-handle" />
+          <button className="sheet-close-x" onClick={closeModal}>✕</button>
+          <div style={{ textAlign: 'center', marginBottom: '18px' }}>
+            <img 
+              src="/photo/kid area pic/icon/cart.png" 
+              alt={lang === 'ar' ? 'التذكرة السريعة' : 'Fast Pass Trips'} 
+              style={{ width: '48px', height: '48px', margin: '0 auto 10px', display: 'block' }} 
+            />
+            <h3 className="info-modal-title" style={{ margin: '0 0 6px' }}>
+              {lang === 'ar' ? 'التذكرة السريعة ورحلات المغامرة' : 'Fast Pass & Adventure Trips'}
+            </h3>
+            <p style={{ color: '#64748b', fontSize: '0.88rem', margin: 0 }}>
+              {lang === 'ar' 
+                ? 'تخطَّ كافة طوابير الانتظار واستمتع برحلات بحرية حصرية في قناة السويس.' 
+                : 'Skip every queue and experience exclusive Suez Canal boat trips.'}
+            </p>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '22px' }}>
+            <div style={{ border: '2px solid #ffd15c', background: '#fffbeb', padding: '14px 18px', borderRadius: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontWeight: 800, color: '#92400e', fontSize: '0.95rem' }}>
+                  {lang === 'ar' ? 'تذكرة الـ VIP السريعة لكل المناطق' : 'All-Zone VIP Fast Pass'}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#b45309' }}>
+                  {lang === 'ar' ? 'دخول مباشر دون انتظار لكافة الألعاب والـ VR وسيارات الكارتينج' : 'Zero wait times for all rides, VR arcades & go-karts'}
+                </div>
+              </div>
+              <div style={{ fontWeight: 900, color: '#b45309', fontSize: '1.2rem', whiteSpace: 'nowrap' }}>
+                {lang === 'ar' ? '٢٥٠ ج.م' : '250 EGP'}
+              </div>
+            </div>
+            <div style={{ border: '1px solid #bae6fd', background: '#f0f9ff', padding: '14px 18px', borderRadius: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontWeight: 800, color: '#0369a1', fontSize: '0.95rem' }}>
+                  {lang === 'ar' ? 'رحلة بحرية في قناة السويس وقت الغروب' : 'Suez Canal Sunset Cruise'}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#0284c7' }}>
+                  {lang === 'ar' ? 'جولة بحرية لمدة ٤٥ دقيقة مع مشروبات ومرشد سياحي' : '45-minute scenic cruise with refreshments & guide'}
+                </div>
+              </div>
+              <div style={{ fontWeight: 900, color: '#0284c7', fontSize: '1.2rem', whiteSpace: 'nowrap' }}>
+                {lang === 'ar' ? '٣٥٠ ج.م' : '350 EGP'}
+              </div>
+            </div>
+          </div>
+          <button 
+            type="button"
+            className="confirm-done-btn"
+            style={{ width: '100%', background: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)' }}
+            onClick={(e) => {
+              handleConfirmBooking(e);
+            }}
+          >
+            {lang === 'ar' ? 'احجز تذكرة الـ VIP الآن' : 'Get VIP Pass Now'}
+          </button>
         </div>
       )}
     </div>

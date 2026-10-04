@@ -28,6 +28,8 @@
 [lang="ar"],
 [dir="rtl"],
 [dir="rtl"] body,
+[dir="rtl"] .mobile-app-shell,
+[dir="rtl"] .mobile-app-shell *,
 .banner-title-ar,
 .banner-subtitle-ar,
 .title-part-ar,
@@ -542,6 +544,18 @@
   text-align: left;
 }
 
+/* Choose Your Experience - Arabic Right Alignment */
+[dir="rtl"] .choose-experience-section,
+[dir="rtl"] .choose-experience-section .section-label-tag,
+[dir="rtl"] .choose-experience-section .section-colorful-heading,
+[dir="rtl"] .choose-experience-section .section-intro-text,
+.lang-ar .choose-experience-section,
+.lang-ar .choose-experience-section .section-label-tag,
+.lang-ar .choose-experience-section .section-colorful-heading,
+.lang-ar .choose-experience-section .section-intro-text {
+  text-align: right !important;
+}
+
 .section-label-tag {
   font-size: 0.72rem;
   font-weight: 800;
@@ -773,6 +787,11 @@
   transform: scale(1.05);
 }
 
+.vibe-tile:last-child:nth-child(odd) {
+  grid-column: span 2;
+  aspect-ratio: 2 / 1;
+}
+
 /* ==========================================================
    READY TO PLAY CTA CARD
    ========================================================== */
@@ -964,6 +983,12 @@
   text-align: center;
   box-shadow: 0 2px 6px rgba(0,0,0,0.25);
   transform: rotate(-6deg);
+}
+
+[dir="rtl"] .banner-yellow-sticker,
+.lang-ar .banner-yellow-sticker {
+  gap: 2.5px;
+  line-height: 1.28;
 }
 
 .banner-dots-row {
@@ -2211,6 +2236,12 @@
   color: #ffffff;
 }
 
+[dir="rtl"] .challenge-banner-overlay,
+.lang-ar .challenge-banner-overlay {
+  text-align: right;
+  background: linear-gradient(270deg, rgba(3, 10, 24, 0.75) 0%, rgba(3, 10, 24, 0.35) 65%, transparent 100%);
+}
+
 .challenge-banner-title {
   font-size: 1.35rem;
   font-weight: 900;
@@ -2792,6 +2823,14 @@
   pointer-events: none;
 }
 
+/* In Arabic version: Invert fade from left to right (dark on right behind Arabic text, transparent on left) */
+[dir="rtl"] .running-banner-overlay,
+.lang-ar .running-banner-overlay,
+.running-banner-slider.lang-ar .running-banner-overlay {
+  text-align: right;
+  background: linear-gradient(270deg, rgba(3, 10, 24, 0.78) 0%, rgba(3, 10, 24, 0.35) 65%, transparent 100%);
+}
+
 .running-title-en {
   font-size: 1.35rem;
   font-weight: 900;
@@ -2882,6 +2921,18 @@
   line-height: 1.15;
   letter-spacing: -0.2px;
   color: #012b32;
+}
+
+/* Arabic Version: Increase spaces a little bit between lines in the yellow sticker */
+[dir="rtl"] .running-banner-slider .challenge-sticker,
+.lang-ar .running-banner-slider .challenge-sticker {
+  gap: 3px;
+  padding: 7px 10px;
+}
+
+[dir="rtl"] .running-banner-slider .challenge-sticker span,
+.lang-ar .running-banner-slider .challenge-sticker span {
+  line-height: 1.32;
 }
 
 

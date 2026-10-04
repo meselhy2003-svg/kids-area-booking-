@@ -12,6 +12,11 @@
   z-index: 9999;
 }
 
+[dir="rtl"] .loading-screen-container,
+[dir="rtl"] .loading-screen-container * {
+  font-family: 'Alexandria', 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
 .loading-screen-container.fullscreen {
   position: fixed;
   inset: 0;

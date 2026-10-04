@@ -1,10 +1,13 @@
 import React from 'react';
+import { getTranslations } from '../data/translations';
 
-export default function DesktopSubNav({ activeTab, setActiveTab, searchQuery, setSearchQuery }) {
+export default function DesktopSubNav({ activeTab, setActiveTab, searchQuery, setSearchQuery, lang = 'ar' }) {
+  const t = getTranslations(lang);
+
   const tabs = [
     {
       id: 'home',
-      label: 'Home',
+      label: t.subnav.home,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="subnav-pill-icon">
           <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -14,7 +17,7 @@ export default function DesktopSubNav({ activeTab, setActiveTab, searchQuery, se
     },
     {
       id: 'kids-area',
-      label: 'Kids Area',
+      label: t.subnav.kidsArea,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="subnav-pill-icon">
           <circle cx="12" cy="12" r="10" />
@@ -26,7 +29,7 @@ export default function DesktopSubNav({ activeTab, setActiveTab, searchQuery, se
     },
     {
       id: 'fun-park',
-      label: 'Fun Park',
+      label: t.subnav.funPark,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="subnav-pill-icon">
           <circle cx="12" cy="12" r="9" />
@@ -36,7 +39,7 @@ export default function DesktopSubNav({ activeTab, setActiveTab, searchQuery, se
     },
     {
       id: 'challenge',
-      label: 'CHALLENGE ZONE',
+      label: t.subnav.challenge,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="subnav-pill-icon">
           <rect x="2" y="6" width="20" height="12" rx="3" />
@@ -46,7 +49,7 @@ export default function DesktopSubNav({ activeTab, setActiveTab, searchQuery, se
     },
     {
       id: 'adventure',
-      label: 'ADVENTURE ZONE',
+      label: t.subnav.adventure,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="subnav-pill-icon">
           <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
@@ -55,20 +58,11 @@ export default function DesktopSubNav({ activeTab, setActiveTab, searchQuery, se
     },
     {
       id: 'package',
-      label: 'PACKAGES',
+      label: t.subnav.packages,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="subnav-pill-icon">
           <rect x="2" y="4" width="20" height="16" rx="2" />
           <path d="M7 15h10M7 9h10" />
-        </svg>
-      )
-    },
-    {
-      id: 'vibes',
-      label: 'VIBES',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="subnav-pill-icon">
-          <path d="m12 3 1.912 5.886a2 2 0 0 0 1.272 1.272L21 12l-5.816 1.842a2 2 0 0 0-1.272 1.272L12 21l-1.912-5.886a2 2 0 0 0-1.272-1.272L3 12l5.816-1.842a2 2 0 0 0 1.272-1.272z" />
         </svg>
       )
     }
@@ -85,18 +79,7 @@ export default function DesktopSubNav({ activeTab, setActiveTab, searchQuery, se
               <button
                 key={tab.id}
                 className={`desktop-subnav-pill ${isActive ? 'active' : ''}`}
-                onClick={() => {
-                  if (tab.id === 'vibes') {
-                    // Navigate to home and scroll to vibes or set activeTab
-                    setActiveTab('home');
-                    setTimeout(() => {
-                      const el = document.getElementById('play-zone-vibes');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }, 100);
-                  } else {
-                    setActiveTab(tab.id);
-                  }
-                }}
+                onClick={() => setActiveTab(tab.id)}
               >
                 {tab.icon}
                 <span>{tab.label}</span>
@@ -115,7 +98,7 @@ export default function DesktopSubNav({ activeTab, setActiveTab, searchQuery, se
             <input
               type="text"
               className="desktop-search-input"
-              placeholder="Search for rides, offers, and more..."
+              placeholder={t.common.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />

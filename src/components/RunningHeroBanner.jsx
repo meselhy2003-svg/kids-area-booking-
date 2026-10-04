@@ -1,6 +1,7 @@
 import React from 'react';
 
-export default function RunningHeroBanner({ initialSlide = 0, slideIndex, zoneIndex, setActiveTab, showSign }) {
+export default function RunningHeroBanner({ initialSlide = 0, slideIndex, zoneIndex, setActiveTab, showSign, heroSlide, lang = 'ar' }) {
+  const isArabic = lang === 'ar';
   const activeIdx = zoneIndex !== undefined ? zoneIndex : (slideIndex !== undefined ? slideIndex : initialSlide);
 
   const slides = [
@@ -46,56 +47,95 @@ export default function RunningHeroBanner({ initialSlide = 0, slideIndex, zoneIn
     }
   ];
 
-  const current = slides[activeIdx] || slides[0];
+  let current = slides[activeIdx] || slides[0];
+  if (heroSlide) {
+    current = {
+      ...current,
+      bgImage: heroSlide.image || heroSlide.src || heroSlide.bgImage || current.bgImage,
+      fallbackImg: heroSlide.fallbackSrc || current.bgImage,
+      titleEn: heroSlide.titleEn || current.titleEn,
+      subtitleEn: heroSlide.subtitleEn || current.subtitleEn,
+      titleAr: heroSlide.titleAr || current.titleAr,
+      subtitleAr: heroSlide.subtitleAr || current.subtitleAr
+    };
+  }
+
   const shouldShowSign = showSign !== undefined ? showSign : (current.showSign !== false);
 
   return (
-    <div className="running-banner-slider">
+    <div className={`running-banner-slider ${isArabic ? 'lang-ar' : 'lang-en'}`}>
       <div className="running-slide active">
-        {/* Background Image strictly from "photo/kid area pic/running image" */}
+        {/* Background Image */}
         <img 
           src={current.bgImage} 
-          alt={current.titleEn} 
+          alt={isArabic ? current.titleAr : current.titleEn} 
           className="running-banner-bg" 
+          onError={(e) => {
+            const fb = current.fallbackImg || '/photo/kid-area-pic/running-image/Little boy laughing in ball pit1.png';
+            if (!e.currentTarget.src.includes(fb)) {
+              e.currentTarget.src = fb;
+            }
+          }}
         />
 
-        {/* Dark gradient overlay + bilingual typography */}
+        {/* Dark gradient overlay + strictly single language typography */}
         <div className="running-banner-overlay">
-          <h2 className="running-title-en">{current.titleEn}</h2>
-          <p className="running-sub-en">{current.subtitleEn}</p>
-          <h3 className="running-title-ar">{current.titleAr}</h3>
-          <p className="running-sub-ar">{current.subtitleAr}</p>
+          {isArabic ? (
+            <>
+              <h2 className="running-title-ar font-alexandria">{current.titleAr}</h2>
+              <p className="running-sub-ar font-alexandria">{current.subtitleAr}</p>
+            </>
+          ) : (
+            <>
+              <h2 className="running-title-en">{current.titleEn}</h2>
+              <p className="running-sub-en">{current.subtitleEn}</p>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Yellow Tilted Sign (Hidden on Adventure image only) */}
+      {/* Yellow Tilted Sign */}
       {shouldShowSign && (
         <div className="banner-yellow-sticker challenge-sticker">
-          <span>Play</span>
-          <span>Explore</span>
-          <span>Learn</span>
-          <span>Together!</span>
+          {isArabic ? (
+            <>
+              <span>العب</span>
+              <span>اكتشف</span>
+              <span>تعلم</span>
+              <span>معنا!</span>
+            </>
+          ) : (
+            <>
+              <span>Play</span>
+              <span>Explore</span>
+              <span>Learn</span>
+              <span>Together!</span>
+            </>
+          )}
         </div>
       )}
 
-      {/* 4 Navigation Dots strictly matching media_1790113823963.png - media_1790113842348.png */}
+      {/* 4 Navigation Dots */}
       <div className="banner-dots-row">
-        {slides.map((s, idx) => (
-          <span 
-            key={s.id} 
-            className={`banner-dot ${activeIdx === idx ? 'active' : ''}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (setActiveTab && s.tab) {
-                setActiveTab(s.tab);
-              }
-            }}
-            role="button"
-            tabIndex={0}
-            aria-label={`Go to ${s.titleEn}`}
-            title={s.titleEn}
-          />
-        ))}
+        {slides.map((s, idx) => {
+          const dotTitle = isArabic ? s.titleAr : s.titleEn;
+          return (
+            <span 
+              key={s.id} 
+              className={`banner-dot ${activeIdx === idx ? 'active' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (setActiveTab && s.tab) {
+                  setActiveTab(s.tab);
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label={dotTitle}
+              title={dotTitle}
+            />
+          );
+        })}
       </div>
     </div>
   );

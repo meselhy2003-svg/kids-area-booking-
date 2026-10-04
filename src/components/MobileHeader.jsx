@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function MobileHeader({ setActiveTab, onOpenMenu, onOpenProfile, lang }) {
+export default function MobileHeader({ setActiveTab, onOpenMenu, onOpenProfile, lang, setLang }) {
   return (
     <header className="mobile-header">
       {/* Brand Logo strictly matching media_1790115673166.png */}
@@ -12,21 +12,49 @@ export default function MobileHeader({ setActiveTab, onOpenMenu, onOpenProfile, 
         />
       </div>
 
-      {/* Centered Colorful PLAY ZONE Title */}
-      <div className="mobile-header-title" onClick={() => setActiveTab('home')} role="button" tabIndex={0} aria-label="Play Zone">
-        <span style={{ color: '#00a9c3' }}>P</span>
-        <span style={{ color: '#ffffff' }}>L</span>
-        <span style={{ color: '#f7a81b' }}>A</span>
-        <span style={{ color: '#ffffff' }}>Y</span>
-        <span className="header-title-space">&nbsp;</span>
-        <span style={{ color: '#00a9c3' }}>Z</span>
-        <span style={{ color: '#ffffff' }}>O</span>
-        <span style={{ color: '#f7a81b' }}>N</span>
-        <span style={{ color: '#ffffff' }}>E</span>
+      {/* Centered Colorful Title: Arabic when ar, English when en */}
+      <div className="mobile-header-title" onClick={() => setActiveTab('home')} role="button" tabIndex={0} aria-label={lang === 'ar' ? 'منطقة الألعاب' : 'Play Zone'}>
+        {lang === 'ar' ? (
+          <span className="font-alexandria" style={{ fontWeight: 800, fontSize: '1.15rem' }}>
+            <span style={{ color: '#00a9c3' }}>منطقة</span>{' '}
+            <span style={{ color: '#f7a81b' }}>الألعاب</span>
+          </span>
+        ) : (
+          <>
+            <span style={{ color: '#00a9c3' }}>P</span>
+            <span style={{ color: '#ffffff' }}>L</span>
+            <span style={{ color: '#f7a81b' }}>A</span>
+            <span style={{ color: '#ffffff' }}>Y</span>
+            <span className="header-title-space">&nbsp;</span>
+            <span style={{ color: '#00a9c3' }}>Z</span>
+            <span style={{ color: '#ffffff' }}>O</span>
+            <span style={{ color: '#f7a81b' }}>N</span>
+            <span style={{ color: '#ffffff' }}>E</span>
+          </>
+        )}
       </div>
 
-      {/* Action Icons: Cyan Profile & Cyan Hamburger Menu */}
+      {/* Action Icons: Language Toggle, Cyan Profile & Cyan Hamburger Menu */}
       <div className="mobile-header-right">
+        {setLang && (
+          <button 
+            className="mobile-icon-btn mobile-lang-toggle-btn"
+            onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
+            title={lang === 'ar' ? 'Switch to English' : 'التحويل للعربية'}
+            aria-label="Switch Language"
+            style={{ 
+              fontSize: '0.78rem', 
+              fontWeight: 800, 
+              color: '#ffd15c',
+              padding: '4px 8px',
+              border: '1px solid rgba(255, 209, 92, 0.4)',
+              borderRadius: '16px',
+              background: 'rgba(255, 255, 255, 0.08)'
+            }}
+          >
+            {lang === 'ar' ? 'EN' : 'عربي'}
+          </button>
+        )}
         <button 
           className="mobile-icon-btn" 
           onClick={onOpenProfile}

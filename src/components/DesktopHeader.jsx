@@ -1,4 +1,5 @@
 import React from 'react';
+import { getTranslations } from '../data/translations';
 
 export default function DesktopHeader({ 
   activeTab, 
@@ -9,7 +10,8 @@ export default function DesktopHeader({
   isDesktopView,
   setIsDesktopView
 }) {
-  const isPlayZonesActive = ['kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'vibes'].includes(activeTab);
+  const t = getTranslations(lang);
+  const isPlayZonesActive = ['kids-area', 'fun-park', 'challenge', 'adventure', 'package'].includes(activeTab);
 
   return (
     <header className="desktop-navbar">
@@ -22,12 +24,12 @@ export default function DesktopHeader({
             e.preventDefault();
             setActiveTab('home');
           }}
-          title="American Dream Ismailia"
-          aria-label="American Dream Home"
+          title={t.brand.name}
+          aria-label={t.brand.name}
         >
           <img 
             src="/photo/logo/logo nav bar and footer.png" 
-            alt="American Dream Logo" 
+            alt={t.brand.name} 
             className="desktop-nav-logo-img" 
           />
         </a>
@@ -38,61 +40,93 @@ export default function DesktopHeader({
             className={`desktop-nav-link ${activeTab === 'home' ? 'active' : ''}`}
             onClick={() => setActiveTab('home')}
           >
-            Home
+            {t.nav.home}
           </button>
           <button 
             className={`desktop-nav-link ${isPlayZonesActive ? 'active' : ''}`}
             onClick={() => setActiveTab('kids-area')}
           >
-            Play Zones
+            {t.nav.playZone}
           </button>
           <button 
-            className="desktop-nav-link"
+            className={`desktop-nav-link ${activeTab === 'restaurant' ? 'active' : ''}`}
             onClick={() => openModal('restaurant-menu')}
           >
-            Restruant &amp; Cafe
+            {t.nav.restaurant}
           </button>
           <button 
-            className="desktop-nav-link"
-            onClick={() => openModal('booking', {
-              name: 'Birthday & Event Hall Celebration',
-              price: '1,500 EGP',
-              priceNum: 1500,
-              discount: 'All-inclusive Hall Booking'
-            })}
+            className={`desktop-nav-link ${activeTab === 'events' ? 'active' : ''}`}
+            onClick={() => setActiveTab('events')}
           >
-            Event &amp; Halls
+            {t.nav.events}
           </button>
           <button 
-            className="desktop-nav-link"
-            onClick={() => openModal('tour')}
+            className={`desktop-nav-link ${activeTab === 'trips' ? 'active' : ''}`}
+            onClick={() => setActiveTab('trips')}
           >
-            Trips
+            {t.nav.tripsShort}
           </button>
         </nav>
 
         {/* Right Nav Actions */}
         <div className="desktop-nav-right">
-          {/* Profile Circle Icon */}
+          {/* Language Switcher Button */}
           <button 
-            className="desktop-profile-btn"
-            onClick={() => openModal('profile')}
-            title="User Profile & Wristband"
+            className="desktop-lang-btn"
+            onClick={() => setLang && setLang(lang === 'ar' ? 'en' : 'ar')}
+            title={lang === 'ar' ? 'Switch website to English' : 'تحويل الموقع إلى اللغة العربية'}
+            aria-label="Switch Language"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="desktop-profile-svg">
-              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
+            <span style={{ marginInlineEnd: '4px' }}>🌐</span>
+            <span>{t.nav.switchLangText}</span>
+          </button>
+
+          {/* Parachute / Fast Pass Cart Button */}
+          <button 
+            className={`desktop-nav-parachute-btn ${activeTab === 'cart' ? 'active' : ''}`}
+            onClick={() => setActiveTab('cart')}
+            title={t.nav.cart}
+            aria-label={t.nav.cart}
+          >
+            <img 
+              src="/photo/kid area pic/icon/cart.png" 
+              alt={t.nav.cart} 
+              className="desktop-nav-parachute-img" 
+            />
+          </button>
+
+          {/* User Profile Pill */}
+          <button 
+            className="desktop-nav-user-pill"
+            onClick={() => openModal('profile')}
+            title={`${t.nav.profileName} - ${t.nav.cart}`}
+          >
+            <span className="desktop-nav-user-name">{t.nav.profileName}</span>
+            <img 
+              src="/photo/kid area pic/icon/Symbol.png" 
+              alt="Avatar" 
+              className="desktop-nav-user-avatar" 
+            />
           </button>
 
           {/* About us Button */}
           <button 
-            className="desktop-about-btn"
-            onClick={() => openModal('about-info')}
+            className={`desktop-about-btn ${activeTab === 'about' ? 'active' : ''}`}
+            onClick={() => setActiveTab('about')}
+            title={t.nav.about}
           >
-            About us
+            {t.nav.about}
           </button>
         </div>
+      </div>
+
+      {/* Floating points Badge */}
+      <div 
+        className="desktop-points-badge"
+        onClick={() => openModal('profile')}
+        title={lang === 'ar' ? 'رصيد نقاطك: ٢,٢٥٠ نقطة' : 'Balance: 2,250 points'}
+      >
+        {t.common.ptsValue}
       </div>
     </header>
   );

@@ -1,36 +1,39 @@
 import React from 'react';
+import { getTranslations } from '../data/translations';
 
-export default function MobileBottomNav({ activeTab, setActiveTab }) {
+export default function MobileBottomNav({ activeTab, setActiveTab, lang = 'ar' }) {
+  const t = getTranslations(lang);
+
   const tabs = [
     {
       id: 'home',
-      label: 'HOME',
+      label: t.bottomNav.home,
       icon: '/photo/kid-area-pic/icon/home-icon.png',
       isHome: true
     },
     {
       id: 'kids-area',
-      label: 'KIDS AREA',
+      label: t.bottomNav.kidsArea,
       icon: '/photo/kid-area-pic/icon/kids-icon.png'
     },
     {
       id: 'fun-park',
-      label: 'FUN PARK',
+      label: t.bottomNav.funPark,
       icon: '/photo/kid-area-pic/icon/funpark-icon.png'
     },
     {
       id: 'challenge',
-      label: 'CHALLENGE',
+      label: t.bottomNav.challenge,
       icon: '/photo/kid-area-pic/icon/challenge-icon.png'
     },
     {
       id: 'adventure',
-      label: 'ADVENTURE',
+      label: t.bottomNav.adventure,
       icon: '/photo/kid-area-pic/icon/adventure-icon.png'
     },
     {
       id: 'package',
-      label: 'PACKAGE',
+      label: t.bottomNav.package,
       icon: '/photo/kid-area-pic/icon/package-icon.png'
     }
   ];

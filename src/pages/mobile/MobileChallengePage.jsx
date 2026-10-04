@@ -1,26 +1,38 @@
 import React, { useState, useMemo } from 'react';
 import RunningHeroBanner from '../../components/RunningHeroBanner';
+import LazyImage from '../../components/common/LazyImage';
 import { useTickets } from '../../hooks/useTickets';
 import { useZoneData } from '../../hooks/useZoneData';
+import { useChallengeMedia } from '../../hooks';
+import { getTranslations } from '../../data/translations';
 
-export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
+export default function MobileChallengePage({ setActiveTab, openModal, lang = 'ar' }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSubTab, setActiveSubTab] = useState('packages'); // 'packages' | 'tickets'
   const [gamePickerOpen, setGamePickerOpen] = useState(false);
-  const [selectedGames, setSelectedGames] = useState(['VR', 'Basketball', 'Shooting', 'Car Racing']);
+  const t = getTranslations(lang);
+  const isArabic = lang === 'ar';
+
+  const defaultSelected = isArabic
+    ? ['واقع افتراضي VR', 'كرة السلة', 'الرماية بالليزر', 'سباق السيارات']
+    : ['VR', 'Basketball', 'Shooting', 'Car Racing'];
+  const [selectedGames, setSelectedGames] = useState(defaultSelected);
 
   const { gameTickets } = useTickets('challenge');
-  const { attractions } = useZoneData('challenge');
+  const { filteredAttractions, attractions } = useZoneData('challenge', searchQuery);
+
+  // Challenge Zone Hero & Explore image caching and server synchronization
+  const { currentHero, exploreItems } = useChallengeMedia();
 
   const allAvailableGames = [
-    { id: 'vr', name: 'VR Arena Simulator', icon: '🎮' },
-    { id: 'basketball', name: 'Basketball Shootout', icon: '🏀' },
-    { id: 'shooting', name: 'Laser Shooting Gallery', icon: '🎯' },
-    { id: 'racing', name: 'Car Racing Simulator', icon: '🏎️' },
-    { id: 'airhockey', name: 'Air Hockey Battle', icon: '🏒' },
-    { id: 'ps4', name: 'PS4 Lounge Station', icon: '🕹️' },
-    { id: 'boxing', name: 'Boxing Power Test', icon: '🥊' },
-    { id: 'pingpong', name: 'Ping Pong Challenge', icon: '🏓' }
+    { id: 'vr', name: isArabic ? 'واقع افتراضي VR' : 'VR Arena Simulator', icon: '🎮' },
+    { id: 'basketball', name: isArabic ? 'كرة السلة التفاعلية' : 'Basketball Shootout', icon: '🏀' },
+    { id: 'shooting', name: isArabic ? 'الرماية بالليزر' : 'Laser Shooting Gallery', icon: '🎯' },
+    { id: 'racing', name: isArabic ? 'سباق السيارات' : 'Car Racing Simulator', icon: '🏎️' },
+    { id: 'airhockey', name: isArabic ? 'هوكي الطاولة المضيء' : 'Air Hockey Battle', icon: '🏒' },
+    { id: 'ps4', name: isArabic ? 'صالة بلايستيشن ٤' : 'PS4 Lounge Station', icon: '🕹️' },
+    { id: 'boxing', name: isArabic ? 'لعبة قياس قوة اللكمة' : 'Boxing Power Test', icon: '🥊' },
+    { id: 'pingpong', name: isArabic ? 'تنس طاولة (بينج بونج)' : 'Ping Pong Challenge', icon: '🏓' }
   ];
 
   const toggleGameSelection = (gameName) => {
@@ -39,13 +51,13 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
     if (!searchQuery.trim()) return gameTickets;
     const q = searchQuery.toLowerCase();
     return gameTickets.filter(
-      t => (t.titleEn && t.titleEn.toLowerCase().includes(q)) || 
-           (t.titleAr && t.titleAr.includes(q))
+      item => (item.titleEn && item.titleEn.toLowerCase().includes(q)) || 
+              (item.titleAr && item.titleAr.includes(q))
     );
   }, [gameTickets, searchQuery]);
 
   return (
-    <div className="mobile-zone-page challenge-screen">
+    <div className={`mobile-zone-page challenge-screen ${isArabic ? 'lang-ar' : 'lang-en'}`}>
       {/* Search Bar */}
       <div className="zone-search-wrapper">
         <div className="zone-search-box">
@@ -56,7 +68,7 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
           <input 
             type="text"
             className="zone-search-input"
-            placeholder="Search for rides, offers, and more..."
+            placeholder={t.common.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -67,7 +79,7 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
       </div>
 
       {/* Zone Hero Banner: Challenge Zone */}
-      <RunningHeroBanner slideIndex={2} setActiveTab={setActiveTab} />
+      <RunningHeroBanner slideIndex={2} heroSlide={currentHero} setActiveTab={setActiveTab} lang={lang} />
 
       {/* Packages vs Tickets Toggle Pills */}
       <div className="challenge-toggle-row">
@@ -81,8 +93,7 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
             className="toggle-pill-icon" 
           />
           <div className="toggle-text-block">
-            <span className="toggle-en-text">Packages</span>
-            <span className="toggle-ar-text">الباقات</span>
+            <span className="toggle-single-text">{t.zones.packagesTab}</span>
           </div>
         </button>
 
@@ -96,8 +107,7 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
             className="toggle-pill-icon" 
           />
           <div className="toggle-text-block">
-            <span className="toggle-en-text">Tickets</span>
-            <span className="toggle-ar-text">التذاكر</span>
+            <span className="toggle-single-text">{t.zones.ticketsTab}</span>
           </div>
         </button>
       </div>
@@ -108,12 +118,10 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
           {/* Section Header */}
           <div className="zone-section-header">
             <div className="section-title-combo">
-              <span className="title-part-en">Challenge zone Offers</span>
-              <span className="title-divider">|</span>
-              <span className="title-part-ar">عروض منطقة التحدي</span>
+              <span className="title-part-current">{t.zones.challenge.offersTitle}</span>
             </div>
             <div className="section-header-actions">
-              <span className="age-pill-badge">All Ages</span>
+              <span className="age-pill-badge">{t.zones.challenge.ageFilter}</span>
             </div>
           </div>
 
@@ -125,7 +133,7 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
               onClick={() => setGamePickerOpen(true)}
               role="button"
               tabIndex={0}
-              title="Click to customize your 4 games"
+              title={isArabic ? 'اضغط لتخصيص الألعاب الـ ٤' : 'Click to customize your 4 games'}
             >
               <img 
                 src="/photo/mobile-challenge/offer-collage.png" 
@@ -136,45 +144,45 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
 
             {/* Right Card Content */}
             <div className="pass-card-right">
-              <div className="pass-save-badge">Save 60 EGP</div>
-              <h4 className="pass-main-title">Challenge Pass</h4>
-              <p className="pass-sub-cyan">Pick any 4 games</p>
+              <div className="pass-save-badge">{isArabic ? 'وفر ٦٠ ج.م' : 'Save 60 EGP'}</div>
+              <h4 className="pass-main-title">{isArabic ? 'باقة التحدي' : 'Challenge Pass'}</h4>
+              <p className="pass-sub-cyan">{isArabic ? 'اختر أي ٤ ألعاب' : 'Pick any 4 games'}</p>
 
               {/* 2x2 Perks Grid */}
               <div className="pass-perks-grid">
                 <div className="perk-item">
                   <span className="perk-icon">🎮</span>
-                  <span className="perk-name">{selectedGames[0] || 'VR'}</span>
+                  <span className="perk-name">{selectedGames[0] || (isArabic ? 'واقع افتراضي' : 'VR')}</span>
                 </div>
                 <div className="perk-item">
                   <span className="perk-icon">🏀</span>
-                  <span className="perk-name">{selectedGames[1] || 'Basketball'}</span>
+                  <span className="perk-name">{selectedGames[1] || (isArabic ? 'كرة السلة' : 'Basketball')}</span>
                 </div>
                 <div className="perk-item">
                   <span className="perk-icon">🎯</span>
-                  <span className="perk-name">{selectedGames[2] || 'Shooting'}</span>
+                  <span className="perk-name">{selectedGames[2] || (isArabic ? 'الرماية' : 'Shooting')}</span>
                 </div>
                 <div className="perk-item">
                   <span className="perk-icon">🏎️</span>
-                  <span className="perk-name">{selectedGames[3] || 'Car Racing'}</span>
+                  <span className="perk-name">{selectedGames[3] || (isArabic ? 'سباق سيارات' : 'Car Racing')}</span>
                 </div>
               </div>
 
               {/* Price Row */}
               <div className="pass-price-row">
-                <span className="pass-price-current">EGP 100</span>
-                <span className="pass-price-orig">EGP 160</span>
+                <span className="pass-price-current">{isArabic ? '١٠٠ ج.م' : 'EGP 100'}</span>
+                <span className="pass-price-orig">{isArabic ? '١٦٠ ج.م' : 'EGP 160'}</span>
               </div>
 
               {/* Get This Offer Button */}
               <button 
                 className="get-this-offer-btn"
                 onClick={() => openModal('booking', {
-                  name: `Challenge Pass (${selectedGames.join(', ')})`,
-                  price: 'EGP 100',
+                  name: isArabic ? `باقة التحدي (${selectedGames.join(', ')})` : `Challenge Pass (${selectedGames.join(', ')})`,
+                  price: isArabic ? '١٠٠ ج.م' : 'EGP 100',
                   priceNum: 100,
-                  discount: 'Save 60 EGP',
-                  details: `Includes selected 4 games: ${selectedGames.join(', ')}`
+                  discount: isArabic ? 'وفر ٦٠ ج.م' : 'Save 60 EGP',
+                  details: isArabic ? `تشمل الألعاب الـ ٤ المختارة: ${selectedGames.join(', ')}` : `Includes selected 4 games: ${selectedGames.join(', ')}`
                 })}
               >
                 <img 
@@ -182,7 +190,7 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
                   alt="ticket" 
                   className="btn-ticket-vector-icon" 
                 />
-                <span>Get This Offer</span>
+                <span>{t.zones.getThisOffer}</span>
               </button>
             </div>
           </div>
@@ -195,99 +203,106 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
           {/* Section Header */}
           <div className="zone-section-header">
             <div className="section-title-combo">
-              <span className="title-part-en">Challenge zone Tickets</span>
-              <span className="title-divider">|</span>
-              <span className="title-part-ar">تذاكر منطقة التحدي</span>
+              <span className="title-part-current">{t.zones.challenge.ticketsTitle}</span>
             </div>
             <div className="section-header-actions">
-              <span className="age-pill-badge">All Ages</span>
+              <span className="age-pill-badge">{t.zones.challenge.ageFilter}</span>
               <button 
                 className="see-all-link"
-                onClick={() => openModal('all-offers', { zone: 'Challenge Tickets', offers: gameTickets })}
+                onClick={() => openModal('all-offers', { zone: t.zones.challenge.title, offers: gameTickets })}
               >
-                See All &gt;
+                {t.zones.seeAll}
               </button>
             </div>
           </div>
 
           {/* 2-Column Grid of Individual Game Cards */}
           <div className="game-tickets-grid">
-            {filteredTickets.map((game) => (
-              <div key={game.id} className="game-ticket-card">
-                <div className="game-ticket-media">
-                  <img src={game.img} alt={game.titleEn} className="game-ticket-img" />
-                  {game.badge && (
-                    <span 
-                      className="game-corner-badge" 
-                      style={{ backgroundColor: game.badgeColor || '#0284c7' }}
-                    >
-                      {game.badge}
-                    </span>
-                  )}
-                </div>
+            {filteredTickets.map((game) => {
+              const gameTitle = isArabic ? (game.titleAr || game.titleEn) : (game.titleEn || game.titleAr);
+              const priceDisplay = isArabic 
+                ? (game.priceAr || `${game.priceNum || 40} ج.م`) 
+                : (game.price || `EGP ${game.priceNum || 40}`);
 
-                <div className="game-ticket-body">
-                  <h4 className="game-ticket-title">{game.titleEn}</h4>
-                  <div className="game-ticket-price">{game.price}</div>
-                  <button 
-                    className="play-now-btn"
-                    onClick={() => openModal('booking', {
-                      name: game.titleEn,
-                      price: game.price,
-                      priceNum: game.priceNum,
-                      discount: 'Quick Pass',
-                      details: `Instant access to ${game.titleEn} station`
-                    })}
-                  >
-                    <img 
-                      src="/photo/kid-area-pic/icon/Vector (3).png" 
-                      alt="ticket" 
-                      className="btn-ticket-vector-icon" 
-                    />
-                    <span>Play Now</span>
-                  </button>
+              return (
+                <div key={game.id} className="game-ticket-card">
+                  <div className="game-ticket-media">
+                    <img src={game.img} alt={gameTitle} className="game-ticket-img" />
+                    {game.badge && (
+                      <span 
+                        className="game-corner-badge" 
+                        style={{ backgroundColor: game.badgeColor || '#0284c7' }}
+                      >
+                        {game.badge}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="game-ticket-body">
+                    <h4 className="game-ticket-title">{gameTitle}</h4>
+                    <div className="game-ticket-price">{priceDisplay}</div>
+                    <button 
+                      className="play-now-btn"
+                      onClick={() => openModal('booking', {
+                        name: gameTitle,
+                        price: priceDisplay,
+                        priceNum: game.priceNum,
+                        discount: isArabic ? 'دخول مباشر' : 'Quick Pass',
+                        details: isArabic ? `دخول فوري لمحطة ${gameTitle}` : `Instant access to ${gameTitle} station`
+                      })}
+                    >
+                      <img 
+                        src="/photo/kid-area-pic/icon/Vector (3).png" 
+                        alt="ticket" 
+                        className="btn-ticket-vector-icon" 
+                      />
+                      <span>{t.zones.playNow}</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
 
       {/* Explore Challenge Zone Section */}
       <div className="zone-section-header" style={{ marginTop: '2rem' }}>
-        <h3 className="section-title-plain">Explore Challenge zone</h3>
+        <h3 className="section-title-plain">{t.zones.challenge.exploreTitle}</h3>
         <button 
           className="see-all-link"
-          onClick={() => openModal('all-attractions', { zone: 'Challenge Zone', attractions })}
+          onClick={() => openModal('all-attractions', { zone: t.zones.challenge.title, attractions })}
         >
-          See All &gt;
+          {t.zones.seeAll}
         </button>
       </div>
 
-      {/* 3 Attraction Cards */}
+      {/* 3 Attraction Cards with LazyImage */}
       <div className="explore-attractions-row">
-        {attractions.map((attr) => (
-          <div 
-            key={attr.id} 
-            className="explore-attraction-card"
-            onClick={() => openModal('attraction-detail', attr)}
-            role="button"
-            tabIndex={0}
-          >
-            <div className="attr-media-wrapper">
-              <img 
-                src={attr.img} 
-                alt={attr.titleEn} 
-                className="attr-card-img"
-                onError={(e) => { e.currentTarget.src = attr.fallbackImg; }}
-              />
-              <div className="attr-overlay-labels">
-                <div className="attr-en-name">{attr.titleEn}</div>
-                <div className="attr-ar-name">{attr.titleAr}</div>
+        {(searchQuery ? filteredAttractions : exploreItems).map((attr) => {
+          const attrTitle = isArabic ? (attr.titleAr || attr.title) : (attr.titleEn || attr.title);
+          return (
+            <div 
+              key={attr.id} 
+              className="explore-attraction-card"
+              onClick={() => openModal('attraction-detail', attr)}
+              role="button"
+              tabIndex={0}
+            >
+              <div className="attr-media-wrapper">
+                <LazyImage 
+                  src={attr.img || attr.image || attr.src} 
+                  alt={attrTitle} 
+                  className="attr-card-img" 
+                  fallbackSrc={attr.fallbackImg || attr.fallback || attr.fallbackSrc}
+                />
+                <div className="attr-overlay-labels">
+                  <div className="attr-single-name">{attrTitle}</div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* EXPLORE 360° Button */}
@@ -301,7 +316,7 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
             alt="360" 
             className="icon-360-img" 
           />
-          <span className="explore-360-text">EXPLORE 360°</span>
+          <span className="explore-360-text">{t.zones.explore360}</span>
         </button>
       </div>
 
@@ -311,8 +326,12 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
           <div className="mobile-modal-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="sheet-drag-handle" />
             <button className="sheet-close-x" onClick={() => setGamePickerOpen(false)}>✕</button>
-            <h3 className="booking-title">Choose Your 4 Games</h3>
-            <p className="booking-details-text">Select any 4 arcade &amp; VR games for your Challenge Pass ({selectedGames.length}/4 selected):</p>
+            <h3 className="booking-title">{isArabic ? 'اختر ٤ ألعاب للباقة' : 'Choose Your 4 Games'}</h3>
+            <p className="booking-details-text">
+              {isArabic 
+                ? `حدد أي ٤ ألعاب لباقة التحدي (${selectedGames.length}/4 تم اختيارها):`
+                : `Select any 4 arcade & VR games for your Challenge Pass (${selectedGames.length}/4 selected):`}
+            </p>
 
             <div className="game-picker-list">
               {allAvailableGames.map((g) => {
@@ -337,7 +356,7 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang }) {
               disabled={selectedGames.length < 4}
               onClick={() => setGamePickerOpen(false)}
             >
-              Confirm 4 Games ({selectedGames.length}/4)
+              {isArabic ? `تأكيد الـ ٤ ألعاب (${selectedGames.length}/4)` : `Confirm 4 Games (${selectedGames.length}/4)`}
             </button>
           </div>
         </div>

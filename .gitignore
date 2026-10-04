@@ -32,4 +32,5 @@ dist-ssr/
 
 # Temporary / Scratch files and archives
 scratch_*
+scratch/
 *.zip

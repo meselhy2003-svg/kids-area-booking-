@@ -1,0 +1,800 @@
+/* ==========================================================================
+   DESKTOP & RESPONSIVE EVENTS & HALLS PAGE STYLES
+   American Dream Ismailia
+   ========================================================================== */
+
+/* Overall Page Wrapper */
+.events-page-wrapper {
+  background-color: #ffffff;
+  color: #0f172a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+  overflow-x: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   1. HERO SECTION ("EVENTS & HALLS")
+   -------------------------------------------------------------------------- */
+.events-hero-section {
+  padding: 48px 24px 44px;
+  text-align: center;
+  background-color: #ffffff;
+  position: relative;
+}
+
+.events-hero-container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* Letters with alternating Cyan & Navy */
+.events-title {
+  font-size: 3.2rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  margin: 0 0 12px;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.events-title .letter-cyan {
+  color: #00a8cc;
+}
+
+.events-title .letter-navy {
+  color: #0d2847;
+}
+
+.events-subtitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0d2847;
+  margin: 0 0 14px;
+  letter-spacing: -0.01em;
+}
+
+.events-description {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #64748b;
+  max-width: 680px;
+  margin: 0 auto 36px;
+}
+
+/* Large Carousel Banner */
+.events-hero-banner-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(13, 40, 71, 0.16);
+  aspect-ratio: 16 / 8.2;
+  min-height: 340px;
+  background-color: #0a192f;
+  cursor: pointer;
+}
+
+.events-hero-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+}
+
+.events-hero-banner-wrap:hover .events-hero-banner-img {
+  transform: scale(1.02);
+}
+
+.events-hero-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(13, 40, 71, 0.45) 100%);
+  pointer-events: none;
+}
+
+/* Carousel Indicator Dots */
+.events-carousel-dots {
+  position: absolute;
+  bottom: 24px;
+  left: 32px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+}
+
+.events-carousel-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.events-carousel-dot:hover {
+  background: #ffffff;
+  transform: scale(1.15);
+}
+
+.events-carousel-dot.active {
+  background: #f59e0b;
+  width: 26px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.6);
+}
+
+/* Floating Tour Trigger on Banner Hover */
+.events-hero-tour-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 28px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  color: #0d2847;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transition: all 0.25s ease;
+  z-index: 10;
+}
+
+.events-hero-tour-btn:hover {
+  background: #f59e0b;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   2. CHOOSE YOUR OCCASION SECTION
+   -------------------------------------------------------------------------- */
+.events-occasion-section {
+  background-color: #072e38;
+  padding: 72px 24px 84px;
+  position: relative;
+}
+
+.events-occasion-container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.events-occasion-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.events-occasion-title {
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+  text-transform: capitalize;
+  line-height: 1.2;
+}
+
+.events-occasion-subtitle {
+  font-size: 0.95rem;
+  color: #a5f3fc;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* 3 Occasion Cards Grid */
+.events-occasion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.events-card {
+  background: #ffffff;
+  border-radius: 22px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  position: relative;
+}
+
+.events-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
+}
+
+/* Card Image Top with Floating Circle Icon Badge */
+.events-card-image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10.5;
+  overflow: hidden;
+  background-color: #f1f5f9;
+}
+
+.events-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+.events-card:hover .events-card-img {
+  transform: scale(1.06);
+}
+
+/* Floating top-right badge on occasion card */
+.events-card-badge-icon {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 5;
+  transition: transform 0.2s ease;
+}
+
+.events-card:hover .events-card-badge-icon {
+  transform: scale(1.1);
+}
+
+.events-card-badge-icon img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* Card Body */
+.events-card-body {
+  padding: 24px 22px 26px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.events-card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.events-card-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0b2533;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.events-card-tag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.events-card-desc {
+  font-size: 0.88rem;
+  line-height: 1.62;
+  color: #475569;
+  margin: 0 0 24px;
+  flex: 1;
+}
+
+/* Orange Gradient Pill Action Button */
+.events-card-btn {
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 30px;
+  padding: 13px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+  width: 100%;
+}
+
+.events-card-btn:hover {
+  background: linear-gradient(135deg, #fbbf24 0%, #ea580c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(234, 88, 12, 0.45);
+}
+
+.events-card-btn-arrow {
+  font-size: 1.15rem;
+  transition: transform 0.2s ease;
+}
+
+.events-card-btn:hover .events-card-btn-arrow {
+  transform: translateX(4px);
+}
+
+/* --------------------------------------------------------------------------
+   3. VIBES OF EVENTS SECTION
+   -------------------------------------------------------------------------- */
+.events-vibes-section {
+  background-color: #ffffff;
+  padding: 80px 24px 90px;
+}
+
+.events-vibes-container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.events-vibes-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.events-vibes-title {
+  font-size: 3.1rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+
+.events-vibes-subtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  max-width: 660px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Mosaic Gallery Grid matching screenshot */
+.events-mosaic-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Top Row: 3 columns (Left big card, Middle floral, Right stacked 2 cards) */
+.events-mosaic-top-row {
+  display: grid;
+  grid-template-columns: 1.25fr 0.95fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.events-mosaic-card {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(13, 40, 71, 0.08);
+  background-color: #f8fafc;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.events-mosaic-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(13, 40, 71, 0.18);
+}
+
+.events-mosaic-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.events-mosaic-card:hover .events-mosaic-img {
+  transform: scale(1.05);
+}
+
+/* Column 1: Left Big Birthday Card */
+.events-mosaic-left {
+  height: 380px;
+}
+
+/* Column 2: Middle Floral Card */
+.events-mosaic-mid {
+  height: 380px;
+}
+
+/* Column 3: Stacked 2 Cards */
+.events-mosaic-stacked-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 380px;
+}
+
+.events-mosaic-stacked-col .events-mosaic-card {
+  flex: 1;
+}
+
+/* Bottom Row: 2 wide landscape cards */
+.events-mosaic-bot-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.3fr;
+  gap: 20px;
+}
+
+.events-mosaic-bot-row .events-mosaic-card {
+  height: 220px;
+}
+
+/* Hover overlay with zoom icon and title caption */
+.events-mosaic-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(13, 40, 71, 0.8) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: flex-end;
+  padding: 18px 20px;
+  color: #ffffff;
+}
+
+.events-mosaic-card:hover .events-mosaic-overlay {
+  opacity: 1;
+}
+
+.events-mosaic-caption {
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   4. MODALS (EVENT BOOKING & LIGHTBOX)
+   -------------------------------------------------------------------------- */
+.event-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 25, 45, 0.78);
+  backdrop-filter: blur(6px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.event-modal-box {
+  background: #ffffff;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.event-modal-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.event-modal-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.event-modal-header {
+  padding: 28px 28px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.event-modal-badge {
+  display: inline-block;
+  background: rgba(0, 168, 204, 0.12);
+  color: #00a8cc;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.event-modal-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #0d2847;
+  margin: 0 0 6px;
+}
+
+.event-modal-subtitle {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.event-modal-body {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.event-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.event-form-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.event-form-input,
+.event-form-select {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 0.92rem;
+  font-family: inherit;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.event-form-input:focus,
+.event-form-select:focus {
+  border-color: #00a8cc;
+  background: #ffffff;
+}
+
+.event-calc-card {
+  background: #f0fdf4;
+  border: 1.5px solid #bbf7d0;
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.event-calc-label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #166534;
+}
+
+.event-calc-price {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #15803d;
+}
+
+.event-modal-footer {
+  padding: 20px 28px 28px;
+  display: flex;
+  gap: 12px;
+}
+
+.event-submit-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 30px;
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(234, 88, 12, 0.4);
+  transition: all 0.2s ease;
+}
+
+.event-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(234, 88, 12, 0.5);
+}
+
+/* Lightbox Modal */
+.events-lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 14, 26, 0.92);
+  backdrop-filter: blur(10px);
+  z-index: 2100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+}
+
+.events-lightbox-close {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #ffffff;
+  font-size: 1.5rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.events-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.events-lightbox-content {
+  max-width: 900px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.events-lightbox-image-wrap {
+  width: 100%;
+  max-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.events-lightbox-img {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.events-lightbox-info {
+  text-align: center;
+  color: #ffffff;
+}
+
+.events-lightbox-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0 0 6px;
+}
+
+.events-lightbox-desc {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin: 0 0 16px;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVENESS (TABLETS & PHONES)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .events-occasion-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .events-mosaic-top-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .events-mosaic-stacked-col {
+    grid-column: span 2;
+    flex-direction: row;
+    height: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .events-title {
+    font-size: 2.2rem;
+  }
+  
+  .events-occasion-title,
+  .events-vibes-title {
+    font-size: 2rem;
+  }
+  
+  .events-occasion-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .events-mosaic-top-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .events-mosaic-left,
+  .events-mosaic-mid {
+    height: 280px;
+  }
+  
+  .events-mosaic-stacked-col {
+    grid-column: span 1;
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .events-mosaic-stacked-col .events-mosaic-card {
+    height: 180px;
+  }
+  
+  .events-mosaic-bot-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .events-mosaic-bot-row .events-mosaic-card {
+    height: 180px;
+  }
+}

@@ -1,25 +1,38 @@
 import React from 'react';
 import { usePackages } from '../../hooks/usePackages';
+import { getTranslations } from '../../data/translations';
 
-export default function MobilePackagePage({ setActiveTab, openModal, lang }) {
+export default function MobilePackagePage({ setActiveTab, openModal, lang = 'ar' }) {
+  const t = getTranslations(lang);
+  const isArabic = lang === 'ar';
+
   const { 
     activeCategory, 
     setActiveCategory, 
     currentPackage: currentPkg 
   } = usePackages('adventure');
 
+  const pkgTitle = isArabic ? (currentPkg.titleAr || currentPkg.title) : currentPkg.title;
+  const pkgSubtitle = isArabic ? (currentPkg.subtitleAr || currentPkg.subtitle) : currentPkg.subtitle;
+  const pkgSaveBadge = isArabic ? (currentPkg.saveBadgeAr || currentPkg.saveBadge) : currentPkg.saveBadge;
+  const priceDisplay = isArabic ? `${currentPkg.priceNum || 100} ج.م` : (currentPkg.price || 'EGP 100');
+  const origPriceDisplay = currentPkg.origPrice 
+    ? (isArabic ? `${currentPkg.origPrice} ج.م` : currentPkg.origPrice) 
+    : null;
+  const featuresList = isArabic ? (currentPkg.featuresAr || currentPkg.features) : currentPkg.features;
+
   return (
-    <div className="mobile-zone-page package-page-container">
+    <div className={`mobile-zone-page package-page-container ${isArabic ? 'lang-ar' : 'lang-en'}`}>
       {/* Light Top Hero Section */}
       <section className="package-make-day-hero">
         <h1 className="make-day-title">
-          MAKE A DAY<br />OF IT
+          {t.zones.packages.heroTitle}
         </h1>
         <p className="make-day-orange-sub">
-          More games. More fun. More memories.
+          {t.zones.packages.heroSub}
         </p>
         <p className="make-day-desc">
-          Choose your gateway into Egypt's premier indoor entertainment wonderland. One contactless wristband unlocks cutting-edge VR arcades, giant Scandinavian soft play, and high-octane racing.
+          {t.zones.packages.heroDesc}
         </p>
       </section>
 
@@ -32,12 +45,12 @@ export default function MobilePackagePage({ setActiveTab, openModal, lang }) {
             alt="tag" 
             className="dream-tag-icon" 
           />
-          <span>PURE JOY, TAILORED FOR YOU</span>
+          <span>{t.zones.packages.dreamTag}</span>
         </div>
 
         {/* Section Heading */}
-        <h2 className="dream-heading">Select Your Dream Experience</h2>
-        <p className="dream-subheading">More games. More fun. More to enjoy</p>
+        <h2 className="dream-heading">{t.zones.packages.dreamTitle}</h2>
+        <p className="dream-subheading">{t.zones.packages.dreamSub}</p>
 
         {/* 4 Horizontal Pill Buttons */}
         <div className="dream-filter-pills">
@@ -45,25 +58,25 @@ export default function MobilePackagePage({ setActiveTab, openModal, lang }) {
             className={`dream-pill-btn ${activeCategory === 'adventure' ? 'active' : ''}`}
             onClick={() => setActiveCategory('adventure')}
           >
-            Adventure
+            {t.zones.packages.tabs.adventure}
           </button>
           <button 
             className={`dream-pill-btn ${activeCategory === 'challenge' ? 'active' : ''}`}
             onClick={() => setActiveCategory('challenge')}
           >
-            Challenge
+            {t.zones.packages.tabs.challenge}
           </button>
           <button 
             className={`dream-pill-btn ${activeCategory === 'midweek' ? 'active' : ''}`}
             onClick={() => setActiveCategory('midweek')}
           >
-            Mid-Week
+            {t.zones.packages.tabs.midWeek}
           </button>
           <button 
             className={`dream-pill-btn ${activeCategory === 'weekend' ? 'active' : ''}`}
             onClick={() => setActiveCategory('weekend')}
           >
-            Weekend
+            {t.zones.packages.tabs.weekend}
           </button>
         </div>
 
@@ -73,32 +86,32 @@ export default function MobilePackagePage({ setActiveTab, openModal, lang }) {
           <div 
             className="pass-card-left dream-card-media"
             onClick={() => openModal('booking', {
-              name: currentPkg.title,
-              price: currentPkg.price,
-              priceNum: currentPkg.priceNum,
-              discount: currentPkg.saveBadge,
+              name: pkgTitle,
+              price: priceDisplay,
+              priceNum: currentPkg.priceNum || 100,
+              discount: pkgSaveBadge,
               details: currentPkg.details
             })}
             role="button"
             tabIndex={0}
-            title={`Click to book ${currentPkg.title}`}
+            title={`Click to book ${pkgTitle}`}
           >
             <img 
               src={currentPkg.img} 
-              alt={currentPkg.title} 
+              alt={pkgTitle} 
               className="pass-collage-img" 
             />
           </div>
 
           {/* Right Card Content */}
           <div className="pass-card-right">
-            <div className="pass-save-badge">{currentPkg.saveBadge}</div>
-            <h4 className="pass-main-title">{currentPkg.title}</h4>
-            <p className="pass-sub-cyan">{currentPkg.subtitle}</p>
+            <div className="pass-save-badge">{pkgSaveBadge}</div>
+            <h4 className="pass-main-title">{pkgTitle}</h4>
+            <p className="pass-sub-cyan">{pkgSubtitle}</p>
 
             {/* Cyan Checklist */}
             <div className="adventure-checklist">
-              {currentPkg.features && currentPkg.features.map((feat, idx) => (
+              {featuresList && featuresList.map((feat, idx) => (
                 <div key={idx} className="adventure-check-item">
                   <svg className="cyan-check-svg" viewBox="0 0 20 20" fill="none">
                     <circle cx="10" cy="10" r="8.5" stroke="#00bcd4" strokeWidth="1.8" />
@@ -111,18 +124,18 @@ export default function MobilePackagePage({ setActiveTab, openModal, lang }) {
 
             {/* Price Row */}
             <div className="pass-price-row">
-              <span className="pass-price-current">{currentPkg.price}</span>
-              <span className="pass-price-orig">{currentPkg.origPrice}</span>
+              <span className="pass-price-current">{priceDisplay}</span>
+              {origPriceDisplay && <span className="pass-price-orig">{origPriceDisplay}</span>}
             </div>
 
             {/* Get This Offer Button */}
             <button 
               className="get-this-offer-btn"
               onClick={() => openModal('booking', {
-                name: currentPkg.title,
-                price: currentPkg.price,
-                priceNum: currentPkg.priceNum,
-                discount: currentPkg.saveBadge,
+                name: pkgTitle,
+                price: priceDisplay,
+                priceNum: currentPkg.priceNum || 100,
+                discount: pkgSaveBadge,
                 details: currentPkg.details
               })}
             >
@@ -131,7 +144,7 @@ export default function MobilePackagePage({ setActiveTab, openModal, lang }) {
                 alt="ticket" 
                 className="btn-ticket-vector-icon" 
               />
-              <span>Get This Offer</span>
+              <span>{t.zones.getThisOffer}</span>
             </button>
           </div>
         </div>

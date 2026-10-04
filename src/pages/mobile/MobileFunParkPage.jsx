@@ -1,18 +1,28 @@
 import React, { useState } from 'react';
 import RunningHeroBanner from '../../components/RunningHeroBanner';
+import LazyImage from '../../components/common/LazyImage';
 import { useZoneData } from '../../hooks/useZoneData';
+import { useFunParkMedia } from '../../hooks';
+import { getTranslations } from '../../data/translations';
 
-export default function MobileFunParkPage({ setActiveTab, openModal, lang }) {
+export default function MobileFunParkPage({ setActiveTab, openModal, lang = 'ar' }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const t = getTranslations(lang);
+  const isArabic = lang === 'ar';
+
   const { 
     filteredOffers, 
+    filteredAttractions,
     attractions, 
     timing, 
     setTiming 
   } = useZoneData('fun-park', searchQuery);
 
+  // Fun Park Hero & Explore image caching and server synchronization
+  const { currentHero, exploreItems } = useFunParkMedia();
+
   return (
-    <div className="mobile-zone-page fun-park-screen">
+    <div className={`mobile-zone-page fun-park-screen ${isArabic ? 'lang-ar' : 'lang-en'}`}>
       {/* Search Bar */}
       <div className="zone-search-wrapper">
         <div className="zone-search-box">
@@ -29,7 +39,7 @@ export default function MobileFunParkPage({ setActiveTab, openModal, lang }) {
           <input 
             type="text"
             className="zone-search-input"
-            placeholder="Search for rides, offers, and more..."
+            placeholder={t.common.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -46,17 +56,15 @@ export default function MobileFunParkPage({ setActiveTab, openModal, lang }) {
       </div>
 
       {/* Zone Hero Banner: Fun Park */}
-      <RunningHeroBanner slideIndex={1} setActiveTab={setActiveTab} />
+      <RunningHeroBanner slideIndex={1} heroSlide={currentHero} setActiveTab={setActiveTab} lang={lang} />
 
-      {/* Section Header: Fun park Offers | عروض منطقة المرح */}
+      {/* Section Header: Fun Park Offers */}
       <div className="zone-section-header">
         <div className="section-title-combo">
-          <span className="title-part-en">Fun park Offers</span>
-          <span className="title-divider">|</span>
-          <span className="title-part-ar">عروض منطقة المرح</span>
+          <span className="title-part-current">{t.zones.funPark.offersTitle}</span>
         </div>
         <div className="section-header-actions">
-          <span className="age-pill-badge">Ages 4 – 12</span>
+          <span className="age-pill-badge">{t.zones.funPark.ageFilter}</span>
         </div>
       </div>
 
@@ -66,133 +74,128 @@ export default function MobileFunParkPage({ setActiveTab, openModal, lang }) {
           className={`timing-pill-btn pill-weekend ${timing === 'weekend' ? 'active' : ''}`}
           onClick={() => setTiming('weekend')}
         >
-          <div className="pill-en-styled">
-            <span className="w-col-1">W</span>
-            <span className="w-col-2">ee</span>
-            <span className="w-col-3">k</span>
-            <span className="w-col-4">e</span>
-            <span className="w-col-5">nd</span>
-          </div>
-          <div className="pill-ar">نهاية الأسبوع</div>
+          <div className="pill-single-label">{isArabic ? 'نهاية الأسبوع' : 'Weekend'}</div>
         </button>
 
         <button 
           className={`timing-pill-btn pill-midweek ${timing === 'midweek' ? 'active' : ''}`}
           onClick={() => setTiming('midweek')}
         >
-          <div className="pill-en-styled">
-            <span className="m-col-1">Mid</span>
-            <span>-</span>
-            <span className="m-col-2">Week</span>
-          </div>
-          <div className="pill-ar">منتصف الأسبوع</div>
+          <div className="pill-single-label">{isArabic ? 'منتصف الأسبوع' : 'Mid-Week'}</div>
         </button>
       </div>
 
       {/* Horizontal Scroll / 2-Column Offers */}
       <div className="offers-slider-row">
-        {filteredOffers.map((offer) => (
-          <div key={offer.id} className="offer-card-item card-slider-item">
-            <div className="offer-save-badge">{offer.saveBadge}</div>
+        {filteredOffers.map((offer) => {
+          const offerTitle = isArabic ? (offer.titleAr || offer.title) : (offer.titleEn || offer.title);
+          const priceDisplay = isArabic ? `${offer.priceNum || offer.price} ج.م` : offer.price;
+          const origPriceDisplay = (offer.origPrice || offer.oldPrice)
+            ? (isArabic ? `${offer.origPrice || offer.oldPrice} ج.م` : offer.origPrice)
+            : null;
 
-            <div className="offer-thumb-container">
-              <img 
-                src={offer.thumb} 
-                alt={offer.titleEn} 
-                className="offer-thumb-img" 
-              />
-            </div>
+          return (
+            <div key={offer.id} className="offer-card-item card-slider-item">
+              <div className="offer-save-badge">{offer.saveBadge}</div>
 
-            <div className="offer-content">
-              <h4 className="offer-en-title">{offer.titleEn}</h4>
-              <p className="offer-ar-title">{offer.titleAr}</p>
-
-              <div className="offer-meta-row">
+              <div className="offer-thumb-container">
                 <img 
-                  src="/photo/kid-area-pic/icon/Icon.png" 
-                  alt="age" 
-                  className="meta-icon-img" 
+                  src={offer.thumb} 
+                  alt={offerTitle} 
+                  className="offer-thumb-img" 
                 />
-                <span className="meta-text">{offer.age}</span>
               </div>
 
-              <div className="offer-features-list">
-                {offer.features && offer.features.map((feat, fidx) => (
-                  <div key={fidx} className="offer-feature-item">
-                    <img 
-                      src="/photo/kid-area-pic/icon/Vector (3).png" 
-                      alt="feat" 
-                      className="feat-vector-icon" 
-                    />
-                    <span className="feat-text">{feat}</span>
-                  </div>
-                ))}
-              </div>
+              <div className="offer-content">
+                <h4 className="offer-main-title">{offerTitle}</h4>
 
-              <div className="offer-pricing-row">
-                <span className="price-current">{offer.price}</span>
-                <span className="price-orig">{offer.origPrice}</span>
-              </div>
+                <div className="offer-meta-row">
+                  <img 
+                    src="/photo/kid-area-pic/icon/Icon.png" 
+                    alt="age" 
+                    className="meta-icon-img" 
+                  />
+                  <span className="meta-text">{offer.age}</span>
+                </div>
 
-              <button 
-                className="get-offer-btn"
-                onClick={() => openModal('booking', {
-                  name: `${offer.titleEn} - Fun Park`,
-                  price: offer.price,
-                  priceNum: offer.priceNum,
-                  discount: offer.saveBadge,
-                  details: offer.features?.join(', ') || ''
-                })}
-              >
-                <img 
-                  src="/photo/kid-area-pic/icon/Vector (3).png" 
-                  alt="ticket" 
-                  className="btn-ticket-vector-icon" 
-                />
-                <span>Get Offer</span>
-              </button>
+                <div className="offer-features-list">
+                  {offer.features && offer.features.map((feat, fidx) => (
+                    <div key={fidx} className="offer-feature-item">
+                      <img 
+                        src="/photo/kid-area-pic/icon/Vector (3).png" 
+                        alt="feat" 
+                        className="feat-vector-icon" 
+                      />
+                      <span className="feat-text">{feat}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="offer-pricing-row">
+                  <span className="price-current">{priceDisplay}</span>
+                  {origPriceDisplay && <span className="price-orig">{origPriceDisplay}</span>}
+                </div>
+
+                <button 
+                  className="get-offer-btn"
+                  onClick={() => openModal('booking', {
+                    name: `${offerTitle} - ${t.zones.funPark.title}`,
+                    price: priceDisplay,
+                    priceNum: offer.priceNum,
+                    discount: offer.saveBadge,
+                    details: offer.features?.join(', ') || ''
+                  })}
+                >
+                  <img 
+                    src="/photo/kid-area-pic/icon/Vector (3).png" 
+                    alt="ticket" 
+                    className="btn-ticket-vector-icon" 
+                  />
+                  <span>{t.zones.getOffer}</span>
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Explore Fun Park Section */}
       <div className="zone-section-header" style={{ marginTop: '2rem' }}>
-        <h3 className="section-title-plain">Explore Fun Park</h3>
+        <h3 className="section-title-plain">{t.zones.funPark.exploreTitle}</h3>
         <button 
           className="see-all-link"
-          onClick={() => openModal('all-attractions', { zone: 'Fun Park', attractions })}
+          onClick={() => openModal('all-attractions', { zone: t.zones.funPark.title, attractions })}
         >
-          See All &gt;
+          {t.zones.seeAll}
         </button>
       </div>
 
-      {/* 3 Attraction Cards */}
+      {/* 3 Attraction Cards with LazyImage */}
       <div className="explore-attractions-row">
-        {attractions.map((attr) => (
-          <div 
-            key={attr.id} 
-            className="explore-attraction-card"
-            onClick={() => openModal('attraction-detail', attr)}
-            role="button"
-            tabIndex={0}
-          >
-            <div className="attr-media-wrapper">
-              <img 
-                src={attr.img} 
-                alt={attr.titleEn} 
-                className="attr-card-img"
-                onError={(e) => {
-                  e.currentTarget.src = attr.fallbackImg;
-                }}
-              />
-              <div className="attr-overlay-labels">
-                <div className="attr-en-name">{attr.titleEn}</div>
-                <div className="attr-ar-name">{attr.titleAr}</div>
+        {(searchQuery ? filteredAttractions : exploreItems).map((attr) => {
+          const attrTitle = isArabic ? (attr.titleAr || attr.title) : (attr.titleEn || attr.title);
+          return (
+            <div 
+              key={attr.id} 
+              className="explore-attraction-card"
+              onClick={() => openModal('attraction-detail', attr)}
+              role="button"
+              tabIndex={0}
+            >
+              <div className="attr-media-wrapper">
+                <LazyImage 
+                  src={attr.img || attr.image || attr.src} 
+                  alt={attrTitle} 
+                  className="attr-card-img" 
+                  fallbackSrc={attr.fallbackImg || attr.fallback || attr.fallbackSrc}
+                />
+                <div className="attr-overlay-labels">
+                  <div className="attr-single-name">{attrTitle}</div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* EXPLORE 360° Button */}
@@ -204,12 +207,12 @@ export default function MobileFunParkPage({ setActiveTab, openModal, lang }) {
           <img 
             src="/photo/kid-area-pic/icon/explore-360.png" 
             alt="360" 
-            className="icon-360-img"
+            className="icon-360-img" 
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
           />
-          <span className="explore-360-text">EXPLORE 360°</span>
+          <span className="explore-360-text">{t.zones.explore360}</span>
         </button>
       </div>
 

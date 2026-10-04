@@ -7,6 +7,10 @@ const MobileFunParkPage = lazy(() => import('./pages/mobile/MobileFunParkPage'))
 const MobileChallengePage = lazy(() => import('./pages/mobile/MobileChallengePage'));
 const MobileAdventurePage = lazy(() => import('./pages/mobile/MobileAdventurePage'));
 const MobilePackagePage = lazy(() => import('./pages/mobile/MobilePackagePage'));
+const MobileEventsPage = lazy(() => import('./pages/mobile/MobileEventsPage'));
+const MobileTripsPage = lazy(() => import('./pages/mobile/MobileTripsPage'));
+const MobileCartPage = lazy(() => import('./pages/mobile/MobileCartPage'));
+const MobileAboutPage = lazy(() => import('./pages/mobile/MobileAboutPage'));
 
 // Desktop Components (Lazy Loaded)
 const DesktopHomePage = lazy(() => import('./pages/desktop/DesktopHomePage'));
@@ -15,6 +19,10 @@ const DesktopFunParkPage = lazy(() => import('./pages/desktop/DesktopFunParkPage
 const DesktopChallengePage = lazy(() => import('./pages/desktop/DesktopChallengePage'));
 const DesktopAdventurePage = lazy(() => import('./pages/desktop/DesktopAdventurePage'));
 const DesktopPackagePage = lazy(() => import('./pages/desktop/DesktopPackagePage'));
+const DesktopEventsPage = lazy(() => import('./pages/desktop/DesktopEventsPage'));
+const DesktopTripsPage = lazy(() => import('./pages/desktop/DesktopTripsPage'));
+const DesktopCartPage = lazy(() => import('./pages/desktop/DesktopCartPage'));
+const DesktopAboutPage = lazy(() => import('./pages/desktop/DesktopAboutPage'));
 
 // Synchronous Layout & UI Components
 import MobileHeader from './components/MobileHeader';
@@ -30,8 +38,28 @@ import './components/MobilePlayZone.css';
 import './components/DesktopPlayZone.css';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'kids-area' | 'fun-park' | 'challenge' | 'adventure' | 'package'
-  const [lang, setLang] = useState('en');
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const h = window.location.hash.replace('#', '');
+      if (['home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'events', 'trips', 'cart', 'about'].includes(h)) {
+        return h;
+      }
+    }
+    return 'about'; // Default directly to the requested About Us & Overview page
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.location.hash = activeTab;
+    }
+  }, [activeTab]);
+  const [lang, setLang] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('kids_area_lang');
+      if (saved === 'ar' || saved === 'en') return saved;
+    }
+    return 'ar'; // Default language: Egyptian Arabic
+  });
   const [modal, setModal] = useState({ isOpen: false, type: null, data: null });
   const [searchQuery, setSearchQuery] = useState('');
   const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -52,13 +80,16 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Update HTML title & RTL
+  // Update HTML title, dir & persistence
   useEffect(() => {
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.lang = lang;
-    document.title = lang === 'ar' 
-      ? 'أمريكان دريم - منطقة الأطفال والمرح' 
-      : 'American Dream Ismailia';
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('kids_area_lang', lang);
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      document.documentElement.lang = lang;
+      document.title = lang === 'ar' 
+        ? 'أمريكان دريم - منطقة الأطفال والمرح بالإسماعيلية' 
+        : 'American Dream Ismailia - Family Entertainment';
+    }
   }, [lang]);
 
   // Global listener for attraction booking
@@ -113,20 +144,53 @@ export default function App() {
           />
 
           {/* Subnav & Search (for zone pages) */}
-          {activeTab !== 'home' && (
+          {activeTab !== 'home' && activeTab !== 'events' && activeTab !== 'trips' && activeTab !== 'cart' && activeTab !== 'about' && (
             <DesktopSubNav 
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
+              lang={lang}
             />
           )}
 
           {/* Main Desktop Page Body with Lazy Loading Suspense Fallback */}
           <main style={{ flex: 1 }}>
             <Suspense fallback={<LoadingScreen fullscreen={false} lang={lang} />}>
+              {activeTab === 'about' && (
+                <DesktopAboutPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
               {activeTab === 'home' && (
                 <DesktopHomePage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'cart' && (
+                <DesktopCartPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'trips' && (
+                <DesktopTripsPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'events' && (
+                <DesktopEventsPage 
                   setActiveTab={setActiveTab}
                   openModal={openModal}
                   lang={lang}
@@ -180,7 +244,7 @@ export default function App() {
           </main>
 
           {/* Desktop Footer */}
-          <DesktopFooter openModal={openModal} setActiveTab={setActiveTab} />
+          <DesktopFooter openModal={openModal} setActiveTab={setActiveTab} lang={lang} />
 
           {/* Global Interactive Modals */}
           {modal.isOpen && (
@@ -205,6 +269,7 @@ export default function App() {
             onOpenMenu={() => openModal('menu-drawer')}
             onOpenProfile={() => openModal('profile')}
             lang={lang}
+            setLang={setLang}
           />
 
           {/* Main Page Views with Lazy Loading Suspense Fallback */}
@@ -257,6 +322,38 @@ export default function App() {
                   lang={lang}
                 />
               )}
+
+              {activeTab === 'events' && (
+                <MobileEventsPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'trips' && (
+                <MobileTripsPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'cart' && (
+                <MobileCartPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'about' && (
+                <MobileAboutPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
             </Suspense>
           </main>
 
@@ -265,6 +362,7 @@ export default function App() {
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             openModal={openModal}
+            lang={lang}
           />
 
           {/* Global Interactive Modals & Drawers */}
@@ -276,6 +374,7 @@ export default function App() {
               setActiveTab={setActiveTab}
               lang={lang}
               setLang={setLang}
+              openModal={openModal}
             />
           )}
         </div>

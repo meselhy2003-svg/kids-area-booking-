@@ -3,7 +3,7 @@ import './LoadingScreen.css';
 
 export default function LoadingScreen({ 
   fullscreen = true, 
-  lang = 'en',
+  lang = 'ar',
   onFinish = null 
 }) {
   const [progress, setProgress] = useState(15);
@@ -49,7 +49,7 @@ export default function LoadingScreen({
         <div className="loading-logo-wrapper">
           <img 
             src="/photo/logo/logo nav bar and footer.png" 
-            alt="Play Zone" 
+            alt={lang === 'ar' ? 'أمريكان دريم' : 'Play Zone'} 
             className="loading-logo-img"
           />
           <div className="loading-logo-glow" />
@@ -57,15 +57,24 @@ export default function LoadingScreen({
 
         {/* Colorful PLAY ZONE Title */}
         <h2 className="loading-brand-title">
-          <span style={{ color: '#00a9c3' }}>P</span>
-          <span style={{ color: '#ffffff' }}>L</span>
-          <span style={{ color: '#f7a81b' }}>A</span>
-          <span style={{ color: '#ffffff' }}>Y</span>
-          <span className="loading-title-space">&nbsp;</span>
-          <span style={{ color: '#00a9c3' }}>Z</span>
-          <span style={{ color: '#ffffff' }}>O</span>
-          <span style={{ color: '#f7a81b' }}>N</span>
-          <span style={{ color: '#ffffff' }}>E</span>
+          {lang === 'ar' ? (
+            <span style={{ fontFamily: 'Alexandria, Cairo, sans-serif', fontWeight: 800 }}>
+              <span style={{ color: '#00a9c3' }}>منطقة</span>{' '}
+              <span style={{ color: '#f7a81b' }}>الألعاب</span>
+            </span>
+          ) : (
+            <>
+              <span style={{ color: '#00a9c3' }}>P</span>
+              <span style={{ color: '#ffffff' }}>L</span>
+              <span style={{ color: '#f7a81b' }}>A</span>
+              <span style={{ color: '#ffffff' }}>Y</span>
+              <span className="loading-title-space">&nbsp;</span>
+              <span style={{ color: '#00a9c3' }}>Z</span>
+              <span style={{ color: '#ffffff' }}>O</span>
+              <span style={{ color: '#f7a81b' }}>N</span>
+              <span style={{ color: '#ffffff' }}>E</span>
+            </>
+          )}
         </h2>
 
         <p className="loading-tagline">

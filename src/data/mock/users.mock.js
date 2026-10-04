@@ -11,9 +11,9 @@ export const mockUsers = [
     email: 'ahmed.hassan@americandream.com',
     password: 'password123',
     membership: 'VIP Member • Gold Club',
-    points: 340,
+    points: 2250,
     zoneVisits: 4,
-    avatar: '/photo/kid-area-pic/icon/user-icon.png',
+    avatar: '/photo/kid area pic/icon/Symbol.png',
     activePasses: [
       {
         code: 'PZ-849201',
