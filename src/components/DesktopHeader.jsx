@@ -72,13 +72,14 @@ export default function DesktopHeader({
         <div className="desktop-nav-right">
           {/* Language Switcher Button */}
           <button 
-            className="desktop-lang-btn"
+            className="desktop-lang-btn font-alexandria"
             onClick={() => setLang && setLang(lang === 'ar' ? 'en' : 'ar')}
             title={lang === 'ar' ? 'Switch website to English' : 'تحويل الموقع إلى اللغة العربية'}
             aria-label="Switch Language"
+            style={{ fontFamily: "'Alexandria', 'Tajawal', sans-serif" }}
           >
             <span style={{ marginInlineEnd: '4px' }}>🌐</span>
-            <span>{t.nav.switchLangText}</span>
+            <span style={{ fontFamily: "'Alexandria', 'Tajawal', sans-serif" }}>{t.nav.switchLangText}</span>
           </button>
 
           {/* Parachute / Fast Pass Cart Button */}

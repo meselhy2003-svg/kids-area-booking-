@@ -1,7 +1,8 @@
 :root {
-  --font-main: 'Outfit', sans-serif;
-  --font-kids: 'Fredoka', cursive, sans-serif;
+  --font-main: 'Outfit', 'Alexandria', sans-serif;
+  --font-kids: 'Fredoka', 'Alexandria', cursive, sans-serif;
   --font-arabic: 'Alexandria', 'Tajawal', sans-serif;
+  --pz-font-arabic: 'Alexandria', 'Tajawal', sans-serif;
   
   --primary-teal: #0c6177;
   --primary-teal-light: #1693b3;
@@ -40,7 +41,8 @@ body {
 html[dir="rtl"],
 html[lang="ar"],
 body[dir="rtl"],
-[dir="rtl"] {
+[dir="rtl"],
+.lang-ar {
   --font-main: 'Alexandria', 'Tajawal', sans-serif !important;
   --font-kids: 'Alexandria', 'Tajawal', sans-serif !important;
   --font-arabic: 'Alexandria', 'Tajawal', sans-serif !important;
@@ -53,12 +55,25 @@ body[dir="rtl"],
 [dir="rtl"] *,
 [dir="rtl"] *::before,
 [dir="rtl"] *::after,
+.lang-ar *,
+.lang-ar *::before,
+.lang-ar *::after,
 [dir="rtl"] body,
 [dir="rtl"] input,
 [dir="rtl"] button,
 [dir="rtl"] select,
 [dir="rtl"] textarea {
-  font-family: 'Alexandria', 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: 'Alexandria', 'Tajawal', sans-serif !important;
+}
+
+/* Explicit Alexandria font for buttons, toggles and Arabic labels */
+.font-alexandria,
+.desktop-lang-btn,
+.mobile-lang-toggle-btn,
+.lang-toggle-btn,
+[lang="ar"],
+:lang(ar) {
+  font-family: 'Alexandria', 'Tajawal', sans-serif !important;
 }
 
 [dir="rtl"] h1,
