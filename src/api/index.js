@@ -21,6 +21,7 @@ export {
   getPageMediaImages,
   getAllPagesImages,
   extractImagesAsArrayOfObjects,
+  extractArrayPayload,
   normalizePageKey
 } from './mediaService';
 export { mediaCache, MEDIA_CACHE_KEYS } from './mediaCache';

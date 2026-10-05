@@ -345,6 +345,22 @@ export const getAllPagesMedia = async (options = {}) => {
 };
 
 /**
+ * Helper to unwrap array payloads from diverse server response shapes
+ */
+export const extractArrayPayload = (res) => {
+  if (!res || !res.success || !res.data) return null;
+  if (Array.isArray(res.data)) return res.data;
+  if (res.data && typeof res.data === 'object') {
+    if (Array.isArray(res.data.data)) return res.data.data;
+    if (Array.isArray(res.data.items)) return res.data.items;
+    if (Array.isArray(res.data.images)) return res.data.images;
+    if (Array.isArray(res.data.banners)) return res.data.banners;
+    if (Array.isArray(res.data.slides)) return res.data.slides;
+  }
+  return null;
+};
+
+/**
  * Normalizes any media payload into a flat Array of Objects.
  * Every item in the array is guaranteed to be an object with { id, src, url, title, alt, ... }.
  * 
@@ -352,8 +368,14 @@ export const getAllPagesMedia = async (options = {}) => {
  * @param {string} pageName - Name of the page for IDs and tagging
  * @returns {Array<object>} Flat array of image objects
  */
-export const extractImagesAsArrayOfObjects = (data, pageName = 'page') => {
-  if (!data) return [];
+export const extractImagesAsArrayOfObjects = (rawData, pageName = 'page') => {
+  if (!rawData) return [];
+
+  // Unwrap envelope object if passed { data: ... }
+  let data = rawData;
+  if (data && typeof data === 'object' && !Array.isArray(data) && data.data !== undefined) {
+    data = data.data;
+  }
 
   const toImageObject = (item, idx = 0, section = '') => {
     if (!item) return null;
