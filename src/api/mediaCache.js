@@ -22,12 +22,13 @@ export const MEDIA_CACHE_KEYS = {
   ADVENTURE_HERO_BANNERS: 'kids_area_cache_hero_adventure_v1',
   EXPLORE_ADVENTURE: 'kids_area_cache_explore_adventure_v1',
   EVENTS_HERO_BANNERS: 'kids_area_cache_hero_events_v1',
-  VIBES_EVENTS: 'kids_area_cache_vibes_events_v1'
+  VIBES_EVENTS: 'kids_area_cache_vibes_events_v1',
+  PAGE_MEDIA_PREFIX: 'kids_area_cache_page_media_v1_'
 };
 
 export const mediaCache = {
   /**
-   * Synchronously retrieve cached images or return fallback
+   * Synchronously retrieve cached media (arrays or objects) or return fallback
    */
   get(key, fallback = null) {
     if (typeof window === 'undefined') return fallback;
@@ -35,7 +36,13 @@ export const mediaCache = {
       const raw = localStorage.getItem(key);
       if (!raw) return fallback;
       const parsed = JSON.parse(raw);
-      if (parsed && Array.isArray(parsed.data) && parsed.data.length > 0) {
+      if (parsed && parsed.data !== undefined && parsed.data !== null) {
+        if (Array.isArray(parsed.data)) {
+          return parsed.data.length > 0 ? parsed.data : fallback;
+        }
+        if (typeof parsed.data === 'object') {
+          return Object.keys(parsed.data).length > 0 ? parsed.data : fallback;
+        }
         return parsed.data;
       }
       return fallback;
@@ -65,14 +72,14 @@ export const mediaCache = {
   },
 
   /**
-   * Save images to persistent cache and notify listeners
+   * Save media data to persistent cache and notify listeners
    */
   set(key, data, source = 'cache') {
-    if (typeof window === 'undefined' || !Array.isArray(data)) return;
+    if (typeof window === 'undefined' || data === undefined || data === null) return;
     try {
       const payload = {
         data,
-        source, // 'mock' | 'server'
+        source, // 'mock' | 'server' | 'cache'
         timestamp: Date.now(),
         version: '1.0'
       };
@@ -104,6 +111,21 @@ export const mediaCache = {
    */
   clearAll() {
     Object.values(MEDIA_CACHE_KEYS).forEach(k => mediaCache.remove(k));
+    // Also remove any page media keys starting with prefix
+    if (typeof window !== 'undefined') {
+      try {
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith(MEDIA_CACHE_KEYS.PAGE_MEDIA_PREFIX)) {
+            keysToRemove.push(k);
+          }
+        }
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+      } catch (e) {
+        console.warn('[MediaCache] Error clearing page media prefix keys:', e);
+      }
+    }
   },
 
   /**
@@ -111,7 +133,6 @@ export const mediaCache = {
    */
   hasChanged(cachedData, newData) {
     if (!cachedData || !newData) return true;
-    if (cachedData.length !== newData.length) return true;
     try {
       return JSON.stringify(cachedData) !== JSON.stringify(newData);
     } catch {
@@ -120,14 +141,27 @@ export const mediaCache = {
   },
 
   /**
-   * Preload an array of image items into browser memory & Cache API
-   * Supports objects with .src or .url, or plain string URLs
+   * Preload an array or collection of image items into browser memory & Cache API
+   * Supports objects with .src, .image, .img, or .url, or plain string URLs
    */
   preloadImages(items = []) {
-    if (typeof window === 'undefined' || !Array.isArray(items)) return Promise.resolve([]);
+    if (typeof window === 'undefined' || !items) return Promise.resolve([]);
 
-    const promises = items.map((item) => {
-      const url = typeof item === 'string' ? item : (item?.src || item?.url);
+    let flatItems = [];
+    if (Array.isArray(items)) {
+      flatItems = items.flat(Infinity);
+    } else if (typeof items === 'object') {
+      flatItems = Object.values(items).flatMap(val => 
+        Array.isArray(val) ? val.flat(Infinity) : [val]
+      );
+    } else {
+      flatItems = [items];
+    }
+
+    const promises = flatItems.map((item) => {
+      const url = typeof item === 'string' 
+        ? item 
+        : (item?.src || item?.image || item?.img || item?.url);
       if (!url) return Promise.resolve({ url: null, success: false });
 
       // Cache in CacheStorage API if available
@@ -148,11 +182,12 @@ export const mediaCache = {
         img.onload = () => resolve({ url, success: true });
         img.onerror = () => {
           // If server URL fails, try to preload fallback if present
-          if (typeof item === 'object' && item?.fallbackSrc) {
+          if (typeof item === 'object' && (item?.fallbackSrc || item?.fallbackImg || item?.fallback)) {
+            const fallbackUrl = item.fallbackSrc || item.fallbackImg || item.fallback;
             const fallbackImg = new Image();
-            fallbackImg.onload = () => resolve({ url: item.fallbackSrc, success: true });
+            fallbackImg.onload = () => resolve({ url: fallbackUrl, success: true });
             fallbackImg.onerror = () => resolve({ url, success: false });
-            fallbackImg.src = item.fallbackSrc;
+            fallbackImg.src = fallbackUrl;
           } else {
             resolve({ url, success: false });
           }
