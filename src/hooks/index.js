@@ -9,3 +9,4 @@ export { useFunParkMedia } from './useFunParkMedia';
 export { useChallengeMedia } from './useChallengeMedia';
 export { useAdventureMedia } from './useAdventureMedia';
 export { useEventsMedia } from './useEventsMedia';
+export { usePageImages } from './usePageImages';

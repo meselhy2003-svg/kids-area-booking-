@@ -16,6 +16,11 @@ export {
   getPageMedia,
   getAllPagesMedia,
   getCachedPageMedia,
+  getPageImages,
+  fetchPageImages,
+  getPageMediaImages,
+  getAllPagesImages,
+  extractImagesAsArrayOfObjects,
   normalizePageKey
 } from './mediaService';
 export { mediaCache, MEDIA_CACHE_KEYS } from './mediaCache';

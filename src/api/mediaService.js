@@ -344,6 +344,206 @@ export const getAllPagesMedia = async (options = {}) => {
   return pagesMap;
 };
 
+/**
+ * Normalizes any media payload into a flat Array of Objects.
+ * Every item in the array is guaranteed to be an object with { id, src, url, title, alt, ... }.
+ * 
+ * @param {any} data - Raw media payload or page structure
+ * @param {string} pageName - Name of the page for IDs and tagging
+ * @returns {Array<object>} Flat array of image objects
+ */
+export const extractImagesAsArrayOfObjects = (data, pageName = 'page') => {
+  if (!data) return [];
+
+  const toImageObject = (item, idx = 0, section = '') => {
+    if (!item) return null;
+
+    if (typeof item === 'string') {
+      return {
+        id: `${pageName}-${section || 'img'}-${idx}`,
+        src: item,
+        url: item,
+        title: `${pageName} image ${idx + 1}`,
+        titleEn: `${pageName} image ${idx + 1}`,
+        titleAr: '',
+        subtitle: '',
+        alt: `${pageName} image ${idx + 1}`,
+        page: pageName,
+        section: section || 'general'
+      };
+    }
+
+    if (typeof item === 'object') {
+      const srcUrl = item.src || item.image || item.img || item.url || item.mainPanorama || '';
+      if (!srcUrl && !item.fallbackSrc) return null;
+
+      const fallbackUrl = item.fallbackSrc || item.fallbackImg || item.fallback || null;
+      const title = item.title || item.titleEn || item.alt || '';
+      const titleEn = item.titleEn || item.title || '';
+      const titleAr = item.titleAr || '';
+      const subtitle = item.subtitle || item.subtitleEn || item.desc || '';
+      const subtitleEn = item.subtitleEn || item.subtitle || item.desc || '';
+      const subtitleAr = item.subtitleAr || item.descAr || '';
+      const alt = item.alt || title || titleEn || `${pageName} image`;
+
+      return {
+        id: item.id ? String(item.id) : `${pageName}-${section || 'img'}-${idx}`,
+        src: srcUrl || fallbackUrl,
+        url: srcUrl || fallbackUrl,
+        fallbackSrc: fallbackUrl,
+        title,
+        titleEn,
+        titleAr,
+        subtitle,
+        subtitleEn,
+        subtitleAr,
+        alt,
+        page: pageName,
+        section: section || item.section || 'media',
+        category: item.category || section || '',
+        badge: item.badge || null,
+        ...item,
+        // Guarantee src & url are resolved strings
+        src: srcUrl || fallbackUrl,
+        url: srcUrl || fallbackUrl
+      };
+    }
+
+    return null;
+  };
+
+  if (Array.isArray(data)) {
+    return data
+      .flatMap((item, idx) => {
+        if (Array.isArray(item)) {
+          return item.map((sub, sIdx) => toImageObject(sub, `${idx}-${sIdx}`, 'gallery'));
+        }
+        return [toImageObject(item, idx)];
+      })
+      .filter(Boolean);
+  }
+
+  if (typeof data === 'object') {
+    const list = [];
+    let counter = 0;
+
+    Object.entries(data).forEach(([key, val]) => {
+      if (['page', '_source', '_success', 'status', 'message', 'error'].includes(key)) return;
+
+      if (Array.isArray(val)) {
+        val.forEach((subItem, sIdx) => {
+          if (Array.isArray(subItem)) {
+            subItem.forEach((colItem, cIdx) => {
+              const obj = toImageObject(colItem, `${key}-${sIdx}-${cIdx}`, key);
+              if (obj) list.push(obj);
+            });
+          } else {
+            const obj = toImageObject(subItem, counter++, key);
+            if (obj) list.push(obj);
+          }
+        });
+      } else if (val && typeof val === 'object') {
+        const obj = toImageObject(val, counter++, key);
+        if (obj) list.push(obj);
+      }
+    });
+
+    return list;
+  }
+
+  return [];
+};
+
+/**
+ * Calls data and fetches API by page name, returning all images as an Array of Objects.
+ * 
+ * @param {string} pageName - The name of the page (e.g. 'home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'events', 'trips', 'about', 'package')
+ * @param {object} [options] - Optional settings ({ forceRefresh, endpoint })
+ * @returns {Promise<Array<object>>} The page images formatted as an array of objects
+ */
+export const getPageImages = async (pageName, options = {}) => {
+  const normKey = normalizePageKey(pageName);
+  const cacheKey = `${MEDIA_CACHE_KEYS.PAGE_MEDIA_PREFIX}images_${normKey}`;
+  const { forceRefresh = false, endpoint } = options;
+
+  // 1. Check cached array for instant zero-latency return
+  if (!forceRefresh) {
+    const cachedImages = mediaCache.get(cacheKey, null);
+    if (Array.isArray(cachedImages) && cachedImages.length > 0) {
+      return cachedImages;
+    }
+  }
+
+  try {
+    let res = null;
+    if (endpoint) {
+      res = await apiClient.get(endpoint);
+    } else {
+      // Try candidate endpoints on backend
+      res = await apiClient.get(`/api/media/${normKey}`);
+      if (!res.success && (res.status === 400 || res.status === 404)) {
+        res = await apiClient.get(`/api/media/pages/${normKey}`);
+      }
+      if (!res.success && (res.status === 400 || res.status === 404)) {
+        res = await apiClient.get('/api/media', { page: normKey });
+      }
+      if (!res.success && (res.status === 400 || res.status === 404)) {
+        res = await apiClient.get(`/media/${normKey}`);
+      }
+    }
+
+    if (res && res.success && res.data) {
+      const serverPayload = res.data.data !== undefined ? res.data.data : res.data;
+      const imagesArray = extractImagesAsArrayOfObjects(serverPayload, normKey);
+
+      if (imagesArray.length > 0) {
+        mediaCache.preloadImages(imagesArray);
+        mediaCache.set(cacheKey, imagesArray, 'server');
+        return imagesArray;
+      }
+    }
+  } catch (err) {
+    console.warn(`[getPageImages] API fetch fallback for "${normKey}":`, err.message);
+  }
+
+  // Fallback: extract images from cached / default page data
+  const pageData = getCachedPageMedia(normKey);
+  const fallbackImages = extractImagesAsArrayOfObjects(pageData, normKey);
+
+  if (fallbackImages.length > 0) {
+    mediaCache.set(cacheKey, fallbackImages, 'mock');
+  }
+
+  return fallbackImages;
+};
+
+// Aliases for convenience
+export const fetchPageImages = getPageImages;
+export const getPageMediaImages = getPageImages;
+
+/**
+ * Fetch images for all pages, each returning as an Array of Objects
+ * 
+ * @param {object} [options] - Optional settings ({ forceRefresh, endpoint })
+ * @returns {Promise<object>} Dictionary mapping each page key to its array of image objects
+ */
+export const getAllPagesImages = async (options = {}) => {
+  const pageKeys = Object.values(PAGE_MEDIA_KEYS);
+  const results = await Promise.allSettled(
+    pageKeys.map(key => getPageImages(key, options))
+  );
+
+  const imagesMap = {};
+  pageKeys.forEach((key, index) => {
+    const outcome = results[index];
+    imagesMap[key] = outcome.status === 'fulfilled' 
+      ? outcome.value 
+      : extractImagesAsArrayOfObjects(getCachedPageMedia(key), key);
+  });
+
+  return imagesMap;
+};
+
 export const mediaService = {
   // Page Media Core API
   PAGE_MEDIA_KEYS,
@@ -354,6 +554,11 @@ export const mediaService = {
   getPageMedia,
   getAllPagesMedia,
   getCachedPageMedia,
+  getPageImages,
+  fetchPageImages,
+  getPageMediaImages,
+  getAllPagesImages,
+  extractImagesAsArrayOfObjects,
 
   /**
    * Helper to distribute a flat list of vibes images into 3 balanced columns
@@ -1301,5 +1506,6 @@ if (typeof window !== 'undefined') {
   window.__mediaService = mediaService;
   window.__getPageMedia = getPageMedia;
   window.__getAllPagesMedia = getAllPagesMedia;
+  window.__getPageImages = getPageImages;
   window.__PAGE_MEDIA_KEYS = PAGE_MEDIA_KEYS;
 }
