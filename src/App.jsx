@@ -270,14 +270,6 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'restaurant' && (
-                <DesktopRestaurantPage 
-                  setActiveTab={setActiveTab}
-                  openModal={openModal}
-                  lang={lang}
-                />
-              )}
-
               {activeTab === 'dashboard' && (
                 <DesktopDashboardPage 
                   setActiveTab={setActiveTab}
