@@ -19,6 +19,7 @@ export function usePageImages(pageName, options = {}) {
     setError(null);
     try {
       const data = await getPageImages(normKey, { forceRefresh: force });
+      console.log(`[usePageImages] Page "${normKey}" images data:`, data);
       setImages(data);
       setLoading(false);
       return data;

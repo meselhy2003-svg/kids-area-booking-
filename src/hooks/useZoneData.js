@@ -42,6 +42,11 @@ export function useZoneData(zoneId = 'kids-area', searchQuery = '') {
           if (loadedOffers) setOffers(loadedOffers);
           if (loadedAttractions) setAttractions(loadedAttractions);
           if (loadedBanners) setBanners(loadedBanners);
+          console.log(`[useZoneData] Loaded data for zone "${zoneId}":`, {
+            offers: loadedOffers,
+            attractions: loadedAttractions,
+            banners: loadedBanners
+          });
         }
       } catch (err) {
         console.warn(`Error loading zone data for ${zoneId}:`, err);

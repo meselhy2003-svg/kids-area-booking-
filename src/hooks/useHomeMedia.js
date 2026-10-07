@@ -44,6 +44,11 @@ export function useHomeMedia() {
         setVibesColumns(mediaService.distributeVibesIntoColumns(freshVibes));
       }
 
+      console.log('[useHomeMedia] Loaded Home media data:', {
+        destinationImages: freshDest,
+        vibesImages: freshVibes
+      });
+
       setIsServerSynced(true);
     } catch (err) {
       console.warn('[useHomeMedia] Background sync warning:', err);
@@ -76,7 +81,7 @@ export function useHomeMedia() {
     };
   }, []);
 
-  // 4. Initial preloading & background verification
+  // 4. Initial preloading & background verification + Auto-sync on window focus
   useEffect(() => {
     let isMounted = true;
 
@@ -91,10 +96,23 @@ export function useHomeMedia() {
 
     initialSync();
 
+    // Revalidate when user switches tabs or returns to window (e.g. from Apidog)
+    const handleWindowFocus = () => {
+      syncMedia(true);
+    };
+    window.addEventListener('focus', handleWindowFocus);
+
+    // Background polling every 15 seconds to catch remote uploads from Apidog
+    const interval = setInterval(() => {
+      syncMedia(false);
+    }, 15000);
+
     return () => {
       isMounted = false;
+      window.removeEventListener('focus', handleWindowFocus);
+      clearInterval(interval);
     };
-  }, []);
+  }, [syncMedia]);
 
   const refreshCache = useCallback(() => {
     mediaService.clearMediaCache();

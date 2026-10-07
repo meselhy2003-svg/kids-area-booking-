@@ -75,6 +75,7 @@ export const translations = {
       challenge: 'منطقة التحدي',
       adventure: 'منطقة المغامرات',
       packages: 'الباقات',
+      restaurant: 'المطعم والكافيه',
       vibes: 'أجواء المرح'
     },
 
@@ -421,6 +422,82 @@ export const translations = {
           midWeek: 'منتصف الأسبوع',
           weekend: 'نهاية الأسبوع'
         }
+      },
+
+      restaurantPage: {
+        badge: 'المطعم والكافيه',
+        heroTitle1: 'طعام رائع.',
+        heroTitle2: 'لحظات لا تُنسى.',
+        heroDesc: 'استمتع بأشهى المأكولات، ومشروباتك المفضلة، وأجواء الواجهة المائية الهادئة في أمريكان دريم الإسماعيلية',
+        exploreBtn: 'استكشف خيارات الطعام ↓',
+        bookTableBtn: 'احجز طاولة',
+        tagAmbiance: 'إطلالة ساحرة على الواجهة المائية',
+        tagFamily: 'مناسب للعائلات والمجموعات',
+        sectionTag: 'تجارب تناول الطعام',
+        sectionTitle1: 'اختر الطريقة',
+        sectionTitle2: 'التي تفضلها للاستمتاع',
+        sectionDesc: 'سواء كنت تسترخي على طول الممشى الكبير أو تتذوق الأطباق الطازجة في أي مكان على ضفاف القناة.',
+        delivery: {
+          badge: 'توصيل / سفري',
+          tag: 'راحة وسرعة',
+          title: 'خدمة التوصيل',
+          desc: 'اطلب طعامك المفضل واستمتع به أينما كنت على طول واجهة الإسماعيلية المائية أو في منزلك مباشرة.',
+          btn: 'اطلب الآن ←'
+        },
+        inPark: {
+          badge: 'تناول الطعام بالحديقة',
+          tag: 'جلسات عائلية',
+          title: 'الطلب داخل أمريكان دريم',
+          desc: 'اطلب أثناء تواجدك في أمريكان دريم واستمتع بوجبتك بسلاسة وبدون انتظار أثناء زيارتك.',
+          btn: 'تصفح المنيو / اطلب هنا'
+        },
+        bookTable: {
+          badge: 'جلسات VIP',
+          tag: 'تراس الواجهة المائية',
+          title: 'حجز طاولة',
+          desc: 'احجز طاولتك بجوار القناة مباشرة لمشاهدة السفن العابرة وعيش تجربة استثنائية لا تُنسى.',
+          btn: 'احجز طاولة الآن 📅'
+        },
+        vibesTitle: 'VIBES',
+        vibesDesc: 'طعام رائع، صحبة جميلة، ولحظات لا تُنسى.',
+        hashtag: '#AmericanDreamIsmailia',
+        modal: {
+          bookTitle: 'حجز طاولة في المطعم',
+          bookSub: 'اختر موعدك واستمتع بأجمل إطلالة على قناة السويس',
+          nameLabel: 'الاسم بالكامل',
+          phoneLabel: 'رقم الهاتف / واتساب',
+          dateLabel: 'تاريخ الحجز',
+          timeLabel: 'الموعد المفضل',
+          guestsLabel: 'عدد الأفراد',
+          zoneLabel: 'منطقة الجلوس المفضلة',
+          zoneTerrace: 'تراس الواجهة المائية (VIP)',
+          zonePromenade: 'الممشى الخارجي المفتوح',
+          zoneIndoor: 'الصالة الداخلية المكيفة',
+          zonePergola: 'برجولة الغروب العائلية',
+          occasionLabel: 'المناسبة (اختياري)',
+          occasionBirthday: 'عيد ميلاد',
+          occasionAnniversary: 'ذكرى سنوية',
+          occasionFamily: 'تجمع عائلي',
+          occasionGeneral: 'عشاء عادي',
+          confirmBtn: 'تأكيد الحجز الآن',
+          successTitle: 'تم تأكيد حجزك بنجاح!',
+          successSub: 'يسعدنا استقبالكم في أمريكان دريم الإسماعيلية',
+          refCode: 'رقم مرجع الحجز:',
+          whatsappBtn: 'إرسال تفاصيل الحجز عبر واتساب',
+          deliveryTitle: 'طلب توصيل الوجبات',
+          deliverySub: 'طعام طازج يصلك بسرعة أينما كنت',
+          addressLabel: 'عنوان التوصيل في الإسماعيلية',
+          notesLabel: 'ملاحظات إضافية',
+          orderBtn: 'تأكيد وإرسال الطلب',
+          menuTitle: 'قائمة طعام وكافيه أمريكان دريم',
+          all: 'الكل',
+          burgers: 'البرجر والسندوتشات',
+          pizza: 'البيتزا الإيطالية',
+          grills: 'المشاوي الفاخرة',
+          drinks: 'المشروبات والعصائر',
+          coffee: 'القهوة والحلويات',
+          addToCart: 'أضف للطلب'
+        }
       }
     }
   },
@@ -492,6 +569,7 @@ export const translations = {
       challenge: 'Challenge Zone',
       adventure: 'Adventure Zone',
       packages: 'Packages',
+      restaurant: 'Restaurant & Cafe',
       vibes: 'Vibes'
     },
 
@@ -837,6 +915,82 @@ export const translations = {
           challenge: 'Challenge',
           midWeek: 'Mid-Week',
           weekend: 'Weekend'
+        }
+      },
+
+      restaurantPage: {
+        badge: 'RESTAURANT & CAFE',
+        heroTitle1: 'Good food.',
+        heroTitle2: 'Great moments.',
+        heroDesc: 'Enjoy delicious food, your favorite drinks, and a relaxing waterfront atmosphere at American Dream Ismailia',
+        exploreBtn: 'Explore Dining Options ↓',
+        bookTableBtn: 'Book a Table',
+        tagAmbiance: 'Ambiance Waterfront View',
+        tagFamily: 'Family & Group Friendly',
+        sectionTag: 'DINING EXPERIENCES',
+        sectionTitle1: 'Choose How You',
+        sectionTitle2: 'Want to Enjoy',
+        sectionDesc: 'Whether relaxing along the grand promenade or savoring fresh cuisine anywhere along the canal.',
+        delivery: {
+          badge: 'DELIVERY/TAKEAWAY',
+          tag: 'CONVENIENCE',
+          title: 'DELIVERY',
+          desc: 'Order your favorite food and enjoy it wherever you are along the Ismailia waterfront or right at home.',
+          btn: 'ORDER NOW →'
+        },
+        inPark: {
+          badge: 'IN-PARK DINE',
+          tag: 'PARK DINING',
+          title: 'ORDER AT AMERICAN DREAM',
+          desc: "Order while you're at American Dream and enjoy your meal seamlessly during your visit without waiting.",
+          btn: 'ORDER HERE / VIEW MENU'
+        },
+        bookTable: {
+          badge: 'VIP Seating',
+          tag: 'WATERFRONT TERRACE',
+          title: 'BOOK A TABLE',
+          desc: 'Reserve your seaside table overlooking passing canal ships and indulge in an unforgettable culinary experience.',
+          btn: 'BOOK A TABLE 📅'
+        },
+        vibesTitle: 'VIBES',
+        vibesDesc: 'Good food, good company, good moments.',
+        hashtag: '#AmericanDreamIsmailia',
+        modal: {
+          bookTitle: 'Reserve a Restaurant Table',
+          bookSub: 'Select your preferred time & experience the scenic Suez Canal waterfront',
+          nameLabel: 'Full Name',
+          phoneLabel: 'Phone / WhatsApp Number',
+          dateLabel: 'Reservation Date',
+          timeLabel: 'Preferred Time Slot',
+          guestsLabel: 'Number of Guests',
+          zoneLabel: 'Preferred Seating Area',
+          zoneTerrace: 'Waterfront Terrace (VIP)',
+          zonePromenade: 'Grand Promenade Open-Air',
+          zoneIndoor: 'Indoor Climate-Controlled Hall',
+          zonePergola: 'Sunset Family Pergola',
+          occasionLabel: 'Occasion (Optional)',
+          occasionBirthday: 'Birthday Party',
+          occasionAnniversary: 'Anniversary',
+          occasionFamily: 'Family Gathering',
+          occasionGeneral: 'Casual Dining',
+          confirmBtn: 'Confirm Reservation',
+          successTitle: 'Reservation Confirmed!',
+          successSub: "We're excited to welcome you to American Dream Ismailia",
+          refCode: 'Booking Reference:',
+          whatsappBtn: 'Send Booking to WhatsApp',
+          deliveryTitle: 'Food Delivery Order',
+          deliverySub: 'Hot & fresh food delivered anywhere along the waterfront or home',
+          addressLabel: 'Delivery Address in Ismailia',
+          notesLabel: 'Special Notes',
+          orderBtn: 'Confirm & Send Order',
+          menuTitle: 'American Dream Food & Drinks Menu',
+          all: 'All',
+          burgers: 'Burgers & Sandwiches',
+          pizza: 'Artisan Pizzas',
+          grills: 'Seaside Grills',
+          drinks: 'Mocktails & Shakes',
+          coffee: 'Specialty Coffee',
+          addToCart: 'Add to Order'
         }
       }
     }

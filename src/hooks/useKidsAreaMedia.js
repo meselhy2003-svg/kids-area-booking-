@@ -40,6 +40,11 @@ export function useKidsAreaMedia() {
         setExploreItems(freshExplore);
       }
 
+      console.log('[useKidsAreaMedia] Loaded Kids Area media data:', {
+        heroBanners: freshHero,
+        exploreItems: freshExplore
+      });
+
       setIsServerSynced(true);
     } catch (err) {
       console.warn('[useKidsAreaMedia] Background sync warning:', err);
@@ -71,7 +76,7 @@ export function useKidsAreaMedia() {
     };
   }, []);
 
-  // 4. Initial preloading & background verification
+  // 4. Initial preloading & background verification + Auto-sync on window focus
   useEffect(() => {
     let isMounted = true;
 
@@ -86,10 +91,23 @@ export function useKidsAreaMedia() {
 
     initialSync();
 
+    // Revalidate when user switches tabs or returns to window (e.g. from Apidog)
+    const handleWindowFocus = () => {
+      syncKidsMedia(true);
+    };
+    window.addEventListener('focus', handleWindowFocus);
+
+    // Background polling every 15 seconds to catch remote uploads from Apidog
+    const interval = setInterval(() => {
+      syncKidsMedia(false);
+    }, 15000);
+
     return () => {
       isMounted = false;
+      window.removeEventListener('focus', handleWindowFocus);
+      clearInterval(interval);
     };
-  }, []);
+  }, [syncKidsMedia]);
 
   const currentHero = heroBanners[activeSlide] || heroBanners[0];
 

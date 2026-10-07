@@ -160,7 +160,7 @@ export default function DesktopAboutPage({ setActiveTab, openModal, lang = 'ar' 
             {/* Card 2: Restaurant */}
             <div 
               className="about-offer-card"
-              onClick={() => openModal('restaurant-menu')}
+              onClick={() => setActiveTab('restaurant')}
             >
               <div className="about-card-img-wrap">
                 <img 

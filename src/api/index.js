@@ -22,7 +22,12 @@ export {
   getAllPagesImages,
   extractImagesAsArrayOfObjects,
   extractArrayPayload,
-  normalizePageKey
+  normalizePageKey,
+  resolveImageUrl,
+  uploadMediaImage,
+  deleteMediaImage,
+  getMediaByPage,
+  getMediaBySection
 } from './mediaService';
 export { mediaCache, MEDIA_CACHE_KEYS } from './mediaCache';
 export { menuService } from './menuService';

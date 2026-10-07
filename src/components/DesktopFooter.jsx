@@ -58,6 +58,14 @@ export default function DesktopFooter({ openModal, setActiveTab, lang = 'ar' }) 
           >
             {t.footer.privacy}
           </button>
+          <button 
+            className="desktop-footer-link"
+            style={{ opacity: 0.85, color: '#ffd15c' }}
+            onClick={() => setActiveTab && setActiveTab('dashboard')}
+            title={lang === 'ar' ? 'لوحة تحكم إدارة الموقع ورفع الصور' : 'Admin & Media Dashboard'}
+          >
+            ⚙️ {lang === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
+          </button>
         </div>
 
         {/* Right: Copyright Text */}

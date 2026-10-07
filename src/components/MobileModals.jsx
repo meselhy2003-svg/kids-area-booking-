@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { useAuth } from '../context/AuthContext';
+import MediaUploadModal from './common/MediaUploadModal';
 
 export default function MobileModals({ 
   modalType, 
@@ -500,7 +501,7 @@ export default function MobileModals({
 
             <button 
               className="drawer-nav-item"
-              onClick={() => { closeModal(); openModal ? openModal('restaurant-menu') : null; }}
+              onClick={() => { closeModal(); setActiveTab('restaurant'); }}
             >
               <img src="/photo/kid area pic/icon/Icon (12)dadd.png" alt="Restaurant" className="drawer-icon" />
               <span className={lang === 'ar' ? 'font-alexandria' : ''}>
@@ -535,6 +536,22 @@ export default function MobileModals({
               <img src="/photo/logo/logo nav bar and footer.png" alt="About" className="drawer-icon" />
               <span className={lang === 'ar' ? 'font-alexandria' : ''}>
                 {lang === 'ar' ? 'عن الحديقة والآراء' : 'About Us & Reviews'}
+              </span>
+            </button>
+
+            <button 
+              className="drawer-nav-item"
+              style={{
+                background: 'rgba(0, 169, 195, 0.08)',
+                border: '1px solid rgba(0, 169, 195, 0.25)',
+                borderRadius: '14px',
+                marginTop: '4px'
+              }}
+              onClick={() => { closeModal(); setActiveTab('dashboard'); }}
+            >
+              <span style={{ fontSize: '1.25rem', width: '28px', textAlign: 'center', display: 'inline-block' }}>📊</span>
+              <span className={lang === 'ar' ? 'font-alexandria' : ''} style={{ color: '#00839c', fontWeight: 700 }}>
+                {lang === 'ar' ? 'لوحة التحكم والإدارة (Dashboard)' : 'Admin Dashboard'}
               </span>
             </button>
           </div>
@@ -665,6 +682,25 @@ export default function MobileModals({
                   </div>
                   <span className="profile-btn-text">
                     {lang === 'ar' ? 'رمز الدخول السريع QR للألعاب' : 'Kids Area Fast Entry QR'}
+                  </span>
+                </button>
+
+                <button 
+                  className="profile-action-btn"
+                  onClick={() => {
+                    closeModal();
+                    setActiveTab('dashboard');
+                  }}
+                  style={{
+                    background: 'rgba(0, 169, 195, 0.08)',
+                    borderColor: 'rgba(0, 169, 195, 0.35)'
+                  }}
+                >
+                  <div className="profile-btn-icon-wrap wrap-cyan">
+                    <span style={{ fontSize: '1.15rem' }}>⚙️</span>
+                  </div>
+                  <span className="profile-btn-text" style={{ color: '#007287', fontWeight: 800 }}>
+                    {lang === 'ar' ? 'لوحة التحكم الإدارية ورفع الصور' : 'Admin & Media Dashboard'}
                   </span>
                 </button>
 
@@ -1342,6 +1378,16 @@ export default function MobileModals({
             {lang === 'ar' ? 'احجز تذكرة الـ VIP الآن' : 'Get VIP Pass Now'}
           </button>
         </div>
+      )}
+
+      {/* 12. MEDIA UPLOAD & ASSET MANAGER MODAL (Apidog API) */}
+      {modalType === 'upload-media' && (
+        <MediaUploadModal 
+          isOpen={true}
+          closeModal={closeModal}
+          setActiveTab={setActiveTab}
+          lang={lang}
+        />
       )}
     </div>
   );

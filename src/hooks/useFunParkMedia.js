@@ -71,7 +71,7 @@ export function useFunParkMedia() {
     };
   }, []);
 
-  // 4. Initial preloading & background verification
+  // 4. Initial preloading & background verification + Auto-sync on window focus
   useEffect(() => {
     let isMounted = true;
 
@@ -86,10 +86,23 @@ export function useFunParkMedia() {
 
     initialSync();
 
+    // Revalidate when user switches tabs or returns to window (e.g. from Apidog)
+    const handleWindowFocus = () => {
+      syncFunParkMedia(true);
+    };
+    window.addEventListener('focus', handleWindowFocus);
+
+    // Background polling every 15 seconds to catch remote uploads from Apidog
+    const interval = setInterval(() => {
+      syncFunParkMedia(false);
+    }, 15000);
+
     return () => {
       isMounted = false;
+      window.removeEventListener('focus', handleWindowFocus);
+      clearInterval(interval);
     };
-  }, []);
+  }, [syncFunParkMedia]);
 
   const currentHero = heroBanners[activeSlide] || heroBanners[0];
 

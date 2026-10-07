@@ -20,6 +20,10 @@ export function usePackages(initialCategory = 'adventure') {
         if (isMounted) {
           if (pkgs) setPackages(pkgs);
           if (bdays) setBirthdays(bdays);
+          console.log('[usePackages] Loaded packages data:', {
+            packages: pkgs,
+            birthdays: bdays
+          });
         }
       } catch (err) {
         console.warn('Failed to fetch packages:', err);

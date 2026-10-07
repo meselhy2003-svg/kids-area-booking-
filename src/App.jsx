@@ -11,6 +11,7 @@ const MobileEventsPage = lazy(() => import('./pages/mobile/MobileEventsPage'));
 const MobileTripsPage = lazy(() => import('./pages/mobile/MobileTripsPage'));
 const MobileCartPage = lazy(() => import('./pages/mobile/MobileCartPage'));
 const MobileAboutPage = lazy(() => import('./pages/mobile/MobileAboutPage'));
+const MobileRestaurantPage = lazy(() => import('./pages/mobile/MobileRestaurantPage'));
 
 // Desktop Components (Lazy Loaded)
 const DesktopHomePage = lazy(() => import('./pages/desktop/DesktopHomePage'));
@@ -23,6 +24,8 @@ const DesktopEventsPage = lazy(() => import('./pages/desktop/DesktopEventsPage')
 const DesktopTripsPage = lazy(() => import('./pages/desktop/DesktopTripsPage'));
 const DesktopCartPage = lazy(() => import('./pages/desktop/DesktopCartPage'));
 const DesktopAboutPage = lazy(() => import('./pages/desktop/DesktopAboutPage'));
+const DesktopRestaurantPage = lazy(() => import('./pages/desktop/DesktopRestaurantPage'));
+const DesktopDashboardPage = lazy(() => import('./pages/desktop/DesktopDashboardPage'));
 
 // Synchronous Layout & UI Components
 import MobileHeader from './components/MobileHeader';
@@ -41,7 +44,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== 'undefined' && window.location.hash) {
       const h = window.location.hash.replace('#', '');
-      if (['home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'events', 'trips', 'cart', 'about'].includes(h)) {
+      if (['home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'events', 'trips', 'cart', 'about', 'restaurant', 'dashboard'].includes(h)) {
         return h;
       }
     }
@@ -144,7 +147,7 @@ export default function App() {
           />
 
           {/* Subnav & Search (for zone pages) */}
-          {activeTab !== 'home' && activeTab !== 'events' && activeTab !== 'trips' && activeTab !== 'cart' && activeTab !== 'about' && (
+          {activeTab !== 'home' && activeTab !== 'events' && activeTab !== 'trips' && activeTab !== 'cart' && activeTab !== 'about' && activeTab !== 'restaurant' && activeTab !== 'dashboard' && (
             <DesktopSubNav 
               activeTab={activeTab}
               setActiveTab={setActiveTab}
@@ -159,6 +162,14 @@ export default function App() {
             <Suspense fallback={<LoadingScreen fullscreen={false} lang={lang} />}>
               {activeTab === 'about' && (
                 <DesktopAboutPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'restaurant' && (
+                <DesktopRestaurantPage 
                   setActiveTab={setActiveTab}
                   openModal={openModal}
                   lang={lang}
@@ -240,6 +251,22 @@ export default function App() {
                   lang={lang}
                 />
               )}
+
+              {activeTab === 'restaurant' && (
+                <DesktopRestaurantPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'dashboard' && (
+                <DesktopDashboardPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
             </Suspense>
           </main>
 
@@ -255,6 +282,7 @@ export default function App() {
               setActiveTab={setActiveTab}
               lang={lang}
               setLang={setLang}
+              openModal={openModal}
             />
           )}
         </div>
@@ -349,6 +377,22 @@ export default function App() {
 
               {activeTab === 'about' && (
                 <MobileAboutPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'restaurant' && (
+                <MobileRestaurantPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'dashboard' && (
+                <DesktopDashboardPage 
                   setActiveTab={setActiveTab}
                   openModal={openModal}
                   lang={lang}

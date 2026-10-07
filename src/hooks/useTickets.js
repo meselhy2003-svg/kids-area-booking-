@@ -15,7 +15,10 @@ export function useTickets(zone = 'challenge') {
       setLoading(true);
       try {
         const games = await ticketService.getGameTickets(zone);
-        if (isMounted && games) setGameTickets(games);
+        if (isMounted && games) {
+          setGameTickets(games);
+          console.log(`[useTickets] Loaded game tickets data for zone "${zone}":`, games);
+        }
       } catch (e) {
         console.warn('Failed to load game tickets:', e);
       } finally {

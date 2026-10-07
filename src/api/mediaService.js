@@ -41,7 +41,8 @@ export const PAGE_MEDIA_KEYS = {
   EVENTS: 'events',
   TRIPS: 'trips',
   ABOUT: 'about',
-  PACKAGE: 'package'
+  PACKAGE: 'package',
+  RESTAURANT: 'restaurant'
 };
 
 /**
@@ -55,13 +56,37 @@ export const PAGE_KEY_ALIASES = {
   'fun': PAGE_MEDIA_KEYS.FUN_PARK,
   'fun-park': PAGE_MEDIA_KEYS.FUN_PARK,
   'funpark': PAGE_MEDIA_KEYS.FUN_PARK,
+  'funzone': PAGE_MEDIA_KEYS.FUN_PARK,
+  'fun-zone': PAGE_MEDIA_KEYS.FUN_PARK,
+  'hero': PAGE_MEDIA_KEYS.KIDS_AREA, // Apidog default documentation example: page name 'hero'
   'challenge': PAGE_MEDIA_KEYS.CHALLENGE,
   'adventure': PAGE_MEDIA_KEYS.ADVENTURE,
   'events': PAGE_MEDIA_KEYS.EVENTS,
   'trips': PAGE_MEDIA_KEYS.TRIPS,
   'about': PAGE_MEDIA_KEYS.ABOUT,
   'package': PAGE_MEDIA_KEYS.PACKAGE,
-  'packages': PAGE_MEDIA_KEYS.PACKAGE
+  'packages': PAGE_MEDIA_KEYS.PACKAGE,
+  'restaurant': PAGE_MEDIA_KEYS.RESTAURANT,
+  'cafe': PAGE_MEDIA_KEYS.RESTAURANT,
+  'dining': PAGE_MEDIA_KEYS.RESTAURANT,
+  'restaurant-cafe': PAGE_MEDIA_KEYS.RESTAURANT
+};
+
+/**
+ * Checks if a string is a valid uploaded image filename or URL (filters out junk test text)
+ */
+export const isValidImageFilename = (filename) => {
+  if (!filename || typeof filename !== 'string') return false;
+  const s = filename.trim().toLowerCase();
+  // Filter out dummy/junk strings
+  if (s.includes('fjlsgjgh') || s.includes('undefined') || s.includes('null')) return false;
+  // Local project assets and data URIs
+  if (s.startsWith('data:image/') || s.startsWith('blob:') || s.startsWith('/photo/') || s.startsWith('/assets/')) return true;
+  // Any string ending in a known image format
+  if (/\.(jpg|jpeg|png|webp|svg|gif|avif)($|\?)/i.test(s)) return true;
+  // Strip host part and recheck
+  const clean = s.replace(/^https?:\/\/[^/]+/i, '');
+  return /\.(jpg|jpeg|png|webp|svg|gif|avif)($|\?)/i.test(clean);
 };
 
 /**
@@ -71,6 +96,302 @@ export const normalizePageKey = (key = '') => {
   if (!key) return PAGE_MEDIA_KEYS.HOME;
   const cleaned = String(key).toLowerCase().trim().replace(/_/g, '-');
   return PAGE_KEY_ALIASES[cleaned] || cleaned;
+};
+
+/**
+ * Resolves any image identifier (file name from backend, local asset path, external URL)
+ * into a fully-qualified browser accessible URL.
+ * Automatically strips internal backend developer hosts (e.g. localhost:9500) and routes
+ * through the Vite /media proxy for 100% reliable image loading without CORS or ngrok blocks.
+ */
+export const resolveImageUrl = (img) => {
+  if (!img) return '';
+  if (typeof img === 'object') {
+    if (img.image) img = img.image;
+    else if (img.src) img = img.src;
+    else if (img.url) img = img.url;
+    else if (Array.isArray(img.images) && img.images.length > 0) img = img.images[0];
+    else if (typeof img.images === 'string') img = img.images;
+  }
+  if (!img || typeof img !== 'string') return '';
+  let trimmed = img.trim();
+
+  // 1. Strip developer machine internal host if returned by server (e.g. http://localhost:9500/media/...)
+  trimmed = trimmed.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, '');
+  // 2. Strip remote ngrok domain if embedded to leverage local proxy
+  trimmed = trimmed.replace(/^https?:\/\/[a-z0-9-]+\.ngrok-free\.dev/i, '');
+
+  // 3. Local bundled public assets or data URLs
+  if (
+    trimmed.startsWith('data:') || 
+    trimmed.startsWith('blob:') || 
+    trimmed.startsWith('/photo/') || 
+    trimmed.startsWith('/assets/') ||
+    trimmed.startsWith('/public/')
+  ) {
+    return trimmed;
+  }
+
+  // 4. External third-party hosted URLs (Cloudinary, Unsplash, etc.)
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+
+  // 5. Backend static uploaded files under /media/<encodedFilename>
+  let cleanPath = trimmed.replace(/^\/+/, '');
+  if (cleanPath.startsWith('media/')) {
+    cleanPath = cleanPath.substring(6);
+  }
+
+  // In browser on localhost, use /media/<encodedFilename> via Vite proxy (avoids CORS & ngrok blocks!)
+  const encoded = encodeURI(cleanPath);
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return `/media/${encoded}`;
+  }
+
+  const cleanBase = (API_BASE_URL || '').replace(/\/+$/, '');
+  return `${cleanBase}/media/${encoded}`;
+};
+
+/**
+ * Uploads an image to the backend via POST /api/media (as per Apidog specification)
+ * 
+ * @param {object} params
+ * @param {File|Blob} params.file - The image file
+ * @param {string} params.page - Target page ('kids-area', 'fun-park', 'home', etc.)
+ * @param {string} params.section - Target section ('hero', 'explore', 'vibes', etc.)
+ * @param {string} params.name - Descriptive name of the image
+ * @returns {Promise<{ success: boolean, data?: object, error?: string, imageUrl?: string }>}
+ */
+export const uploadMediaImage = async ({ file, page = 'kids-area', section = 'hero', name = '' }) => {
+  if (!file) {
+    return { success: false, error: 'Please select an image file to upload.' };
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append('images', file);
+    formData.append('page', page);
+    formData.append('section', section);
+    formData.append('name', name || file.name || 'Uploaded Image');
+
+    const res = await apiClient.upload('/api/media', formData);
+
+    if (res && res.success && res.data) {
+      const item = res.data.data !== undefined ? res.data.data : res.data;
+      const normKey = normalizePageKey(page);
+
+      // Invalidate relevant cache entries
+      mediaCache.remove(`${MEDIA_CACHE_KEYS.PAGE_MEDIA_PREFIX}${normKey}`);
+      mediaCache.remove(`${MEDIA_CACHE_KEYS.PAGE_MEDIA_PREFIX}images_${normKey}`);
+      if (normKey === PAGE_MEDIA_KEYS.KIDS_AREA) {
+        mediaCache.remove(MEDIA_CACHE_KEYS.KIDS_HERO_BANNERS);
+        mediaCache.remove(MEDIA_CACHE_KEYS.EXPLORE_KIDS_AREA);
+      } else if (normKey === PAGE_MEDIA_KEYS.FUN_PARK) {
+        mediaCache.remove(MEDIA_CACHE_KEYS.FUNPARK_HERO_BANNERS);
+        mediaCache.remove(MEDIA_CACHE_KEYS.EXPLORE_FUN_PARK);
+      } else if (normKey === PAGE_MEDIA_KEYS.CHALLENGE) {
+        mediaCache.remove(MEDIA_CACHE_KEYS.CHALLENGE_HERO_BANNERS);
+        mediaCache.remove(MEDIA_CACHE_KEYS.EXPLORE_CHALLENGE);
+      } else if (normKey === PAGE_MEDIA_KEYS.ADVENTURE) {
+        mediaCache.remove(MEDIA_CACHE_KEYS.ADVENTURE_HERO_BANNERS);
+        mediaCache.remove(MEDIA_CACHE_KEYS.EXPLORE_ADVENTURE);
+      } else if (normKey === PAGE_MEDIA_KEYS.EVENTS) {
+        mediaCache.remove(MEDIA_CACHE_KEYS.EVENTS_HERO_BANNERS);
+        mediaCache.remove(MEDIA_CACHE_KEYS.VIBES_EVENTS);
+      } else if (normKey === PAGE_MEDIA_KEYS.HOME) {
+        mediaCache.remove(MEDIA_CACHE_KEYS.DESTINATION_IMAGES);
+        mediaCache.remove(MEDIA_CACHE_KEYS.PLAYZONE_VIBES);
+      }
+
+      // Re-fetch page media in background
+      await mediaService.refreshZone(normKey);
+
+      // Dispatch global events for instant reactive UI updates
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('media_updated', {
+          detail: { page, section, item }
+        }));
+      }
+
+      const rawImg = Array.isArray(item.images) ? item.images[0] : item.images;
+      return {
+        success: true,
+        data: item,
+        imageUrl: resolveImageUrl(rawImg)
+      };
+    }
+
+    return {
+      success: false,
+      error: res?.error || (res?.data?.message) || 'Failed to upload image'
+    };
+  } catch (err) {
+    console.error('[mediaService.uploadMediaImage] error:', err);
+    return {
+      success: false,
+      error: err.message
+    };
+  }
+};
+
+/**
+ * Deletes an uploaded image from backend via DELETE /api/media/:id
+ */
+export const deleteMediaImage = async (mediaId, page = '', section = '') => {
+  if (!mediaId) {
+    return { success: false, error: 'Media ID required for deletion.' };
+  }
+
+  try {
+    const res = await apiClient.delete(`/api/media/${mediaId}`);
+    if (res && res.success) {
+      if (page) {
+        const normKey = normalizePageKey(page);
+        mediaCache.remove(`${MEDIA_CACHE_KEYS.PAGE_MEDIA_PREFIX}${normKey}`);
+        mediaCache.remove(`${MEDIA_CACHE_KEYS.PAGE_MEDIA_PREFIX}images_${normKey}`);
+        await mediaService.refreshZone(normKey);
+      } else {
+        mediaService.clearMediaCache();
+      }
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('media_updated', {
+          detail: { mediaId, page, section, deleted: true }
+        }));
+      }
+
+      return { success: true, data: res.data };
+    }
+    return { success: false, error: res?.error || 'Failed to delete image' };
+  } catch (err) {
+    console.error('[mediaService.deleteMediaImage] error:', err);
+    return { success: false, error: err.message };
+  }
+};
+
+/**
+ * Gets media for a page directly from the backend /api/media/page/:page with robust fallback
+ */
+export const getMediaByPage = async (pageName) => {
+  try {
+    if (pageName === 'all') {
+      const endpoints = [
+        '/api/media/section/hero',
+        '/api/media/section/explore',
+        '/api/media/section/vibes',
+        '/api/media/page/kids-area',
+        '/api/media/page/hero',
+        '/api/media/page/Home',
+        '/api/media/page/home',
+        '/api/media/page/funzone',
+        '/api/media/page/fun-park',
+        '/api/media/page/challenge',
+        '/api/media/page/adventure',
+        '/api/media/page/events'
+      ];
+      const results = await Promise.allSettled(
+        endpoints.map(ep => apiClient.get(ep))
+      );
+      const allItems = [];
+      const seen = new Set();
+      results.forEach(r => {
+        if (r.status === 'fulfilled' && r.value && r.value.success && r.value.data) {
+          const list = Array.isArray(r.value.data) ? r.value.data : (Array.isArray(r.value.data.data) ? r.value.data.data : []);
+          list.forEach(item => {
+            if (item && item._id && !seen.has(item._id)) {
+              seen.add(item._id);
+              const rawImgs = Array.isArray(item.images) ? item.images : (item.images ? [item.images] : []);
+              const validImgs = rawImgs.filter(isValidImageFilename);
+              if (validImgs.length > 0) {
+                allItems.push({
+                  ...item,
+                  images: validImgs,
+                  imageUrl: resolveImageUrl(validImgs[0])
+                });
+              }
+            }
+          });
+        }
+      });
+      return allItems;
+    }
+
+    const normKey = normalizePageKey(pageName);
+    const candidates = new Set([normKey]);
+    if (normKey === PAGE_MEDIA_KEYS.KIDS_AREA) {
+      candidates.add('kids');
+      candidates.add('kids-area');
+      candidates.add('hero');
+    } else if (normKey === PAGE_MEDIA_KEYS.FUN_PARK) {
+      candidates.add('fun-park');
+      candidates.add('funpark');
+      candidates.add('funzone');
+      candidates.add('funZone');
+    } else if (normKey === PAGE_MEDIA_KEYS.HOME) {
+      candidates.add('home');
+      candidates.add('Home');
+      candidates.add('hero');
+    }
+
+    const listResults = await Promise.allSettled(
+      Array.from(candidates).map(c => apiClient.get(`/api/media/page/${encodeURIComponent(c)}`))
+    );
+    const all = [];
+    const seen = new Set();
+    listResults.forEach(r => {
+      if (r.status === 'fulfilled' && r.value && r.value.success && r.value.data) {
+        const list = Array.isArray(r.value.data) ? r.value.data : (Array.isArray(r.value.data.data) ? r.value.data.data : []);
+        list.forEach(item => {
+          if (item && item._id && !seen.has(item._id)) {
+            seen.add(item._id);
+            const rawImgs = Array.isArray(item.images) ? item.images : (item.images ? [item.images] : []);
+            const validImgs = rawImgs.filter(isValidImageFilename);
+            if (validImgs.length > 0) {
+              all.push({
+                ...item,
+                images: validImgs,
+                imageUrl: resolveImageUrl(validImgs[0])
+              });
+            }
+          }
+        });
+      }
+    });
+    return all;
+  } catch (err) {
+    console.warn('[mediaService.getMediaByPage] error:', err);
+    return [];
+  }
+};
+
+/**
+ * Gets media for a section directly from backend /api/media/section/:section
+ */
+export const getMediaBySection = async (sectionName) => {
+  try {
+    const res = await apiClient.get(`/api/media/section/${encodeURIComponent(sectionName)}`);
+    if (res && res.success && res.data) {
+      const list = Array.isArray(res.data) ? res.data : (Array.isArray(res.data.data) ? res.data.data : []);
+      const valid = [];
+      list.forEach(item => {
+        const rawImgs = Array.isArray(item.images) ? item.images : (item.images ? [item.images] : []);
+        const validImgs = rawImgs.filter(isValidImageFilename);
+        if (validImgs.length > 0) {
+          valid.push({
+            ...item,
+            images: validImgs,
+            imageUrl: resolveImageUrl(validImgs[0])
+          });
+        }
+      });
+      return valid;
+    }
+    return [];
+  } catch (err) {
+    console.warn('[mediaService.getMediaBySection] error:', err);
+    return [];
+  }
 };
 
 /**
@@ -153,6 +474,72 @@ export const DEFAULT_PAGE_MEDIA = {
       fallbackSrc: '/photo/mobile-challenge/offer-collage.png',
       alt: 'Packages Promo'
     }
+  },
+  [PAGE_MEDIA_KEYS.RESTAURANT]: {
+    page: PAGE_MEDIA_KEYS.RESTAURANT,
+    heroBanner: {
+      id: 'restaurant-hero',
+      src: '/photo/kid area pic/Hero Background Image with DataStore Placeholder.png',
+      image: '/photo/kid area pic/Hero Background Image with DataStore Placeholder.png',
+      fallbackSrc: '/photo/kid area pic/Canal-side sunset dinner terrace with warm string lights, dining tables, grilled meats, salads, and sparkling water.png',
+      title: 'Good food. Great moments.',
+      titleAr: 'طعام رائع. لحظات لا تُنسى.',
+      subtitle: 'Enjoy delicious food, your favorite drinks, and a relaxing waterfront atmosphere at American Dream Ismailia',
+      subtitleAr: 'استمتع بأشهى المأكولات، ومشروباتك المفضلة، وأجواء الواجهة المائية الهادئة في أمريكان دريم الإسماعيلية'
+    },
+    delivery: {
+      id: 'rest-delivery',
+      src: '/photo/kid area pic/Freshly grilled brioche cheeseburger with crispy shoestring fries and artisanal dip in craft takeaway presentation.png',
+      title: 'Delivery',
+      titleAr: 'خدمة التوصيل'
+    },
+    inPark: {
+      id: 'rest-in-park',
+      src: '/photo/kid area pic/Canal-side sunset dinner terrace with warm string lights, dining tables, grilled meats, salads, and sparkling water.png',
+      fallbackSrc: '/photo/kid area pic/mosaic-card-2.png',
+      title: 'Order at American Dream',
+      titleAr: 'الطلب داخل أمريكان دريم'
+    },
+    bookTable: {
+      id: 'rest-book-table',
+      src: '/photo/kid area pic/Item 2_ Vertical Dining & Floral Setup.png',
+      fallbackSrc: '/photo/kid area pic/American Dream Ismailia luxury event hall architecture setup.png',
+      title: 'Book a Table',
+      titleAr: 'حجز طاولة'
+    },
+    vibes: [
+      {
+        id: 'vibes-1',
+        src: '/photo/kid area pic/Canal-side sunset dinner terrace with warm string lights, dining tables, grilled meats, salads, and sparkling water.png',
+        title: 'Sunset Dinner Terrace',
+        titleAr: 'تراس العشاء عند الغروب'
+      },
+      {
+        id: 'vibes-2',
+        src: '/photo/kid area pic/Item 2_ Vertical Dining & Floral Setup.png',
+        title: 'Waterfront Floral Banquets',
+        titleAr: 'جلسات الواجهة المائية الراقية'
+      },
+      {
+        id: 'vibes-3',
+        src: '/photo/kid area pic/Freshly grilled brioche cheeseburger with crispy shoestring fries and artisanal dip in craft takeaway presentation.png',
+        title: 'Artisanal Brioche Burger',
+        titleAr: 'برجر البريوش الفاخر'
+      },
+      {
+        id: 'vibes-4',
+        src: '/photo/kid area pic/mosaic-card-2.png',
+        title: 'Family Gathering & Laughter',
+        titleAr: 'لمّة العائلة والضحكة الحلوة'
+      },
+      {
+        id: 'vibes-5',
+        src: '/photo/kid area pic/Image (1).png',
+        fallbackSrc: '/photo/kid area pic/Canal-side sunset dinner terrace with warm string lights, dining tables, grilled meats, salads, and sparkling water.png',
+        title: 'Seaside Coffee & Mocktails',
+        titleAr: 'قهوة وعصائر على نسيم القناة'
+      }
+    ]
   }
 };
 
@@ -215,6 +602,8 @@ export const getCachedPageMedia = (pageKey) => {
         heroBanners: mediaCache.get(MEDIA_CACHE_KEYS.EVENTS_HERO_BANNERS, eventsHeroBanners),
         vibes: mediaCache.get(MEDIA_CACHE_KEYS.VIBES_EVENTS, vibesEventsImages)
       };
+    case PAGE_MEDIA_KEYS.RESTAURANT:
+      return DEFAULT_PAGE_MEDIA[PAGE_MEDIA_KEYS.RESTAURANT];
     default:
       return defaultData;
   }
@@ -238,13 +627,17 @@ export const getPageMedia = async (pageKey, options = {}) => {
     if (endpoint) {
       res = await apiClient.get(endpoint);
     } else {
-      // 1. Try standard REST endpoint: /api/media/pages/{pageKey}
-      res = await apiClient.get(`/api/media/pages/${normKey}`);
-      // 2. Fallback to /api/media/{pageKey} if 404
+      // 1. Primary Live Apidog endpoint: /api/media/page/:page
+      res = await apiClient.get(`/api/media/page/${encodeURIComponent(normKey)}`);
+      if (!res.success && normKey === PAGE_MEDIA_KEYS.FUN_PARK) {
+        res = await apiClient.get('/api/media/page/funZone');
+      }
+      if (!res.success && res.status === 404) {
+        res = await apiClient.get(`/api/media/pages/${normKey}`);
+      }
       if (!res.success && res.status === 404) {
         res = await apiClient.get(`/api/media/${normKey}`);
       }
-      // 3. Fallback to /api/media?page={pageKey}
       if (!res.success && res.status === 404) {
         res = await apiClient.get('/api/media', { page: normKey });
       }
@@ -255,12 +648,66 @@ export const getPageMedia = async (pageKey, options = {}) => {
       
       let updatedPage = { ...cached };
       if (Array.isArray(serverPayload)) {
-        if (normKey === PAGE_MEDIA_KEYS.HOME) {
-          updatedPage.ultimateDestination = serverPayload.slice(0, 4);
-          updatedPage.vibes = serverPayload.slice(4);
+        const heroItems = serverPayload.filter(it => !it.section || it.section.toLowerCase() === 'hero');
+        const exploreItems = serverPayload.filter(it => it.section && (it.section.toLowerCase() === 'explore' || it.section.toLowerCase() === 'games'));
+        const vibeItems = serverPayload.filter(it => it.section && (it.section.toLowerCase() === 'vibes' || it.section.toLowerCase() === 'gallery'));
+        const destItems = serverPayload.filter(it => it.section && it.section.toLowerCase() === 'destination');
+
+        const mapToHero = (it) => {
+          const imgUrl = resolveImageUrl(Array.isArray(it.images) ? it.images[0] : it.images);
+          return {
+            id: it._id,
+            _id: it._id,
+            name: it.name,
+            title: it.name,
+            titleAr: it.name,
+            titleEn: it.name,
+            subtitle: it.name,
+            subtitleAr: it.name,
+            subtitleEn: it.name,
+            image: imgUrl,
+            src: imgUrl,
+            badge: 'Live',
+            badgeAr: 'مرفوع',
+            badgeEn: 'Live',
+            isServerUploaded: true
+          };
+        };
+
+        const mapToItem = (it) => {
+          const imgUrl = resolveImageUrl(Array.isArray(it.images) ? it.images[0] : it.images);
+          return {
+            id: it._id,
+            _id: it._id,
+            name: it.name,
+            title: it.name,
+            titleAr: it.name,
+            titleEn: it.name,
+            image: imgUrl,
+            src: imgUrl,
+            isServerUploaded: true
+          };
+        };
+
+        if (heroItems.length > 0) {
+          const mappedHeroes = heroItems.map(mapToHero);
+          updatedPage.heroBanners = [...mappedHeroes, ...(cached.heroBanners || [])];
+        }
+
+        if (exploreItems.length > 0) {
+          const mappedExplore = exploreItems.map(mapToItem);
+          updatedPage.explore = [...mappedExplore, ...(cached.explore || [])];
+        }
+
+        if (vibeItems.length > 0) {
+          const mappedVibes = vibeItems.map(mapToItem);
+          updatedPage.vibes = [...mappedVibes, ...(cached.vibes || [])];
           updatedPage.vibesGallery = mediaService.distributeVibesIntoColumns(updatedPage.vibes);
-        } else {
-          updatedPage.heroBanners = serverPayload;
+        }
+
+        if (destItems.length > 0) {
+          const mappedDest = destItems.map(mapToItem);
+          updatedPage.ultimateDestination = [...mappedDest, ...(cached.ultimateDestination || [])].slice(0, 4);
         }
       } else if (typeof serverPayload === 'object' && serverPayload !== null) {
         updatedPage = {
@@ -275,9 +722,11 @@ export const getPageMedia = async (pageKey, options = {}) => {
 
       // Save to cache
       mediaCache.set(cacheKey, updatedPage, 'server');
+      console.log(`[mediaService.getPageMedia] Live media data for "${normKey}":`, updatedPage);
       return updatedPage;
     }
 
+    console.log(`[mediaService.getPageMedia] Cached fallback data for "${normKey}":`, cached);
     return cached;
   } catch (err) {
     console.warn(`[mediaService.getPageMedia] fallback for ${normKey}:`, err.message);
@@ -381,10 +830,11 @@ export const extractImagesAsArrayOfObjects = (rawData, pageName = 'page') => {
     if (!item) return null;
 
     if (typeof item === 'string') {
+      const resolved = resolveImageUrl(item);
       return {
         id: `${pageName}-${section || 'img'}-${idx}`,
-        src: item,
-        url: item,
+        src: resolved,
+        url: resolved,
         title: `${pageName} image ${idx + 1}`,
         titleEn: `${pageName} image ${idx + 1}`,
         titleAr: '',
@@ -396,20 +846,22 @@ export const extractImagesAsArrayOfObjects = (rawData, pageName = 'page') => {
     }
 
     if (typeof item === 'object') {
-      const srcUrl = item.src || item.image || item.img || item.url || item.mainPanorama || '';
+      const rawSrc = item.src || item.image || item.img || item.url || item.mainPanorama || (Array.isArray(item.images) ? item.images[0] : item.images) || '';
+      const srcUrl = resolveImageUrl(rawSrc);
       if (!srcUrl && !item.fallbackSrc) return null;
 
-      const fallbackUrl = item.fallbackSrc || item.fallbackImg || item.fallback || null;
-      const title = item.title || item.titleEn || item.alt || '';
-      const titleEn = item.titleEn || item.title || '';
-      const titleAr = item.titleAr || '';
+      const fallbackUrl = resolveImageUrl(item.fallbackSrc || item.fallbackImg || item.fallback || null);
+      const title = item.name || item.title || item.titleEn || item.alt || '';
+      const titleEn = item.titleEn || item.name || item.title || '';
+      const titleAr = item.titleAr || item.name || '';
       const subtitle = item.subtitle || item.subtitleEn || item.desc || '';
       const subtitleEn = item.subtitleEn || item.subtitle || item.desc || '';
       const subtitleAr = item.subtitleAr || item.descAr || '';
       const alt = item.alt || title || titleEn || `${pageName} image`;
 
       return {
-        id: item.id ? String(item.id) : `${pageName}-${section || 'img'}-${idx}`,
+        id: item._id ? String(item._id) : (item.id ? String(item.id) : `${pageName}-${section || 'img'}-${idx}`),
+        _id: item._id,
         src: srcUrl || fallbackUrl,
         url: srcUrl || fallbackUrl,
         fallbackSrc: fallbackUrl,
@@ -501,22 +953,26 @@ export const getPageImages = async (pageName, options = {}) => {
     if (endpoint) {
       res = await apiClient.get(endpoint);
     } else {
-      // Try candidate endpoints on backend
-      res = await apiClient.get(`/api/media/${normKey}`);
-      if (!res.success && (res.status === 400 || res.status === 404)) {
+      // Primary Live Apidog endpoint: /api/media/page/:page
+      res = await apiClient.get(`/api/media/page/${encodeURIComponent(normKey)}`);
+      if (!res.success && normKey === PAGE_MEDIA_KEYS.FUN_PARK) {
+        res = await apiClient.get('/api/media/page/funZone');
+      }
+      if (!res.success) {
+        res = await apiClient.get(`/api/media/${normKey}`);
+      }
+      if (!res.success) {
         res = await apiClient.get(`/api/media/pages/${normKey}`);
       }
-      if (!res.success && (res.status === 400 || res.status === 404)) {
+      if (!res.success) {
         res = await apiClient.get('/api/media', { page: normKey });
-      }
-      if (!res.success && (res.status === 400 || res.status === 404)) {
-        res = await apiClient.get(`/media/${normKey}`);
       }
     }
 
     if (res && res.success && res.data) {
       const serverPayload = res.data.data !== undefined ? res.data.data : res.data;
       const imagesArray = extractImagesAsArrayOfObjects(serverPayload, normKey);
+      console.log(`[mediaService.getPageImages] Live data for "${normKey}":`, imagesArray);
 
       if (imagesArray.length > 0) {
         mediaCache.preloadImages(imagesArray);
@@ -531,6 +987,7 @@ export const getPageImages = async (pageName, options = {}) => {
   // Fallback: extract images from cached / default page data
   const pageData = getCachedPageMedia(normKey);
   const fallbackImages = extractImagesAsArrayOfObjects(pageData, normKey);
+  console.log(`[mediaService.getPageImages] Fallback cached data for "${normKey}":`, fallbackImages);
 
   if (fallbackImages.length > 0) {
     mediaCache.set(cacheKey, fallbackImages, 'mock');
@@ -582,6 +1039,205 @@ export const mediaService = {
   getAllPagesImages,
   extractImagesAsArrayOfObjects,
 
+  // Live Apidog API Methods
+  resolveImageUrl,
+  uploadMediaImage,
+  deleteMediaImage,
+  getMediaByPage,
+  getMediaBySection,
+
+  /**
+   * Fetches live media items from backend /api/media/page/:page and /api/media/section/:section
+   * Fully supports Apidog uploads (e.g. page 'hero', 'Home', 'funzone', etc.)
+   */
+  async fetchLivePageMediaItems(pageName, sectionName = null) {
+    try {
+      const normKey = normalizePageKey(pageName);
+      const candidatePages = new Set([normKey]);
+      if (normKey === PAGE_MEDIA_KEYS.KIDS_AREA) {
+        candidatePages.add('kids');
+        candidatePages.add('kids-area');
+        candidatePages.add('hero');
+      } else if (normKey === PAGE_MEDIA_KEYS.FUN_PARK) {
+        candidatePages.add('fun-park');
+        candidatePages.add('funpark');
+        candidatePages.add('funzone');
+        candidatePages.add('funZone');
+      } else if (normKey === PAGE_MEDIA_KEYS.HOME) {
+        candidatePages.add('home');
+        candidatePages.add('Home');
+        candidatePages.add('hero');
+      }
+
+      const endpoints = Array.from(candidatePages).map(p => `/api/media/page/${encodeURIComponent(p)}`);
+      if (sectionName) {
+        endpoints.push(`/api/media/section/${encodeURIComponent(sectionName)}`);
+      }
+
+      const results = await Promise.allSettled(
+        endpoints.map(ep => apiClient.get(ep))
+      );
+
+      const allRaw = [];
+      results.forEach(r => {
+        if (r.status === 'fulfilled' && r.value && r.value.success && r.value.data) {
+          const list = Array.isArray(r.value.data) ? r.value.data : (Array.isArray(r.value.data.data) ? r.value.data.data : []);
+          allRaw.push(...list);
+        }
+      });
+
+      const seen = new Set();
+      const uniqueItems = [];
+
+      for (const it of allRaw) {
+        if (!it || !it._id || seen.has(it._id)) continue;
+        seen.add(it._id);
+
+        const rawImgs = Array.isArray(it.images) ? it.images : (it.images ? [it.images] : []);
+        const validImgs = rawImgs.filter(isValidImageFilename);
+        if (validImgs.length === 0) continue;
+
+        if (sectionName) {
+          const sLower = sectionName.toLowerCase();
+          const itSection = (it.section || '').toLowerCase();
+          const itPage = (it.page || '').toLowerCase();
+
+          if (sLower === 'hero') {
+            if (itSection === 'hero' || itPage === 'hero' || !itSection) {
+              // If item belongs to a different specific zone, don't mix unless it's general hero
+              if (itPage && itPage !== 'hero') {
+                const normItPage = normalizePageKey(itPage);
+                if (normItPage !== normKey && normKey !== PAGE_MEDIA_KEYS.HOME) {
+                  continue;
+                }
+              }
+              uniqueItems.push({ ...it, images: validImgs });
+            }
+          } else if (sLower === 'explore') {
+            if (itSection === 'explore' || itSection === 'games') {
+              uniqueItems.push({ ...it, images: validImgs });
+            }
+          } else if (sLower === 'vibes' || sLower === 'gallery') {
+            if (itSection === 'vibes' || itSection === 'gallery') {
+              uniqueItems.push({ ...it, images: validImgs });
+            }
+          } else {
+            if (itSection === sLower) {
+              uniqueItems.push({ ...it, images: validImgs });
+            }
+          }
+        } else {
+          uniqueItems.push({ ...it, images: validImgs });
+        }
+      }
+
+      return uniqueItems;
+    } catch {
+      return [];
+    }
+  },
+
+  /**
+   * Helper to map live backend media items to hero slide objects, expanding multi-image arrays
+   */
+  mapLiveItemsToSlides(liveItems, fallbackSubtitle = 'American Dream Park') {
+    const mapped = [];
+    liveItems.forEach(it => {
+      const arr = Array.isArray(it.images) ? it.images : [it.images];
+      arr.filter(isValidImageFilename).forEach((filename, fIdx) => {
+        const imgUrl = resolveImageUrl(filename);
+        mapped.push({
+          id: `${it._id}-${fIdx}`,
+          _id: it._id,
+          title: it.name || 'American Dream',
+          titleAr: it.name || 'أمريكان دريم',
+          titleEn: it.name || 'American Dream',
+          subtitle: fallbackSubtitle,
+          subtitleAr: fallbackSubtitle,
+          subtitleEn: fallbackSubtitle,
+          image: imgUrl,
+          src: imgUrl,
+          badge: 'Live',
+          badgeAr: 'مرفوع',
+          badgeEn: 'Live',
+          isServerUploaded: true
+        });
+      });
+    });
+    return mapped;
+  },
+
+  /**
+   * Helper to map live backend media items to explore / gallery card objects
+   */
+  mapLiveItemsToExplore(liveItems) {
+    const mapped = [];
+    liveItems.forEach(it => {
+      const arr = Array.isArray(it.images) ? it.images : [it.images];
+      arr.filter(isValidImageFilename).forEach((filename, fIdx) => {
+        const imgUrl = resolveImageUrl(filename);
+        mapped.push({
+          id: `${it._id}-${fIdx}`,
+          _id: it._id,
+          title: it.name || 'Zone Attraction',
+          titleAr: it.name || 'معلم ترفيهي',
+          titleEn: it.name || 'Attraction',
+          image: imgUrl,
+          src: imgUrl,
+          isServerUploaded: true
+        });
+      });
+    });
+    return mapped;
+  },
+
+  /**
+   * Refreshes zone data across caches and event listeners
+   */
+  async refreshZone(normKey) {
+    switch (normKey) {
+      case PAGE_MEDIA_KEYS.KIDS_AREA:
+        await Promise.all([
+          this.getKidsHeroBanners(true),
+          this.getExploreKidsArea(true)
+        ]);
+        break;
+      case PAGE_MEDIA_KEYS.FUN_PARK:
+        await Promise.all([
+          this.getFunParkHeroBanners(true),
+          this.getExploreFunPark(true)
+        ]);
+        break;
+      case PAGE_MEDIA_KEYS.CHALLENGE:
+        await Promise.all([
+          this.getChallengeHeroBanners(true),
+          this.getExploreChallenge(true)
+        ]);
+        break;
+      case PAGE_MEDIA_KEYS.ADVENTURE:
+        await Promise.all([
+          this.getAdventureHeroBanners(true),
+          this.getExploreAdventure(true)
+        ]);
+        break;
+      case PAGE_MEDIA_KEYS.EVENTS:
+        await Promise.all([
+          this.getEventsHeroBanners(true),
+          this.getVibesEventsImages(true)
+        ]);
+        break;
+      case PAGE_MEDIA_KEYS.HOME:
+        await Promise.all([
+          this.getUltimateDestinationImages(true),
+          this.getPlayzoneVibes(true)
+        ]);
+        break;
+      default:
+        await getPageMedia(normKey, { forceRefresh: true });
+        break;
+    }
+  },
+
   /**
    * Helper to distribute a flat list of vibes images into 3 balanced columns
    */
@@ -626,7 +1282,7 @@ export const mediaService = {
 
     try {
       const remoteOverride = apiClient.storage.get('kids_area_remote_destination_override', null);
-      const res = await apiClient.get('/api/media/ultimate-destination');
+      const liveItems = await this.fetchLivePageMediaItems('home', 'destination');
 
       let serverData = ultimateDestinationImages;
       let isServerSource = false;
@@ -634,8 +1290,9 @@ export const mediaService = {
       if (remoteOverride && Array.isArray(remoteOverride) && remoteOverride.length === 4) {
         serverData = remoteOverride;
         isServerSource = true;
-      } else if (res && res.success && Array.isArray(res.data) && res.data.length === 4) {
-        serverData = res.data;
+      } else if (liveItems.length > 0) {
+        const mapped = this.mapLiveItemsToExplore(liveItems);
+        serverData = [...mapped, ...ultimateDestinationImages].slice(0, 4);
         isServerSource = true;
       }
 
@@ -696,7 +1353,7 @@ export const mediaService = {
 
     try {
       const remoteOverride = apiClient.storage.get('kids_area_remote_vibes_override', null);
-      const res = await apiClient.get('/api/media/playzone-vibes');
+      const liveItems = await this.fetchLivePageMediaItems('home', 'vibes');
 
       let serverData = playzoneVibesImages;
       let isServerSource = false;
@@ -704,8 +1361,9 @@ export const mediaService = {
       if (remoteOverride && Array.isArray(remoteOverride) && remoteOverride.length >= 9) {
         serverData = remoteOverride;
         isServerSource = true;
-      } else if (res && res.success && Array.isArray(res.data) && res.data.length >= 9) {
-        serverData = res.data;
+      } else if (liveItems.length > 0) {
+        const mapped = this.mapLiveItemsToExplore(liveItems);
+        serverData = [...mapped, ...playzoneVibesImages];
         isServerSource = true;
       }
 
@@ -774,7 +1432,7 @@ export const mediaService = {
 
     try {
       const remoteOverride = apiClient.storage.get('kids_area_remote_hero_override', null);
-      const res = await apiClient.get('/api/media/banners?zone=kids-area');
+      const liveItems = await this.fetchLivePageMediaItems('kids-area', 'hero');
 
       let serverData = kidsAreaHeroBanners;
       let isServerSource = false;
@@ -782,8 +1440,9 @@ export const mediaService = {
       if (remoteOverride && Array.isArray(remoteOverride) && remoteOverride.length > 0) {
         serverData = remoteOverride;
         isServerSource = true;
-      } else if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
-        serverData = res.data;
+      } else if (liveItems.length > 0) {
+        const mapped = this.mapLiveItemsToSlides(liveItems, 'منطقة الأطفال • Kids Area');
+        serverData = [...mapped, ...kidsAreaHeroBanners];
         isServerSource = true;
       }
 
@@ -844,7 +1503,7 @@ export const mediaService = {
 
     try {
       const remoteOverride = apiClient.storage.get('kids_area_remote_explore_override', null);
-      const res = await apiClient.get('/api/media/explore-kids-area');
+      const liveItems = await this.fetchLivePageMediaItems('kids-area', 'explore');
 
       let serverData = exploreKidsAreaImages;
       let isServerSource = false;
@@ -852,8 +1511,9 @@ export const mediaService = {
       if (remoteOverride && Array.isArray(remoteOverride) && remoteOverride.length >= 3) {
         serverData = remoteOverride;
         isServerSource = true;
-      } else if (res && res.success && Array.isArray(res.data) && res.data.length >= 3) {
-        serverData = res.data;
+      } else if (liveItems.length > 0) {
+        const mapped = this.mapLiveItemsToExplore(liveItems);
+        serverData = [...mapped, ...exploreKidsAreaImages];
         isServerSource = true;
       }
 
@@ -914,7 +1574,7 @@ export const mediaService = {
 
     try {
       const remoteOverride = apiClient.storage.get('kids_area_remote_funpark_hero_override', null);
-      const res = await apiClient.get('/api/media/banners?zone=fun-park');
+      const liveItems = await this.fetchLivePageMediaItems('fun-park', 'hero');
 
       let serverData = funParkHeroBanners;
       let isServerSource = false;
@@ -922,8 +1582,9 @@ export const mediaService = {
       if (remoteOverride && Array.isArray(remoteOverride) && remoteOverride.length > 0) {
         serverData = remoteOverride;
         isServerSource = true;
-      } else if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
-        serverData = res.data;
+      } else if (liveItems.length > 0) {
+        const mapped = this.mapLiveItemsToSlides(liveItems, 'فن بارك • Fun Park');
+        serverData = [...mapped, ...funParkHeroBanners];
         isServerSource = true;
       }
 
@@ -984,7 +1645,7 @@ export const mediaService = {
 
     try {
       const remoteOverride = apiClient.storage.get('kids_area_remote_funpark_explore_override', null);
-      const res = await apiClient.get('/api/media/explore-fun-park');
+      const liveItems = await this.fetchLivePageMediaItems('fun-park', 'explore');
 
       let serverData = exploreFunParkImages;
       let isServerSource = false;
@@ -992,8 +1653,9 @@ export const mediaService = {
       if (remoteOverride && Array.isArray(remoteOverride) && remoteOverride.length >= 3) {
         serverData = remoteOverride;
         isServerSource = true;
-      } else if (res && res.success && Array.isArray(res.data) && res.data.length >= 3) {
-        serverData = res.data;
+      } else if (liveItems.length > 0) {
+        const mapped = this.mapLiveItemsToExplore(liveItems);
+        serverData = [...mapped, ...exploreFunParkImages];
         isServerSource = true;
       }
 
@@ -1054,7 +1716,7 @@ export const mediaService = {
 
     try {
       const remoteOverride = apiClient.storage.get('kids_area_remote_challenge_hero_override', null);
-      const res = await apiClient.get('/api/media/banners?zone=challenge');
+      const liveItems = await this.fetchLivePageMediaItems('challenge', 'hero');
 
       let serverData = challengeHeroBanners;
       let isServerSource = false;
@@ -1062,8 +1724,9 @@ export const mediaService = {
       if (remoteOverride && Array.isArray(remoteOverride) && remoteOverride.length > 0) {
         serverData = remoteOverride;
         isServerSource = true;
-      } else if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
-        serverData = res.data;
+      } else if (liveItems.length > 0) {
+        const mapped = this.mapLiveItemsToSlides(liveItems, 'منطقة التحدي • Challenge Zone');
+        serverData = [...mapped, ...challengeHeroBanners];
         isServerSource = true;
       }
 
@@ -1124,7 +1787,7 @@ export const mediaService = {
 
     try {
       const remoteOverride = apiClient.storage.get('kids_area_remote_challenge_explore_override', null);
-      const res = await apiClient.get('/api/media/explore-challenge');
+      const liveItems = await this.fetchLivePageMediaItems('challenge', 'explore');
 
       let serverData = exploreChallengeImages;
       let isServerSource = false;
@@ -1132,8 +1795,9 @@ export const mediaService = {
       if (remoteOverride && Array.isArray(remoteOverride) && remoteOverride.length >= 3) {
         serverData = remoteOverride;
         isServerSource = true;
-      } else if (res && res.success && Array.isArray(res.data) && res.data.length >= 3) {
-        serverData = res.data;
+      } else if (liveItems.length > 0) {
+        const mapped = this.mapLiveItemsToExplore(liveItems);
+        serverData = [...mapped, ...exploreChallengeImages];
         isServerSource = true;
       }
 
@@ -1194,7 +1858,7 @@ export const mediaService = {
 
     try {
       const remoteOverride = apiClient.storage.get('kids_area_remote_adventure_hero_override', null);
-      const res = await apiClient.get('/api/media/banners?zone=adventure');
+      const liveItems = await this.fetchLivePageMediaItems('adventure', 'hero');
 
       let serverData = adventureHeroBanners;
       let isServerSource = false;
@@ -1202,8 +1866,9 @@ export const mediaService = {
       if (remoteOverride && Array.isArray(remoteOverride) && remoteOverride.length > 0) {
         serverData = remoteOverride;
         isServerSource = true;
-      } else if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
-        serverData = res.data;
+      } else if (liveItems.length > 0) {
+        const mapped = this.mapLiveItemsToSlides(liveItems, 'حديقة المغامرة • Adventure Park');
+        serverData = [...mapped, ...adventureHeroBanners];
         isServerSource = true;
       }
 
@@ -1264,7 +1929,7 @@ export const mediaService = {
 
     try {
       const remoteOverride = apiClient.storage.get('kids_area_remote_adventure_explore_override', null);
-      const res = await apiClient.get('/api/media/explore-adventure');
+      const liveItems = await this.fetchLivePageMediaItems('adventure', 'explore');
 
       let serverData = exploreAdventureImages;
       let isServerSource = false;
@@ -1272,8 +1937,9 @@ export const mediaService = {
       if (remoteOverride && Array.isArray(remoteOverride) && remoteOverride.length >= 3) {
         serverData = remoteOverride;
         isServerSource = true;
-      } else if (res && res.success && Array.isArray(res.data) && res.data.length >= 3) {
-        serverData = res.data;
+      } else if (liveItems.length > 0) {
+        const mapped = this.mapLiveItemsToExplore(liveItems);
+        serverData = [...mapped, ...exploreAdventureImages];
         isServerSource = true;
       }
 
@@ -1334,7 +2000,7 @@ export const mediaService = {
 
     try {
       const remoteOverride = apiClient.storage.get('kids_area_remote_events_hero_override', null);
-      const res = await apiClient.get('/api/media/events-hero');
+      const liveItems = await this.fetchLivePageMediaItems('events', 'hero');
 
       let serverData = eventsHeroBanners;
       let isServerSource = false;
@@ -1342,8 +2008,9 @@ export const mediaService = {
       if (remoteOverride && Array.isArray(remoteOverride) && remoteOverride.length > 0) {
         serverData = remoteOverride;
         isServerSource = true;
-      } else if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
-        serverData = res.data;
+      } else if (liveItems.length > 0) {
+        const mapped = this.mapLiveItemsToSlides(liveItems, 'الحفلات والمناسبات • Events');
+        serverData = [...mapped, ...eventsHeroBanners];
         isServerSource = true;
       }
 
@@ -1402,7 +2069,7 @@ export const mediaService = {
 
     try {
       const remoteOverride = apiClient.storage.get('kids_area_remote_events_vibes_override', null);
-      const res = await apiClient.get('/api/media/events-vibes');
+      const liveItems = await this.fetchLivePageMediaItems('events', 'vibes');
 
       let serverData = vibesEventsImages;
       let isServerSource = false;
@@ -1410,8 +2077,21 @@ export const mediaService = {
       if (remoteOverride && Array.isArray(remoteOverride) && remoteOverride.length >= 6) {
         serverData = remoteOverride;
         isServerSource = true;
-      } else if (res && res.success && Array.isArray(res.data) && res.data.length >= 6) {
-        serverData = res.data;
+      } else if (liveItems.length > 0) {
+        const mapped = liveItems.map(it => {
+          const imgUrl = resolveImageUrl(Array.isArray(it.images) ? it.images[0] : it.images);
+          return {
+            id: it._id,
+            _id: it._id,
+            title: it.name,
+            titleAr: it.name,
+            titleEn: it.name,
+            image: imgUrl,
+            src: imgUrl,
+            isServerUploaded: true
+          };
+        });
+        serverData = [...mapped, ...vibesEventsImages];
         isServerSource = true;
       }
 
@@ -1530,4 +2210,9 @@ if (typeof window !== 'undefined') {
   window.__getAllPagesMedia = getAllPagesMedia;
   window.__getPageImages = getPageImages;
   window.__PAGE_MEDIA_KEYS = PAGE_MEDIA_KEYS;
+  window.__uploadMediaImage = uploadMediaImage;
+  window.__deleteMediaImage = deleteMediaImage;
+  window.__getMediaByPage = getMediaByPage;
+  window.__getMediaBySection = getMediaBySection;
+  window.__resolveImageUrl = resolveImageUrl;
 }

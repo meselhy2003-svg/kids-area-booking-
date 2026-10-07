@@ -23,6 +23,10 @@ export function DataProvider({ children }) {
         if (isMounted) {
           if (status) setParkStatus(status);
           if (bookings) setRecentBookings(bookings);
+          console.log('[DataContext] Initialized park status & bookings data:', {
+            parkStatus: status,
+            recentBookings: bookings
+          });
         }
       } catch (e) {
         console.warn('DataContext init warning:', e);

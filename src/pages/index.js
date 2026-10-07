@@ -9,6 +9,7 @@ export { default as MobileEventsPage } from './mobile/MobileEventsPage';
 export { default as MobileTripsPage } from './mobile/MobileTripsPage';
 export { default as MobileCartPage } from './mobile/MobileCartPage';
 export { default as MobileAboutPage } from './mobile/MobileAboutPage';
+export { default as MobileRestaurantPage } from './mobile/MobileRestaurantPage';
 
 // Desktop Pages
 export { default as DesktopHomePage } from './desktop/DesktopHomePage';
@@ -21,6 +22,8 @@ export { default as DesktopEventsPage } from './desktop/DesktopEventsPage';
 export { default as DesktopTripsPage } from './desktop/DesktopTripsPage';
 export { default as DesktopCartPage } from './desktop/DesktopCartPage';
 export { default as DesktopAboutPage } from './desktop/DesktopAboutPage';
+export { default as DesktopRestaurantPage } from './desktop/DesktopRestaurantPage';
+export { default as DesktopDashboardPage } from './desktop/DesktopDashboardPage';
 
 
 

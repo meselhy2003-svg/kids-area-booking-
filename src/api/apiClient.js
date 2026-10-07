@@ -20,9 +20,17 @@ const DEFAULT_TIMEOUT_MS = 8000;
  * Builds a full URL from an endpoint path and query params
  */
 const formatUrl = (endpoint = '', params = {}) => {
-  let urlStr = endpoint.startsWith('http://') || endpoint.startsWith('https://')
-    ? endpoint
-    : `${API_BASE_URL.replace(/\/+$/, '')}/${endpoint.replace(/^\/+/, '')}`;
+  let urlStr = '';
+  if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+    urlStr = endpoint;
+  } else {
+    const cleanEndpoint = endpoint.replace(/^\/+/, '');
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      urlStr = `/${cleanEndpoint}`;
+    } else {
+      urlStr = `${API_BASE_URL.replace(/\/+$/, '')}/${cleanEndpoint}`;
+    }
+  }
 
   if (params && typeof params === 'object' && Object.keys(params).length > 0) {
     const query = new URLSearchParams();
@@ -43,18 +51,25 @@ const formatUrl = (endpoint = '', params = {}) => {
 /**
  * Resolves standard request headers with ngrok bypass & auth token
  */
-const getHeaders = (customHeaders = {}) => {
+const getHeaders = (customHeaders = {}, isFormData = false) => {
   const token = typeof window !== 'undefined'
     ? localStorage.getItem(STORAGE_KEYS.TOKEN)
     : null;
 
-  return {
+  const headers = {
     'Accept': 'application/json',
-    'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': 'true',
     ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     ...customHeaders
   };
+
+  if (!isFormData && !headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json';
+  } else if (isFormData && headers['Content-Type']) {
+    delete headers['Content-Type'];
+  }
+
+  return headers;
 };
 
 export const apiClient = {
@@ -71,7 +86,7 @@ export const apiClient = {
     try {
       const response = await fetch(url, {
         method: 'GET',
-        headers: getHeaders(options.headers),
+        headers: getHeaders(options.headers, false),
         signal: controller.signal
       });
       clearTimeout(timeoutId);
@@ -88,6 +103,8 @@ export const apiClient = {
           parsedData = text;
         }
       }
+
+      console.log(`[apiClient.get] ${endpoint} -> data:`, parsedData);
 
       return {
         success: response.ok,
@@ -111,18 +128,19 @@ export const apiClient = {
   },
 
   /**
-   * Performs an asynchronous POST request
+   * Performs an asynchronous POST request (JSON or FormData)
    */
   async post(endpoint, data = {}, options = {}) {
     const url = formatUrl(endpoint);
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), options.timeout || DEFAULT_TIMEOUT_MS);
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
 
     try {
       const response = await fetch(url, {
         method: 'POST',
-        headers: getHeaders(options.headers),
-        body: typeof data === 'string' ? data : JSON.stringify(data),
+        headers: getHeaders(options.headers, isFormData),
+        body: isFormData ? data : (typeof data === 'string' ? data : JSON.stringify(data)),
         signal: controller.signal
       });
       clearTimeout(timeoutId);
@@ -140,6 +158,8 @@ export const apiClient = {
         }
       }
 
+      console.log(`[apiClient.post] ${endpoint} -> data:`, parsedData);
+
       return {
         success: response.ok,
         status: response.status,
@@ -150,6 +170,59 @@ export const apiClient = {
     } catch (err) {
       clearTimeout(timeoutId);
       console.warn(`[apiClient.post] ${endpoint} fallback:`, err.message);
+      return {
+        success: false,
+        status: 0,
+        error: err.message,
+        data: null,
+        endpoint,
+        timestamp: new Date().toISOString()
+      };
+    }
+  },
+
+  /**
+   * Performs a multipart/form-data upload request (specifically for images & media)
+   */
+  async upload(endpoint, formData, options = {}) {
+    const url = formatUrl(endpoint);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), options.timeout || 30000);
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: getHeaders(options.headers, true),
+        body: formData,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      let parsedData = null;
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        parsedData = await response.json();
+      } else {
+        const text = await response.text();
+        try {
+          parsedData = JSON.parse(text);
+        } catch {
+          parsedData = text;
+        }
+      }
+
+      console.log(`[apiClient.upload] ${endpoint} -> data:`, parsedData);
+
+      return {
+        success: response.ok,
+        status: response.status,
+        data: parsedData,
+        endpoint,
+        timestamp: new Date().toISOString()
+      };
+    } catch (err) {
+      clearTimeout(timeoutId);
+      console.warn(`[apiClient.upload] ${endpoint} fallback:`, err.message);
       return {
         success: false,
         status: 0,
@@ -190,6 +263,8 @@ export const apiClient = {
           parsedData = text;
         }
       }
+
+      console.log(`[apiClient.put] ${endpoint} -> data:`, parsedData);
 
       return {
         success: response.ok,
@@ -240,6 +315,8 @@ export const apiClient = {
           parsedData = text;
         }
       }
+
+      console.log(`[apiClient.delete] ${endpoint} -> data:`, parsedData);
 
       return {
         success: response.ok,

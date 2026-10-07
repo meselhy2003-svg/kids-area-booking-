@@ -50,7 +50,7 @@ export default function DesktopHeader({
           </button>
           <button 
             className={`desktop-nav-link ${activeTab === 'restaurant' ? 'active' : ''}`}
-            onClick={() => openModal('restaurant-menu')}
+            onClick={() => setActiveTab('restaurant')}
           >
             {t.nav.restaurant}
           </button>

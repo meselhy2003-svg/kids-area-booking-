@@ -1,0 +1,1275 @@
+/* ========================================================================= */
+/* ORDER FOR DELIVERY - EXACT PIXEL-PERFECT REPLICA & FUNCTIONALITY         */
+/* ========================================================================= */
+
+.delivery-order-page {
+  min-height: 100vh;
+  background-color: #f1f4f7;
+  color: #0b2533;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  padding: 0 0 60px 0;
+  box-sizing: border-box;
+  direction: ltr;
+}
+
+.delivery-order-page.rtl {
+  direction: rtl;
+}
+
+/* ------------------------------------------------------------------------- */
+/* TOP BANNER / LOYALTY & BACK BAR                                           */
+/* ------------------------------------------------------------------------- */
+.deliv-top-bar {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px 24px 8px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.deliv-top-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* 2250 pts Badge */
+.loyalty-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f59e0b;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.28);
+  transition: all 0.2s ease;
+}
+
+.loyalty-badge-btn:hover {
+  background: #d97706;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.38);
+}
+
+.btn-back-to-dining {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #0b2533;
+  border: 1px solid #cbd5e1;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-back-to-dining:hover {
+  background: #028090;
+  color: #ffffff;
+  border-color: #028090;
+  transform: translateY(-1px);
+}
+
+.deliv-top-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.deliv-hotline-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #028090;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.deliv-hotline-pill:hover {
+  border-color: #028090;
+  background: #f0fdfa;
+}
+
+/* ------------------------------------------------------------------------- */
+/* MAIN TITLE SECTION                                                        */
+/* ------------------------------------------------------------------------- */
+.deliv-header-section {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 8px 24px 20px 24px;
+}
+
+.deliv-main-title {
+  font-size: 2.1rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin: 0 0 6px 0;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.title-orange {
+  color: #f59e0b;
+}
+
+.title-dark {
+  color: #073b4c;
+}
+
+.deliv-main-subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------------------- */
+/* FILTER PILLS & SEARCH ROW                                                 */
+/* ------------------------------------------------------------------------- */
+.deliv-controls-row {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px 24px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.deliv-category-pills {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.deliv-category-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.cat-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  background: transparent;
+  color: #475569;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.cat-pill-btn:hover {
+  color: #073b4c;
+  background: #ffffff;
+}
+
+.cat-pill-btn.active {
+  background: #073b4c;
+  color: #ffffff;
+  border-color: #073b4c;
+  box-shadow: 0 2px 8px rgba(7, 59, 76, 0.25);
+}
+
+.cat-pill-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+/* Search Bar */
+.deliv-search-bar {
+  flex: 1;
+  max-width: 440px;
+  min-width: 260px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.deliv-search-icon {
+  position: absolute;
+  left: 14px;
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.delivery-order-page.rtl .deliv-search-icon {
+  left: auto;
+  right: 14px;
+}
+
+.deliv-search-input {
+  width: 100%;
+  height: 40px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 0 36px 0 38px;
+  font-size: 0.86rem;
+  color: #0f172a;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.delivery-order-page.rtl .deliv-search-input {
+  padding: 0 38px 0 36px;
+}
+
+.deliv-search-input:focus {
+  border-color: #028090;
+  box-shadow: 0 0 0 3px rgba(2, 128, 144, 0.12);
+}
+
+.deliv-search-clear {
+  position: absolute;
+  right: 12px;
+  background: #e2e8f0;
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.delivery-order-page.rtl .deliv-search-clear {
+  right: auto;
+  left: 12px;
+}
+
+/* ------------------------------------------------------------------------- */
+/* MAIN CONTENT 2-COLUMN LAYOUT                                              */
+/* ------------------------------------------------------------------------- */
+.deliv-layout-grid {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 370px;
+  gap: 28px;
+  align-items: start;
+}
+
+/* ------------------------------------------------------------------------- */
+/* DISHES SELECTION AREA (LEFT)                                              */
+/* ------------------------------------------------------------------------- */
+.deliv-menu-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.deliv-section-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #028090;
+  margin-bottom: 4px;
+}
+
+.deliv-section-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #f59e0b;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.3px;
+}
+
+/* 2-Columns Dishes Grid */
+.deliv-dishes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* Food Card */
+.deliv-dish-card {
+  background: #ffffff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 3px 12px rgba(11, 37, 51, 0.04);
+  border: 1px solid #edf2f7;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s ease;
+}
+
+.deliv-dish-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(11, 37, 51, 0.08);
+}
+
+.deliv-dish-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 155px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.deliv-dish-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.deliv-dish-card:hover .deliv-dish-image {
+  transform: scale(1.03);
+}
+
+.dish-logo-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(4px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  padding: 4px;
+}
+
+.delivery-order-page.rtl .dish-logo-badge {
+  left: auto;
+  right: 10px;
+}
+
+.dish-logo-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.deliv-dish-content {
+  padding: 14px 16px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.deliv-dish-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #0b2533;
+  margin: 0 0 6px 0;
+  line-height: 1.25;
+}
+
+.deliv-dish-desc {
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.35;
+  margin: 0 0 16px 0;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.deliv-dish-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  gap: 12px;
+}
+
+.deliv-dish-price {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0b2533;
+  letter-spacing: -0.2px;
+}
+
+/* Action Controls: Add vs Qty Pill */
+.btn-dish-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f1f5f9;
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 0.84rem;
+  padding: 7px 16px;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-dish-add:hover {
+  background: #073b4c;
+  color: #ffffff;
+  border-color: #073b4c;
+}
+
+.dish-qty-control-pill {
+  display: inline-flex;
+  align-items: center;
+  background: #073b4c;
+  color: #ffffff;
+  border-radius: 9999px;
+  padding: 2px 4px;
+  box-shadow: 0 2px 6px rgba(7, 59, 76, 0.2);
+}
+
+.dish-qty-btn {
+  background: transparent;
+  color: #ffffff;
+  border: none;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.15s ease;
+}
+
+.dish-qty-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dish-qty-number {
+  min-width: 24px;
+  text-align: center;
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+/* Empty search state */
+.deliv-empty-search {
+  grid-column: 1 / -1;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 40px 20px;
+  text-align: center;
+  color: #64748b;
+  border: 1px dashed #cbd5e1;
+}
+
+/* ------------------------------------------------------------------------- */
+/* CART SIDEBAR (RIGHT COLUMN - STICKY)                                      */
+/* ------------------------------------------------------------------------- */
+.deliv-cart-sidebar {
+  position: sticky;
+  top: 24px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(11, 37, 51, 0.06);
+  border: 1px solid #edf2f7;
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Cart Header */
+.deliv-cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 4px;
+}
+
+.cart-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cart-header-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.cart-header-title {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #0b2533;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.cart-badge-pill {
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 9999px;
+}
+
+/* Delivering To Destination Box */
+.deliv-dest-box {
+  background: #fbf7ee;
+  border: 1px solid #eee2cf;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dest-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dest-label-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dest-pin-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.dest-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: #854d0e;
+  text-transform: uppercase;
+}
+
+.btn-dest-change {
+  background: transparent;
+  border: none;
+  color: #028090;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  transition: color 0.15s ease;
+}
+
+.btn-dest-change:hover {
+  color: #073b4c;
+}
+
+.dest-address-text {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+}
+
+.dest-time-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #0d9488;
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.dest-clock-icon {
+  width: 13px;
+  height: 13px;
+  object-fit: contain;
+}
+
+/* Cart Items List */
+.deliv-cart-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.delivery-order-page.rtl .deliv-cart-items-list {
+  padding-right: 0;
+  padding-left: 4px;
+}
+
+.deliv-cart-item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.deliv-cart-item-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.cart-item-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f1f5f9;
+  flex-shrink: 0;
+}
+
+.cart-item-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.cart-item-name {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #0b2533;
+  margin: 0 0 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-item-unit-price {
+  font-size: 0.74rem;
+  color: #64748b;
+  margin: 0 0 4px 0;
+}
+
+/* Inline Qty Pill inside cart */
+.cart-item-qty-pill {
+  display: inline-flex;
+  align-items: center;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 1px 3px;
+}
+
+.cart-qty-btn {
+  background: transparent;
+  border: none;
+  color: #334155;
+  width: 18px;
+  height: 18px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.cart-qty-btn:hover {
+  background: #cbd5e1;
+}
+
+.cart-qty-val {
+  font-size: 0.78rem;
+  font-weight: 800;
+  min-width: 16px;
+  text-align: center;
+}
+
+.cart-item-right-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.cart-item-subtotal {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: #0b2533;
+}
+
+.btn-cart-remove {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-cart-remove:hover {
+  color: #ef4444;
+}
+
+.cart-trash-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+/* Empty Cart State */
+.cart-empty-message {
+  padding: 20px 10px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+/* Notes / Cutlery input */
+.deliv-notes-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5f4ef;
+  border: 1px solid #e7e5dd;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.notes-cutlery-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  opacity: 0.65;
+  flex-shrink: 0;
+}
+
+.deliv-notes-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-size: 0.78rem;
+  color: #334155;
+  outline: none;
+}
+
+.deliv-notes-input::placeholder {
+  color: #94a3b8;
+}
+
+/* Price Calculations */
+.deliv-calc-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 12px;
+}
+
+.calc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.calc-label-with-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.promo-pill-badge {
+  background: #e0f2fe;
+  color: #028090;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.calc-val-strikethrough {
+  text-decoration: line-through;
+  color: #94a3b8;
+  margin-right: 6px;
+  font-size: 0.78rem;
+}
+
+.delivery-order-page.rtl .calc-val-strikethrough {
+  margin-right: 0;
+  margin-left: 6px;
+}
+
+.calc-val-free {
+  color: #0d9488;
+  font-weight: 800;
+}
+
+.calc-row-grand {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 10px;
+  margin-top: 2px;
+}
+
+.grand-title-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.grand-title-text {
+  font-size: 0.98rem;
+  font-weight: 900;
+  color: #0b2533;
+}
+
+.grand-tax-note {
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.grand-total-amount {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #073b4c;
+}
+
+/* Proceed to Checkout Button */
+.btn-proceed-checkout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #073b4c;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 13px 20px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(7, 59, 76, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-proceed-checkout:hover:not(:disabled) {
+  background: #028090;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(2, 128, 144, 0.35);
+}
+
+.btn-proceed-checkout:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.checkout-lock-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+/* ------------------------------------------------------------------------- */
+/* MODALS (ADDRESS SELECTOR, LOYALTY REWARDS, CHECKOUT FLOW)                 */
+/* ------------------------------------------------------------------------- */
+.deliv-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 37, 51, 0.6);
+  backdrop-filter: blur(5px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+.deliv-modal-box {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: relative;
+  animation: slideUp 0.25s ease;
+}
+
+.deliv-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.delivery-order-page.rtl .deliv-modal-close {
+  right: auto;
+  left: 18px;
+}
+
+.deliv-modal-close:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.deliv-modal-header h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0b2533;
+}
+
+.deliv-modal-header p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+/* Address List Options */
+.address-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.address-option-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.address-option-card:hover {
+  border-color: #028090;
+  background: #f0fdfa;
+}
+
+.address-option-card.selected {
+  border-color: #028090;
+  background: #f0fdfa;
+  box-shadow: 0 2px 8px rgba(2, 128, 144, 0.15);
+}
+
+.addr-opt-name {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #0b2533;
+}
+
+.addr-opt-est {
+  font-size: 0.76rem;
+  color: #0d9488;
+  font-weight: 700;
+}
+
+/* Custom address input */
+.custom-addr-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.custom-addr-input:focus {
+  border-color: #028090;
+}
+
+/* Checkout Form Grid */
+.checkout-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-group-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group-field label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.checkout-input {
+  padding: 10px 14px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  color: #0f172a;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.checkout-input:focus {
+  border-color: #028090;
+}
+
+/* Payment Methods */
+.payment-methods-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.payment-method-pill {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 6px;
+  text-align: center;
+  background: #f8fafc;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #334155;
+  transition: all 0.2s ease;
+}
+
+.payment-method-pill.active {
+  border-color: #028090;
+  background: #f0fdfa;
+  color: #073b4c;
+  box-shadow: 0 2px 6px rgba(2, 128, 144, 0.15);
+}
+
+.payment-method-pill span.pay-icon {
+  font-size: 1.25rem;
+}
+
+/* Points Discount Toggle */
+.points-discount-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+}
+
+.points-card-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.points-card-title {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #92400e;
+}
+
+.points-card-sub {
+  font-size: 0.74rem;
+  color: #b45309;
+}
+
+/* Success Confirmation Screen */
+.order-success-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+.order-success-icon-badge {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #ecfdf5;
+  border: 2px solid #10b981;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.ref-code-card {
+  background: #f8fafc;
+  border: 1.5px dashed #028090;
+  border-radius: 12px;
+  padding: 12px 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ref-code-card span {
+  display: block;
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.ref-code-card strong {
+  font-size: 1.4rem;
+  color: #073b4c;
+  letter-spacing: 1px;
+}
+
+.btn-whatsapp-order {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #25d366;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 12px 20px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-whatsapp-order:hover {
+  background: #1ebc59;
+  transform: translateY(-1px);
+}
+
+/* ------------------------------------------------------------------------- */
+/* RESPONSIVE BREAKPOINTS                                                    */
+/* ------------------------------------------------------------------------- */
+@media (max-width: 960px) {
+  .deliv-layout-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .deliv-cart-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .deliv-top-bar {
+    padding: 12px 16px 6px 16px;
+    flex-wrap: wrap;
+  }
+
+  .deliv-header-section {
+    padding: 6px 16px 16px 16px;
+  }
+
+  .deliv-main-title {
+    font-size: 1.6rem;
+  }
+
+  .deliv-controls-row {
+    padding: 0 16px 16px 16px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .deliv-search-bar {
+    max-width: 100%;
+  }
+
+  .deliv-dishes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .deliv-layout-grid {
+    padding: 0 16px;
+  }
+
+  .payment-methods-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
