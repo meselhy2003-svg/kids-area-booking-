@@ -17,15 +17,18 @@
 /* ========================================================================= */
 .restaurant-hero {
   position: relative;
-  min-height: 82vh;
   width: 100%;
+  height: calc(100vh - 84px);
+  min-height: calc(100vh - 84px);
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  padding: 80px 24px 60px;
+  padding: clamp(24px, 4vh, 48px) 24px;
+  overflow: hidden;
 }
 
 .restaurant-hero-overlay {
@@ -44,12 +47,14 @@
   position: relative;
   z-index: 2;
   max-width: 960px;
+  width: 100%;
   margin: 0 auto;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  justify-content: center;
+  gap: clamp(12px, 2vh, 20px);
 }
 
 /* Hero Badge Pill */
@@ -79,7 +84,7 @@
 
 /* Hero Title */
 .restaurant-hero-title {
-  font-size: clamp(2.4rem, 5.2vw, 4.4rem);
+  font-size: clamp(2.2rem, 4.4vw, 4rem);
   font-weight: 800;
   line-height: 1.15;
   color: #ffffff;
@@ -97,10 +102,10 @@
 
 /* Hero Subtitle */
 .restaurant-hero-subtitle {
-  font-size: clamp(1rem, 1.35vw, 1.25rem);
+  font-size: clamp(0.95rem, 1.25vw, 1.2rem);
   font-weight: 400;
   color: rgba(255, 255, 255, 0.92);
-  line-height: 1.65;
+  line-height: 1.6;
   max-width: 780px;
   margin: 0;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
@@ -113,7 +118,7 @@
   justify-content: center;
   gap: 16px;
   flex-wrap: wrap;
-  margin-top: 10px;
+  margin-top: 6px;
 }
 
 .btn-primary-teal {
@@ -176,9 +181,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 32px;
+  gap: clamp(20px, 3vw, 36px);
   flex-wrap: wrap;
-  margin-top: 24px;
+  margin-top: clamp(8px, 1.5vh, 18px);
 }
 
 .hero-feature-item {
@@ -837,13 +842,34 @@
   box-shadow: 0 8px 22px rgba(37, 211, 102, 0.45);
 }
 
-/* Digital Menu Modal Grid */
 .menu-categories-bar {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 8px;
+  overflow-y: hidden;
+  padding: 4px 4px 10px 4px;
   border-bottom: 1px solid #e2e8f0;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #028090 #e2e8f0;
+}
+
+.menu-categories-bar::-webkit-scrollbar {
+  height: 5px;
+  display: block !important;
+}
+
+.menu-categories-bar::-webkit-scrollbar-track {
+  background: #e2e8f0;
+  border-radius: 9999px;
+}
+
+.menu-categories-bar::-webkit-scrollbar-thumb {
+  background: #028090;
+  border-radius: 9999px;
 }
 
 .menu-cat-btn {
@@ -1052,9 +1078,14 @@
 }
 
 @media (max-width: 768px) {
+  .restaurant-page {
+    padding-bottom: 110px;
+  }
   .restaurant-hero {
-    min-height: 70vh;
-    padding: 60px 16px 40px;
+    height: calc(100vh - 60px - 70px);
+    min-height: calc(100dvh - 130px);
+    padding: 24px 16px 36px;
+    box-sizing: border-box;
   }
   .experiences-cards-grid {
     grid-template-columns: 1fr;
