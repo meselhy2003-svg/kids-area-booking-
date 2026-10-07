@@ -20,11 +20,32 @@ import {
 } from 'lucide-react';
 import { getTranslations } from '../../data/translations';
 import { mockMenuItems } from '../../data/mock/menu.mock';
+import OrderForDeliveryPage from './OrderForDeliveryPage';
 import './DesktopRestaurantPage.css';
 
 export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 'ar' }) {
   const t = getTranslations(lang);
   const r = t.restaurantPage || {};
+
+  // Page View State: 'overview' | 'delivery'
+  const [currentView, setCurrentView] = useState(() => {
+    if (typeof window !== 'undefined' && window.location.hash.includes('delivery')) {
+      return 'delivery';
+    }
+    return 'overview';
+  });
+
+  useEffect(() => {
+    const handleHash = () => {
+      if (window.location.hash.includes('delivery')) {
+        setCurrentView('delivery');
+      } else if (window.location.hash === '#restaurant') {
+        setCurrentView('overview');
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
 
   // Modals State
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -183,10 +204,13 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
     window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
   };
 
-  // Open Delivery Modal
+  // Open Delivery View (Order for Delivery page)
   const handleOpenDelivery = () => {
-    setDeliveryStep('form');
-    setIsDeliveryModalOpen(true);
+    setCurrentView('delivery');
+    if (typeof window !== 'undefined') {
+      window.location.hash = 'restaurant-delivery';
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Update item quantity in delivery order
@@ -293,6 +317,21 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
       type: 'row2-card'
     }
   ];
+
+  if (currentView === 'delivery') {
+    return (
+      <OrderForDeliveryPage 
+        onBack={() => {
+          setCurrentView('overview');
+          if (typeof window !== 'undefined') {
+            window.location.hash = 'restaurant';
+          }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        lang={lang}
+      />
+    );
+  }
 
   return (
     <div className={`restaurant-page ${lang === 'ar' ? 'font-alexandria' : ''}`}>

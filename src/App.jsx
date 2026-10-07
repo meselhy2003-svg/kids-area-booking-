@@ -44,6 +44,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== 'undefined' && window.location.hash) {
       const h = window.location.hash.replace('#', '');
+      if (h.startsWith('restaurant')) return 'restaurant';
       if (['home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'events', 'trips', 'cart', 'about', 'restaurant', 'dashboard'].includes(h)) {
         return h;
       }
@@ -53,9 +54,26 @@ export default function App() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      window.location.hash = activeTab;
+      if (activeTab === 'restaurant' && window.location.hash.includes('delivery')) {
+        // keep subroute intact
+      } else {
+        window.location.hash = activeTab;
+      }
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    const handleHashSync = () => {
+      const h = window.location.hash.replace('#', '');
+      if (h.startsWith('restaurant')) {
+        setActiveTab('restaurant');
+      } else if (['home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'events', 'trips', 'cart', 'about', 'dashboard'].includes(h)) {
+        setActiveTab(h);
+      }
+    };
+    window.addEventListener('hashchange', handleHashSync);
+    return () => window.removeEventListener('hashchange', handleHashSync);
+  }, []);
   const [lang, setLang] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('kids_area_lang');
