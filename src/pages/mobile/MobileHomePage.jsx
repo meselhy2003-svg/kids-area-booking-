@@ -95,7 +95,7 @@ export default function MobileHomePage({ setActiveTab, openModal, lang = 'ar' })
 
           {/* 3 Quick Stat Badges */}
           <div className="hero-stats-row">
-            <div className="stat-card">
+            <div className="stat-card" style={isArabic ? { textAlign: 'right', alignItems: 'flex-start' } : {}}>
               <div className="stat-icon-wrap stat-icon-teal">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#00a9c3" strokeWidth="2.4">
                   <circle cx="7" cy="7" r="3" />
@@ -104,11 +104,11 @@ export default function MobileHomePage({ setActiveTab, openModal, lang = 'ar' })
                   <circle cx="17" cy="17" r="3" />
                 </svg>
               </div>
-              <div className="stat-num">{t.home.stat1Title}</div>
-              <div className="stat-desc">{t.home.stat1Desc}</div>
+              <div className="stat-num" style={isArabic ? { textAlign: 'right', width: '100%' } : {}}>{t.home.stat1Title}</div>
+              <div className="stat-desc" style={isArabic ? { textAlign: 'right', width: '100%' } : {}}>{t.home.stat1Desc}</div>
             </div>
 
-            <div className="stat-card">
+            <div className="stat-card" style={isArabic ? { textAlign: 'right', alignItems: 'flex-start' } : {}}>
               <div className="stat-icon-wrap stat-icon-yellow">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f7a81b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="3" />
@@ -118,11 +118,11 @@ export default function MobileHomePage({ setActiveTab, openModal, lang = 'ar' })
                   <path d="M17 16v2a2 2 0 0 1-2 2h-2" />
                 </svg>
               </div>
-              <div className="stat-num">{t.home.stat2Title}</div>
-              <div className="stat-desc">{t.home.stat2Desc}</div>
+              <div className="stat-num" style={isArabic ? { textAlign: 'right', width: '100%' } : {}}>{t.home.stat2Title}</div>
+              <div className="stat-desc" style={isArabic ? { textAlign: 'right', width: '100%' } : {}}>{t.home.stat2Desc}</div>
             </div>
 
-            <div className="stat-card">
+            <div className="stat-card" style={isArabic ? { textAlign: 'right', alignItems: 'flex-start' } : {}}>
               <div className="stat-icon-wrap stat-icon-orange">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="9" cy="8" r="3" />
@@ -132,8 +132,8 @@ export default function MobileHomePage({ setActiveTab, openModal, lang = 'ar' })
                   <path d="M19 4l2 1.5L19 7V4z" fill="#f59e0b" />
                 </svg>
               </div>
-              <div className="stat-num">{t.home.stat3Title}</div>
-              <div className="stat-desc">{t.home.stat3Desc}</div>
+              <div className="stat-num" style={isArabic ? { textAlign: 'right', width: '100%' } : {}}>{t.home.stat3Title}</div>
+              <div className="stat-desc" style={isArabic ? { textAlign: 'right', width: '100%' } : {}}>{t.home.stat3Desc}</div>
             </div>
           </div>
         </div>

@@ -1,0 +1,1134 @@
+/* ==========================================================================
+   DESKTOP & MOBILE PROFILE PAGE CSS
+   Pixel-perfect match for American Dream Guest Profile Dashboard
+   ========================================================================== */
+
+.profile-page-container {
+  min-height: calc(100vh - 80px);
+  background-color: #f1f5f9;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(0, 169, 195, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.03) 0%, transparent 40%);
+  padding: 32px 24px 60px 24px;
+  font-family: var(--font-main, 'Outfit', 'Alexandria', sans-serif);
+  color: #0f172a;
+}
+
+.profile-page-inner {
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ==========================================================================
+   1. PAGE HEADER (Title + Subtitle + 'More Fun Ahmed!' Badge)
+   ========================================================================== */
+.profile-main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 4px;
+}
+
+.profile-title-group h1 {
+  font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+  font-weight: 850;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.02em;
+}
+
+.profile-title-group p {
+  font-size: clamp(0.9rem, 1.2vw, 1.05rem);
+  color: #64748b;
+  margin: 0;
+}
+
+.profile-fun-badge-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.profile-fun-badge-img {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.06));
+}
+
+.profile-fun-script {
+  text-align: right;
+  font-family: 'Brush Script MT', 'Alexandria', cursive, sans-serif;
+  line-height: 1.1;
+  color: #0f172a;
+  user-select: none;
+}
+
+.profile-fun-script .script-top {
+  font-size: 1.35rem;
+  font-style: italic;
+  color: #0f172a;
+  font-weight: 700;
+  display: block;
+}
+
+.profile-fun-script .script-bot {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #0f172a;
+  display: inline-block;
+  position: relative;
+}
+
+.profile-fun-script .script-bot::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 4px;
+  background: #f59e0b;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   2. HERO USER CARD (Overview)
+   ========================================================================== */
+.profile-user-card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.profile-user-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.profile-avatar-circle {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.profile-user-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-user-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.profile-welcome-text {
+  font-size: 0.86rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.profile-edit-btn {
+  margin-top: 4px;
+  align-self: flex-start;
+  background: #f59e0b;
+  color: #0f172a;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.25);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-edit-btn:hover {
+  background: #d97706;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+}
+
+.profile-user-stats {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.profile-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.profile-stat-item:hover {
+  transform: translateY(-2px);
+}
+
+.profile-stat-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-stat-icon-wrap.icon-green {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.profile-stat-icon-wrap.icon-cyan {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.profile-stat-text-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-stat-value {
+  font-size: 1.05rem;
+  font-weight: 850;
+  color: #0f172a;
+}
+
+.profile-stat-label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.profile-stat-arrow {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin-left: 4px;
+}
+
+/* ==========================================================================
+   3. TWO-COLUMN GRIDS FOR DASHBOARD CARDS
+   ========================================================================== */
+.profile-grid-2cols {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.profile-card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-card:hover {
+  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+}
+
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-card-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.profile-card-icon-box.box-blue {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.profile-card-icon-box.box-cyan {
+  background: #ccfbf1;
+  color: #0d9488;
+}
+
+.profile-card-icon-box.box-teal {
+  background: #e6fffa;
+  color: #007788;
+}
+
+.profile-card-titles h3 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.profile-card-titles p {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 2px 0 0 0;
+}
+
+.profile-card-content-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.profile-activity-value {
+  font-size: 1.1rem;
+  font-weight: 850;
+  color: #0f172a;
+}
+
+.profile-activity-sub {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.profile-row-arrow-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 1.1rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.profile-row-arrow-btn:hover {
+  color: #0f172a;
+  transform: translateX(3px);
+}
+
+.profile-action-btn-gold {
+  width: 100%;
+  background: #f59e0b;
+  color: #0f172a;
+  border: none;
+  border-radius: 999px;
+  padding: 11px 18px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.profile-action-btn-gold:hover {
+  background: #d97706;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   4. BOOKING HISTORY LIST
+   ========================================================================== */
+.profile-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 12px;
+  transition: background 0.18s ease;
+  cursor: pointer;
+}
+
+.profile-history-item:hover {
+  background: #f8fafc;
+}
+
+.profile-history-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-history-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+}
+
+.profile-history-details h4 {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.profile-history-details p {
+  font-size: 0.76rem;
+  color: #64748b;
+  margin: 2px 0 0 0;
+}
+
+.profile-see-all-link {
+  color: #0284c7;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  transition: color 0.18s ease;
+  background: none;
+  border: none;
+}
+
+.profile-see-all-link:hover {
+  color: #0369a1;
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   5. QUICK ACTIONS 2X2 GRID
+   ========================================================================== */
+.profile-quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.profile-quick-action-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-quick-action-card:hover {
+  border-color: #38bdf8;
+  background: #f0f9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.1);
+}
+
+.profile-quick-action-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+}
+
+.profile-quick-action-card .action-title {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.profile-quick-action-card .action-sub {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ==========================================================================
+   6. THANK YOU BANNER (Teal Brand Box with Badges & Logo)
+   ========================================================================== */
+.profile-thankyou-banner {
+  background: #012b32;
+  border-radius: 20px;
+  padding: 30px 36px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-shadow: 0 10px 30px rgba(1, 43, 50, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-thankyou-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -20%;
+  width: 60%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0, 169, 195, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.profile-thankyou-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 2;
+}
+
+.profile-thankyou-script {
+  font-family: 'Brush Script MT', 'Alexandria', cursive, sans-serif;
+  font-style: italic;
+  font-size: 2.1rem;
+  color: #f59e0b;
+  line-height: 1;
+}
+
+.profile-thankyou-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 4px 0 2px 0;
+}
+
+.profile-thankyou-arabic {
+  font-size: 0.9rem;
+  color: #99f6e4;
+  margin: 0;
+}
+
+.profile-thankyou-badges {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  z-index: 2;
+}
+
+.profile-badge-pill {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.profile-badge-pill.badge-teal {
+  background: #004655;
+  color: #ffffff;
+  border: 1px solid rgba(0, 169, 195, 0.4);
+}
+
+.profile-badge-pill.badge-orange {
+  background: #f59e0b;
+  color: #012b32;
+  border: 1px solid #fbbf24;
+}
+
+.profile-badge-pill.badge-cyan {
+  background: #00a9c3;
+  color: #ffffff;
+  border: 1px solid #38bdf8;
+}
+
+.profile-thankyou-logo {
+  height: 72px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   7. EDIT PROFILE VIEW (Image 3)
+   ========================================================================== */
+.profile-edit-header-card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  padding: 24px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.profile-edit-user-wrap {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-avatar-upload-wrap {
+  position: relative;
+  width: 82px;
+  height: 82px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.profile-avatar-large {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-camera-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  background: #012b32;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.profile-avatar-upload-wrap:hover .profile-camera-badge {
+  transform: scale(1.1);
+  background: #0284c7;
+}
+
+.profile-edit-meta h2 {
+  font-size: 1.45rem;
+  font-weight: 850;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.profile-meta-sub {
+  font-size: 0.82rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.profile-meta-tag {
+  background: #f1f5f9;
+  color: #475569;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+}
+
+/* Dream points card in top-right of edit view */
+.profile-points-card-beige {
+  background: #fbf9f5;
+  border: 1px solid #f1ece4;
+  border-radius: 14px;
+  padding: 16px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 220px;
+}
+
+.dream-points-badge {
+  background: #ecfdf5;
+  color: #059669;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dream-points-value {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.dream-points-credit {
+  font-size: 0.78rem;
+  color: #475569;
+}
+
+.dream-points-credit strong {
+  color: #0f172a;
+}
+
+/* ==========================================================================
+   8. PERSONAL INFORMATION FORM (Left Column of Edit View)
+   ========================================================================== */
+.profile-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.profile-form-label {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #334155;
+}
+
+.profile-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.profile-input-icon {
+  position: absolute;
+  left: 14px;
+  color: #94a3b8;
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+[dir="rtl"] .profile-input-icon {
+  left: auto;
+  right: 14px;
+}
+
+.profile-input-field {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px 12px 42px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+[dir="rtl"] .profile-input-field {
+  padding: 12px 42px 12px 14px;
+}
+
+.profile-input-field:focus {
+  background: #ffffff;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+}
+
+.profile-verified-badge {
+  background: #e0f2fe;
+  color: #0284c7;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+}
+
+.profile-sms-badge {
+  position: absolute;
+  right: 12px;
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+[dir="rtl"] .profile-sms-badge {
+  right: auto;
+  left: 12px;
+}
+
+/* Gender Toggles */
+.profile-gender-toggles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.profile-gender-btn {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 0.88rem;
+  font-weight: 750;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.profile-gender-btn.active {
+  background: #012b32;
+  color: #ffffff;
+  border-color: #012b32;
+  box-shadow: 0 2px 8px rgba(1, 43, 50, 0.2);
+}
+
+/* Form Action Buttons */
+.profile-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.profile-btn-cancel {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 0.88rem;
+  font-weight: 750;
+  cursor: pointer;
+  padding: 10px 18px;
+  border-radius: 10px;
+  transition: all 0.18s ease;
+}
+
+.profile-btn-cancel:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.profile-btn-save {
+  background: #f59e0b;
+  color: #0f172a;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 22px;
+  font-size: 0.88rem;
+  font-weight: 850;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(245, 158, 11, 0.28);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-btn-save:hover {
+  background: #d97706;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   9. CHILDREN CARD (Right Column of Edit View)
+   ========================================================================== */
+.profile-add-child-btn {
+  background: #012b32;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-add-child-btn:hover {
+  background: #004655;
+  transform: translateY(-1px);
+}
+
+.profile-child-card {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-child-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.profile-child-info-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-child-avatar-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.profile-child-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-child-name {
+  font-size: 0.98rem;
+  font-weight: 850;
+  color: #0f172a;
+  margin: 0;
+}
+
+.profile-child-gender-tag {
+  background: #fdf2f8;
+  color: #db2777;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.profile-child-gender-tag.boy {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.profile-child-age {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 2px 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.profile-child-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-child-icon-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.18s ease;
+  font-size: 0.95rem;
+}
+
+.profile-child-icon-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.profile-child-icon-btn.delete:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.profile-wristband-pill {
+  background: #f1f5f9;
+  color: #475569;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ==========================================================================
+   10. INTERACTIVE MODALS (Child, Booking, Rewards, Support)
+   ========================================================================== */
+.profile-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.profile-modal-card {
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: profileModalPop 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes profileModalPop {
+  0% { transform: scale(0.94) translateY(10px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.profile-modal-header {
+  padding: 18px 24px;
+  background: #012b32;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profile-modal-header h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.profile-modal-close-btn {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+/* ==========================================================================
+   11. RESPONSIVENESS (MOBILE / TABLET ADAPTATION)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .profile-page-container {
+    padding: 16px 14px 40px 14px;
+  }
+
+  .profile-grid-2cols {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .profile-user-card {
+    padding: 18px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-user-stats {
+    width: 100%;
+    justify-content: space-between;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 14px;
+  }
+
+  .profile-thankyou-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px 20px;
+  }
+
+  .profile-thankyou-logo {
+    align-self: center;
+    height: 56px;
+  }
+
+  .profile-edit-header-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px;
+  }
+
+  .profile-points-card-beige {
+    width: 100%;
+  }
+}

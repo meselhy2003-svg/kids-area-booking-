@@ -456,7 +456,7 @@ export const translations = {
           tag: 'تراس الواجهة المائية',
           title: 'حجز طاولة',
           desc: 'احجز طاولتك بجوار القناة مباشرة لمشاهدة السفن العابرة وعيش تجربة استثنائية لا تُنسى.',
-          btn: 'احجز طاولة الآن 📅'
+          btn: 'احجز طاولة الآن'
         },
         vibesTitle: 'VIBES',
         vibesDesc: 'طعام رائع، صحبة جميلة، ولحظات لا تُنسى.',
@@ -950,7 +950,7 @@ export const translations = {
           tag: 'WATERFRONT TERRACE',
           title: 'BOOK A TABLE',
           desc: 'Reserve your seaside table overlooking passing canal ships and indulge in an unforgettable culinary experience.',
-          btn: 'BOOK A TABLE 📅'
+          btn: 'BOOK A TABLE'
         },
         vibesTitle: 'VIBES',
         vibesDesc: 'Good food, good company, good moments.',

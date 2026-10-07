@@ -66,8 +66,16 @@ body[dir="rtl"],
   font-family: 'Alexandria', 'Tajawal', sans-serif !important;
 }
 
-/* Explicit Alexandria font for buttons, toggles and Arabic labels */
+/* Explicit Alexandria font for buttons, toggles and Arabic labels (ALWAYS in all modes) */
 .font-alexandria,
+.arabic-alexandria-text,
+.arabic-alexandria-text *,
+.ar-choice,
+.ar-choice *,
+.desktop-lang-choice.ar-choice,
+.desktop-lang-choice.ar-choice *,
+.drawer-lang-btn.ar-choice,
+.drawer-lang-btn.ar-choice *,
 .desktop-lang-btn,
 .mobile-lang-toggle-btn,
 .lang-toggle-btn,

@@ -13,8 +13,8 @@ import {
   Check, 
   Share2, 
   Sparkles,
-  Phone,
-  Gift,
+  ChevronLeft,
+  ChevronRight,
   X
 } from 'lucide-react';
 import './OrderForDeliveryPage.css';
@@ -93,55 +93,6 @@ const INITIAL_MENU_ITEMS = [
     image: '/photo/kid area pic/dish_cooler.png',
     isChefSpecial: true,
     initialQty: 0
-  },
-  // Additional menu items for rich category filtering
-  {
-    id: 'dish-grills',
-    nameEn: 'Waterfront Sunset Mixed Grill Feast',
-    nameAr: 'مشاوي الواجهة المائية المشكلة الفاخرة',
-    descEn: 'Charcoal-grilled kebab skewers, shish tawook, grilled kofta, basmati rice & fresh Lebanese salads.',
-    descAr: 'كباب وكفتة وشيش طاووق على الفحم يقدم مع أرز بسمتي فاخر ومقبلات وسلطات طازجة.',
-    price: 340,
-    category: 'food',
-    image: '/photo/kid area pic/Canal-side sunset dinner terrace with warm string lights, dining tables, grilled meats, salads, and sparkling water.png',
-    isChefSpecial: false,
-    initialQty: 0
-  },
-  {
-    id: 'dish-smoothie-mango',
-    nameEn: 'Island Breeze Mango Passion Mocktail',
-    nameAr: 'كوكتيل نسيم الجزيرة بالمانجو والباشن',
-    descEn: 'Fresh Ismailia mango puree, passion fruit syrup, sparkling soda & garden mint.',
-    descAr: 'مانجو إسماعيلية طبيعية مع سيرب الباشن فروت وصودا منعشة وأوراق النعناع.',
-    price: 75,
-    category: 'drinks',
-    image: '/photo/kid area pic/Image (1).png',
-    isChefSpecial: false,
-    initialQty: 0
-  },
-  {
-    id: 'dish-cappuccino',
-    nameEn: 'American Dream Signature Cappuccino',
-    nameAr: 'كابتشينو أمريكان دريم بالرغوة الغنية',
-    descEn: 'Double espresso with velvety textured steamed whole milk and fine cocoa dust.',
-    descAr: 'إسبريسو دبل شوت مع رغوة حليب مخملية كثيفة ورشة كاكاو فاخر.',
-    price: 65,
-    category: 'cafe',
-    image: '/photo/kid area pic/Image (2).png',
-    isChefSpecial: false,
-    initialQty: 0
-  },
-  {
-    id: 'dish-waffle',
-    nameEn: 'Belgian Golden Waffle with Nutella',
-    nameAr: 'وافل بلجيكي ذهبي بنوتيلا وتوت',
-    descEn: 'Crispy warm Belgian waffle loaded with Nutella drizzle, Belgian strawberries & vanilla gelato.',
-    descAr: 'وافل بلجيكي مقرمش ومحشو بنوتيلا غنية، فراولة طازجة وبولة آيس كريم فانيليا.',
-    price: 125,
-    category: 'desserts',
-    image: '/photo/kid area pic/dish_cake.png',
-    isChefSpecial: false,
-    initialQty: 0
   }
 ];
 
@@ -179,10 +130,6 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
   // Notes & cutlery
   const [deliveryNotes, setDeliveryNotes] = useState('');
 
-  // Loyalty rewards modal & discount
-  const [isLoyaltyModalOpen, setIsLoyaltyModalOpen] = useState(false);
-  const [applyLoyaltyDiscount, setApplyLoyaltyDiscount] = useState(false);
-
   // Checkout modal flow
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState('form'); // 'form' | 'success'
@@ -211,10 +158,7 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
   const deliveryFee = 0.0; // FREE Promotion
   const vatRate = 0.14; // 14% VAT & Municipal Service
   const vatAmount = subtotal * vatRate;
-
-  // Loyalty discount (2250 pts = 112.50 EGP off)
-  const loyaltyDiscountValue = applyLoyaltyDiscount && subtotal > 150 ? 112.50 : 0.0;
-  const grandTotal = Math.max(0, subtotal + vatAmount - loyaltyDiscountValue);
+  const grandTotal = Math.max(0, subtotal + vatAmount);
 
   // Filtered dishes
   const filteredDishes = useMemo(() => {
@@ -260,6 +204,17 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
     setCartQuantities(prev => ({ ...prev, [dishId]: 0 }));
   };
 
+  const scrollCategoryPills = (direction) => {
+    const el = document.getElementById('deliv-category-pills');
+    if (el) {
+      const scrollStep = 180;
+      const factor = isAr 
+        ? (direction === 'left' ? scrollStep : -scrollStep) 
+        : (direction === 'left' ? -scrollStep : scrollStep);
+      el.scrollBy({ left: factor, behavior: 'smooth' });
+    }
+  };
+
   // Checkout submission
   const handleConfirmOrder = (e) => {
     e.preventDefault();
@@ -293,8 +248,8 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
     ).join('%0A');
 
     const msg = isAr
-      ? `طلب توصيل جديد من موقع أمريكان دريم:%0A- كود الطلب: ${orderTrackingCode}%0A- اسم العميل: ${customerName}%0A- الهاتف: ${customerPhone}%0A- العنوان: ${destination}%0A- الوجبات المطلوبة:%0A${itemsList}%0A- الإجمالي الفرعي: ${subtotal.toFixed(2)} ج.م%0A- التوصيل: مجاني (عرض ترويجي)%0A- الضريبة والخدمة (14%): ${vatAmount.toFixed(2)} ج.م%0A${loyaltyDiscountValue > 0 ? `- خصم نقاط الولاء: -${loyaltyDiscountValue.toFixed(2)} ج.م%0A` : ''}- الإجمالي الكلي: ${grandTotal.toFixed(2)} ج.م%0A- طريقة الدفع: ${paymentMethod === 'cod' ? 'نقداً عند الاستلام' : paymentMethod === 'card' ? 'فيزا / بطاقة بنكية' : 'إنستاباي / فودافون كاش'}%0A- ملاحظات وأدوات المائدة: ${deliveryNotes || 'لا يوجد'}`
-      : `New Delivery Order from American Dream Website:%0A- Order Ref: ${orderTrackingCode}%0A- Name: ${customerName}%0A- Phone: ${customerPhone}%0A- Delivery Address: ${destination}%0A- Items:%0A${itemsList}%0A- Subtotal: ${subtotal.toFixed(2)} EGP%0A- Delivery: 0.00 EGP (FREE PROMO)%0A- VAT & Service (14%): ${vatAmount.toFixed(2)} EGP%0A${loyaltyDiscountValue > 0 ? `- Loyalty Discount: -${loyaltyDiscountValue.toFixed(2)} EGP%0A` : ''}- Grand TOTAL: ${grandTotal.toFixed(2)} EGP%0A- Payment: ${paymentMethod.toUpperCase()}%0A- Cutlery & Notes: ${deliveryNotes || 'None'}`;
+      ? `طلب توصيل جديد من موقع أمريكان دريم:%0A- كود الطلب: ${orderTrackingCode}%0A- اسم العميل: ${customerName}%0A- الهاتف: ${customerPhone}%0A- العنوان: ${destination}%0A- الوجبات المطلوبة:%0A${itemsList}%0A- الإجمالي الفرعي: ${subtotal.toFixed(2)} ج.م%0A- التوصيل: مجاني (عرض ترويجي)%0A- الضريبة والخدمة (14%): ${vatAmount.toFixed(2)} ج.م%0A- الإجمالي الكلي: ${grandTotal.toFixed(2)} ج.م%0A- طريقة الدفع: ${paymentMethod === 'cod' ? 'نقداً عند الاستلام' : paymentMethod === 'card' ? 'فيزا / بطاقة بنكية' : 'إنستاباي / فودافون كاش'}%0A- ملاحظات وأدوات المائدة: ${deliveryNotes || 'لا يوجد'}`
+      : `New Delivery Order from American Dream Website:%0A- Order Ref: ${orderTrackingCode}%0A- Name: ${customerName}%0A- Phone: ${customerPhone}%0A- Delivery Address: ${destination}%0A- Items:%0A${itemsList}%0A- Subtotal: ${subtotal.toFixed(2)} EGP%0A- Delivery: 0.00 EGP (FREE PROMO)%0A- VAT & Service (14%): ${vatAmount.toFixed(2)} EGP%0A- Grand TOTAL: ${grandTotal.toFixed(2)} EGP%0A- Payment: ${paymentMethod.toUpperCase()}%0A- Cutlery & Notes: ${deliveryNotes || 'None'}`;
 
     window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
   };
@@ -303,37 +258,17 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
     <div className={`delivery-order-page ${isAr ? 'rtl' : ''}`}>
 
       {/* ------------------------------------------------------------------- */}
-      {/* 1. TOP BAR: LOYALTY POINTS & BACK NAVIGATION                        */}
+      {/* 1. TOP BAR: BACK NAVIGATION                                         */}
       {/* ------------------------------------------------------------------- */}
       <div className="deliv-top-bar">
-        <div className="deliv-top-left">
-          {/* 2250 pts Loyalty Badge */}
-          <button 
-            type="button" 
-            className="loyalty-badge-btn" 
-            title={isAr ? "نقاط ولاء أمريكان دريم" : "American Dream Loyalty Points"}
-            onClick={() => setIsLoyaltyModalOpen(true)}
-          >
-            <span>2250 pts</span>
-          </button>
-
-          {/* Back to Dining Overview */}
-          <button 
-            type="button" 
-            className="btn-back-to-dining"
-            onClick={onBack}
-          >
-            {isAr ? <ArrowRight size={16} /> : <ArrowLeft size={16} />}
-            <span>{isAr ? 'العودة للمطعم والكافيه' : 'Back to Restaurant & Cafe'}</span>
-          </button>
-        </div>
-
-        <div className="deliv-top-right">
-          <a href="tel:19820" className="deliv-hotline-pill">
-            <Phone size={14} />
-            <span>{isAr ? 'الخط الساخن: 19820' : 'Hotline: 19820'}</span>
-          </a>
-        </div>
+        <button 
+          type="button" 
+          className="btn-back-to-dining"
+          onClick={onBack}
+        >
+          {isAr ? <ArrowRight size={16} /> : <ArrowLeft size={16} />}
+          <span>{isAr ? 'العودة للمطعم والكافيه' : 'Back to Restaurant & Cafe'}</span>
+        </button>
       </div>
 
       {/* ------------------------------------------------------------------- */}
@@ -368,70 +303,92 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
       {/* 3. CATEGORY PILLS & SEARCH BAR ROW                                  */}
       {/* ------------------------------------------------------------------- */}
       <div className="deliv-controls-row">
-        {/* Category Pills */}
-        <div className="deliv-category-pills">
+        {/* Category Pills Slider Container */}
+        <div className="deliv-category-slider-wrapper">
           <button 
-            type="button"
-            className={`cat-pill-btn ${selectedCategory === 'all' ? 'active' : ''}`}
-            onClick={() => setSelectedCategory('all')}
+            type="button" 
+            className="deliv-slide-btn prev"
+            onClick={() => scrollCategoryPills('left')}
+            title={isAr ? "السابق" : "Previous"}
+            aria-label="Previous categories"
           >
-            <span>{isAr ? 'الكل' : 'ALL'}</span>
+            {isAr ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </button>
 
-          <button 
-            type="button"
-            className={`cat-pill-btn ${selectedCategory === 'food' ? 'active' : ''}`}
-            onClick={() => setSelectedCategory('food')}
-          >
-            <img 
-              src="/photo/kid area pic/icon/Icon (30).png" 
-              alt="Food" 
-              className="cat-pill-icon"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-            <span>{isAr ? 'طعام' : 'FOOD'}</span>
-          </button>
+          <div className="deliv-category-pills" id="deliv-category-pills">
+            <button 
+              type="button"
+              className={`cat-pill-btn ${selectedCategory === 'all' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('all')}
+            >
+              <span>{isAr ? 'الكل' : 'ALL'}</span>
+            </button>
+
+            <button 
+              type="button"
+              className={`cat-pill-btn ${selectedCategory === 'food' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('food')}
+            >
+              <img 
+                src="/photo/kid area pic/icon/Icon (30).png" 
+                alt="Food" 
+                className="cat-pill-icon"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+              <span>{isAr ? 'طعام' : 'FOOD'}</span>
+            </button>
+
+            <button 
+              type="button"
+              className={`cat-pill-btn ${selectedCategory === 'drinks' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('drinks')}
+            >
+              <img 
+                src="/photo/kid area pic/icon/Icon (19).png" 
+                alt="Drinks" 
+                className="cat-pill-icon"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+              <span>{isAr ? 'مشروبات' : 'DRINKS'}</span>
+            </button>
+
+            <button 
+              type="button"
+              className={`cat-pill-btn ${selectedCategory === 'desserts' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('desserts')}
+            >
+              <img 
+                src="/photo/kid area pic/icon/Icon (21).png" 
+                alt="Desserts" 
+                className="cat-pill-icon"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+              <span>{isAr ? 'حلويات' : 'DESSERTS'}</span>
+            </button>
+
+            <button 
+              type="button"
+              className={`cat-pill-btn ${selectedCategory === 'cafe' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('cafe')}
+            >
+              <img 
+                src="/photo/kid area pic/icon/Icon (26).png" 
+                alt="Café" 
+                className="cat-pill-icon"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+              <span>{isAr ? 'كافيه' : 'CAFÉ'}</span>
+            </button>
+          </div>
 
           <button 
-            type="button"
-            className={`cat-pill-btn ${selectedCategory === 'drinks' ? 'active' : ''}`}
-            onClick={() => setSelectedCategory('drinks')}
+            type="button" 
+            className="deliv-slide-btn next"
+            onClick={() => scrollCategoryPills('right')}
+            title={isAr ? "التالي" : "Next"}
+            aria-label="Next categories"
           >
-            <img 
-              src="/photo/kid area pic/icon/Icon (19).png" 
-              alt="Drinks" 
-              className="cat-pill-icon"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-            <span>{isAr ? 'مشروبات' : 'DRINKS'}</span>
-          </button>
-
-          <button 
-            type="button"
-            className={`cat-pill-btn ${selectedCategory === 'desserts' ? 'active' : ''}`}
-            onClick={() => setSelectedCategory('desserts')}
-          >
-            <img 
-              src="/photo/kid area pic/icon/Icon (21).png" 
-              alt="Desserts" 
-              className="cat-pill-icon"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-            <span>{isAr ? 'حلويات' : 'DESSERTS'}</span>
-          </button>
-
-          <button 
-            type="button"
-            className={`cat-pill-btn ${selectedCategory === 'cafe' ? 'active' : ''}`}
-            onClick={() => setSelectedCategory('cafe')}
-          >
-            <img 
-              src="/photo/kid area pic/icon/Icon (26).png" 
-              alt="Café" 
-              className="cat-pill-icon"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-            <span>{isAr ? 'كافيه' : 'CAFÉ'}</span>
+            {isAr ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
           </button>
         </div>
 
@@ -471,13 +428,6 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
         {/* COLUMN 1: DISHES SELECTION                                        */}
         {/* ----------------------------------------------------------------- */}
         <div className="deliv-menu-column">
-          <div className="deliv-section-eyebrow">
-            {isAr ? 'مختارات المطبخ المميزة' : 'SIGNATURE KITCHEN SELECTION'}
-          </div>
-          <h2 className="deliv-section-title">
-            {isAr ? 'أطباق الشيف الأكثر طلباً' : "Chef's Special & Most Ordered"}
-          </h2>
-
           <div className="deliv-dishes-grid">
             {filteredDishes.length === 0 ? (
               <div className="deliv-empty-search">
@@ -729,12 +679,6 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
               <span>{vatAmount.toFixed(2)} {isAr ? 'ج.م' : 'EGP'}</span>
             </div>
 
-            {loyaltyDiscountValue > 0 && (
-              <div className="calc-row" style={{ color: '#b45309', fontWeight: '700' }}>
-                <span>{isAr ? 'خصم نقاط الولاء (2250 نقطة)' : 'Loyalty Points Discount'}</span>
-                <span>-{loyaltyDiscountValue.toFixed(2)} {isAr ? 'ج.م' : 'EGP'}</span>
-              </div>
-            )}
 
             <div className="calc-row-grand">
               <div className="grand-title-col">
@@ -829,54 +773,7 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
         </div>
       )}
 
-      {/* ------------------------------------------------------------------- */}
-      {/* 6. MODAL: LOYALTY POINTS INFO & REDEMPTION                          */}
-      {/* ------------------------------------------------------------------- */}
-      {isLoyaltyModalOpen && (
-        <div className="deliv-modal-backdrop" onClick={() => setIsLoyaltyModalOpen(false)}>
-          <div className="deliv-modal-box" onClick={(e) => e.stopPropagation()}>
-            <button type="button" className="deliv-modal-close" onClick={() => setIsLoyaltyModalOpen(false)}>✕</button>
 
-            <div className="deliv-modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d97706' }}>
-                <Gift size={24} />
-                <h3 style={{ margin: 0 }}>{isAr ? 'مكافآت ونقاط أمريكان دريم' : 'American Dream Rewards'}</h3>
-              </div>
-              <p>{isAr ? 'رصيد نقاطك الحالي في حسابك' : 'Your current active rewards balance'}</p>
-            </div>
-
-            <div style={{ background: '#fef3c7', padding: '16px', borderRadius: '14px', textAlign: 'center' }}>
-              <span style={{ fontSize: '2rem', fontWeight: '900', color: '#b45309' }}>2,250</span>
-              <span style={{ fontSize: '1rem', fontWeight: '800', color: '#b45309', marginLeft: '6px' }}>pts</span>
-              <div style={{ fontSize: '0.85rem', color: '#92400e', marginTop: '4px' }}>
-                {isAr ? 'تعادل خصماً بقيمة 112.50 ج.م على طلبك اليوم!' : 'Worth 112.50 EGP discount on your order today!'}
-              </div>
-            </div>
-
-            <div className="points-discount-card">
-              <div className="points-card-left">
-                <span className="points-card-title">{isAr ? 'استخدام النقاط للخصم' : 'Redeem Points for Discount'}</span>
-                <span className="points-card-sub">{isAr ? 'وفر 112.50 ج.م فوراً من الإجمالي' : 'Save 112.50 EGP instantly'}</span>
-              </div>
-              <input 
-                type="checkbox" 
-                id="apply-points"
-                checked={applyLoyaltyDiscount}
-                onChange={(e) => setApplyLoyaltyDiscount(e.target.checked)}
-                style={{ width: '20px', height: '20px', accentColor: '#d97706', cursor: 'pointer' }}
-              />
-            </div>
-
-            <button 
-              type="button" 
-              className="btn-proceed-checkout" 
-              onClick={() => setIsLoyaltyModalOpen(false)}
-            >
-              {isAr ? 'تطبيق والعودة للطلب' : 'Apply & Return'}
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* ------------------------------------------------------------------- */}
       {/* 7. MODAL: CHECKOUT & ORDER CONFIRMATION FLOW                        */}

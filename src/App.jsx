@@ -26,6 +26,7 @@ const DesktopCartPage = lazy(() => import('./pages/desktop/DesktopCartPage'));
 const DesktopAboutPage = lazy(() => import('./pages/desktop/DesktopAboutPage'));
 const DesktopRestaurantPage = lazy(() => import('./pages/desktop/DesktopRestaurantPage'));
 const DesktopDashboardPage = lazy(() => import('./pages/desktop/DesktopDashboardPage'));
+const DesktopProfilePage = lazy(() => import('./pages/desktop/DesktopProfilePage'));
 
 // Synchronous Layout & UI Components
 import MobileHeader from './components/MobileHeader';
@@ -35,22 +36,22 @@ import DesktopSubNav from './components/DesktopSubNav';
 import DesktopFooter from './components/DesktopFooter';
 import MobileModals from './components/MobileModals';
 import LoadingScreen from './components/common/LoadingScreen';
+import LobbyPage from './pages/LobbyPage';
 
 // Styles
 import './components/MobilePlayZone.css';
 import './components/DesktopPlayZone.css';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState(() => {
-    if (typeof window !== 'undefined' && window.location.hash) {
-      const h = window.location.hash.replace('#', '');
-      if (h.startsWith('restaurant')) return 'restaurant';
-      if (['home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'events', 'trips', 'cart', 'about', 'restaurant', 'dashboard'].includes(h)) {
-        return h;
-      }
+  // Always open the Lobby Gateway first when the site loads
+  const [activeTab, setActiveTab] = useState('lobby');
+
+  useEffect(() => {
+    // Ensure URL hash reflects the lobby when the website opens
+    if (typeof window !== 'undefined') {
+      window.location.hash = 'lobby';
     }
-    return 'about'; // Default directly to the requested About Us & Overview page
-  });
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -67,7 +68,7 @@ export default function App() {
       const h = window.location.hash.replace('#', '');
       if (h.startsWith('restaurant')) {
         setActiveTab('restaurant');
-      } else if (['home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'events', 'trips', 'cart', 'about', 'dashboard'].includes(h)) {
+      } else if (['lobby', 'home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'events', 'trips', 'cart', 'about', 'dashboard'].includes(h)) {
         setActiveTab(h);
       }
     };
@@ -83,7 +84,7 @@ export default function App() {
   });
   const [modal, setModal] = useState({ isOpen: false, type: null, data: null });
   const [searchQuery, setSearchQuery] = useState('');
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(false);
 
   // Responsive desktop vs mobile detection
   const [isDesktop, setIsDesktop] = useState(() => {
@@ -149,23 +150,32 @@ export default function App() {
       )}
 
       {/* ========================================================================= */}
-      {/* COMPUTER (DESKTOP) VIEW */}
+      {/* FULL-SCREEN LOBBY GATEWAY PAGE (BEFORE ENTERING MAIN SITE) */}
       {/* ========================================================================= */}
-      {isDesktop ? (
+      {activeTab === 'lobby' ? (
+        <LobbyPage 
+          setActiveTab={setActiveTab}
+          lang={lang}
+          setLang={setLang}
+          isDesktop={isDesktop}
+        />
+      ) : isDesktop ? (
         <div className="desktop-app-shell">
           {/* Top Navbar */}
-          <DesktopHeader 
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            openModal={openModal}
-            lang={lang}
-            setLang={setLang}
-            isDesktopView={isDesktop}
-            setIsDesktopView={setIsDesktop}
-          />
+          {activeTab !== 'dashboard' && (
+            <DesktopHeader 
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              openModal={openModal}
+              lang={lang}
+              setLang={setLang}
+              isDesktopView={isDesktop}
+              setIsDesktopView={setIsDesktop}
+            />
+          )}
 
           {/* Subnav & Search (for zone pages) */}
-          {activeTab !== 'home' && activeTab !== 'events' && activeTab !== 'trips' && activeTab !== 'cart' && activeTab !== 'about' && activeTab !== 'restaurant' && activeTab !== 'dashboard' && (
+          {activeTab !== 'home' && activeTab !== 'events' && activeTab !== 'trips' && activeTab !== 'cart' && activeTab !== 'about' && activeTab !== 'restaurant' && activeTab !== 'dashboard' && activeTab !== 'profile' && (
             <DesktopSubNav 
               activeTab={activeTab}
               setActiveTab={setActiveTab}
@@ -277,11 +287,21 @@ export default function App() {
                   lang={lang}
                 />
               )}
+
+              {activeTab === 'profile' && (
+                <DesktopProfilePage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
             </Suspense>
           </main>
 
           {/* Desktop Footer */}
-          <DesktopFooter openModal={openModal} setActiveTab={setActiveTab} lang={lang} />
+          {activeTab !== 'dashboard' && (
+            <DesktopFooter openModal={openModal} setActiveTab={setActiveTab} lang={lang} />
+          )}
 
           {/* Global Interactive Modals */}
           {modal.isOpen && (
@@ -305,7 +325,7 @@ export default function App() {
           <MobileHeader 
             setActiveTab={setActiveTab}
             onOpenMenu={() => openModal('menu-drawer')}
-            onOpenProfile={() => openModal('profile')}
+            onOpenProfile={() => setActiveTab('profile')}
             lang={lang}
             setLang={setLang}
           />
@@ -313,7 +333,7 @@ export default function App() {
           {/* Main Page Views with Lazy Loading Suspense Fallback */}
           <main style={{ flex: 1 }}>
             <Suspense fallback={<LoadingScreen fullscreen={false} lang={lang} />}>
-              {(activeTab === 'home' || activeTab === 'lobby') && (
+              {activeTab === 'home' && (
                 <MobileHomePage 
                   setActiveTab={setActiveTab}
                   openModal={openModal}
@@ -403,6 +423,14 @@ export default function App() {
 
               {activeTab === 'dashboard' && (
                 <DesktopDashboardPage 
+                  setActiveTab={setActiveTab}
+                  openModal={openModal}
+                  lang={lang}
+                />
+              )}
+
+              {activeTab === 'profile' && (
+                <DesktopProfilePage 
                   setActiveTab={setActiveTab}
                   openModal={openModal}
                   lang={lang}

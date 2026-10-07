@@ -34,27 +34,8 @@ export default function MobileHeader({ setActiveTab, onOpenMenu, onOpenProfile, 
         )}
       </div>
 
-      {/* Action Icons: Language Toggle, Cyan Profile & Cyan Hamburger Menu */}
+      {/* Action Icons: Cyan Profile & Cyan Hamburger Menu */}
       <div className="mobile-header-right">
-        {setLang && (
-          <button 
-            className="mobile-icon-btn mobile-lang-toggle-btn"
-            onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
-            title={lang === 'ar' ? 'Switch to English' : 'التحويل للعربية'}
-            aria-label="Switch Language"
-            style={{ 
-              fontSize: '0.78rem', 
-              fontWeight: 800, 
-              color: '#ffd15c',
-              padding: '4px 8px',
-              border: '1px solid rgba(255, 209, 92, 0.4)',
-              borderRadius: '16px',
-              background: 'rgba(255, 255, 255, 0.08)'
-            }}
-          >
-            {lang === 'ar' ? 'EN' : 'عربي'}
-          </button>
-        )}
         <button 
           className="mobile-icon-btn" 
           onClick={onOpenProfile}

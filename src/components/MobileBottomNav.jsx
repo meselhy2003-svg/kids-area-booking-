@@ -3,6 +3,7 @@ import { getTranslations } from '../data/translations';
 
 export default function MobileBottomNav({ activeTab, setActiveTab, lang = 'ar' }) {
   const t = getTranslations(lang);
+  const isRtl = lang === 'ar';
 
   const tabs = [
     {
@@ -38,26 +39,35 @@ export default function MobileBottomNav({ activeTab, setActiveTab, lang = 'ar' }
     }
   ];
 
-  // Resolve active index (defaults to 0 for home/lobby)
+  // Resolve active index (-1 if external page like restaurant/about/cart/trips/events/dashboard)
   let activeIndex = tabs.findIndex(t => t.id === activeTab);
-  if (activeIndex === -1) activeIndex = 0;
+  if (activeIndex === -1 && (activeTab === 'home' || activeTab === 'lobby')) {
+    activeIndex = 0;
+  }
 
   const handleTabClick = (tabId) => {
     setActiveTab(tabId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const currentTab = tabs[activeIndex];
+  const currentTab = activeIndex >= 0 ? tabs[activeIndex] : null;
   const notchFillColor = 'var(--pz-bg-cream, #faf7f2)';
+
+  // In LTR: tab[0] is at col 0 ... tab[5] is at col 5
+  // In RTL: flex layout places tab[0] at the rightmost col (col 5) ... tab[5] at col 0
+  const sliderColumn = activeIndex >= 0 
+    ? (isRtl ? (tabs.length - 1 - activeIndex) : activeIndex) 
+    : -1;
 
   return (
     <nav className="mobile-bottom-nav">
       <div className="wave-navbar-container">
         {/* Animated Wave Slider (Concave Notch + Elevated Circle Bubble) */}
-        <div 
-          className="wave-slider"
-          style={{ transform: `translateX(${activeIndex * 100}%)` }}
-        >
+        {activeIndex >= 0 && currentTab && (
+          <div 
+            className="wave-slider"
+            style={{ transform: `translateX(${sliderColumn * 100}%)` }}
+          >
           {/* The Concave Wave Notch Cutout SVG - Concentric Circular Cradle */}
           <div className="wave-notch-wrap">
             <svg 
@@ -99,6 +109,7 @@ export default function MobileBottomNav({ activeTab, setActiveTab, lang = 'ar' }
             </div>
           </div>
         </div>
+      )}
 
         {/* The 6 Interactive Tab Items */}
         <div className="wave-tabs-row">

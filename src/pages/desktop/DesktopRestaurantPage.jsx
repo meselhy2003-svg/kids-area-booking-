@@ -570,7 +570,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                   onClick={handleOpenBooking}
                 >
                   <Calendar size={17} />
-                  <span>{lang === 'ar' ? 'احجز طاولة الآن 📅' : 'BOOK A TABLE 📅'}</span>
+                  <span>{lang === 'ar' ? 'احجز طاولة الآن' : 'BOOK A TABLE'}</span>
                 </button>
               </div>
             </div>
@@ -600,17 +600,6 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
               </p>
             </div>
 
-            <button 
-              className="vibes-hashtag-link"
-              onClick={() => {
-                navigator.clipboard?.writeText('#AmericanDreamIsmailia');
-                showToast(lang === 'ar' ? 'تم نسخ الهاشتاج!' : 'Hashtag copied to clipboard!');
-              }}
-              title="Copy Hashtag"
-            >
-              <span>🌐</span>
-              <span>#AmericanDreamIsmailia</span>
-            </button>
           </div>
 
           {/* Mosaic Gallery Layout */}

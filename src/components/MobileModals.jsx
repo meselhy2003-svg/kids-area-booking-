@@ -388,25 +388,35 @@ export default function MobileModals({
             <button className="drawer-close-btn" onClick={closeModal}>✕</button>
           </div>
 
-          {/* Language Switcher in Drawer */}
+          {/* Language Switcher in Drawer: Main Arabic (Alexandria), Second English */}
           <div className="drawer-lang-toggle" style={{ display: 'flex', gap: '8px', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: '12px', margin: '0 16px 14px' }}>
             <button 
               type="button"
-              className={`drawer-lang-btn ${lang === 'ar' ? 'active' : ''}`}
+              className={`drawer-lang-btn ar-choice font-alexandria arabic-alexandria-text ${lang === 'ar' ? 'active' : ''}`}
               onClick={() => setLang && setLang('ar')}
               style={{
                 flex: 1,
-                padding: '8px 10px',
+                padding: '9px 8px',
                 borderRadius: '8px',
                 border: lang === 'ar' ? '1.5px solid #00a9c3' : '1px solid rgba(255,255,255,0.15)',
                 background: lang === 'ar' ? 'rgba(0, 169, 195, 0.25)' : 'transparent',
                 color: lang === 'ar' ? '#00b4d8' : '#e2e8f0',
-                fontWeight: 700,
-                fontSize: '0.85rem',
-                cursor: 'pointer'
+                fontWeight: 800,
+                fontSize: '0.86rem',
+                fontFamily: "'Alexandria', 'Tajawal', sans-serif",
+                whiteSpace: 'nowrap',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
-              🇪🇬 العربية (مصر)
+              <span 
+                className="font-alexandria arabic-alexandria-text"
+                style={{ fontFamily: "'Alexandria', 'Tajawal', sans-serif", fontWeight: 800, whiteSpace: 'nowrap' }}
+              >
+                العربية (مصر)
+              </span>
             </button>
             <button 
               type="button"
@@ -414,17 +424,20 @@ export default function MobileModals({
               onClick={() => setLang && setLang('en')}
               style={{
                 flex: 1,
-                padding: '8px 10px',
+                padding: '9px 10px',
                 borderRadius: '8px',
                 border: lang === 'en' ? '1.5px solid #00a9c3' : '1px solid rgba(255,255,255,0.15)',
                 background: lang === 'en' ? 'rgba(0, 169, 195, 0.25)' : 'transparent',
                 color: lang === 'en' ? '#00b4d8' : '#e2e8f0',
                 fontWeight: 700,
-                fontSize: '0.85rem',
-                cursor: 'pointer'
+                fontSize: '0.86rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
-              🇬🇧 English
+              <span>English</span>
             </button>
           </div>
 
@@ -541,19 +554,21 @@ export default function MobileModals({
 
             <button 
               className="drawer-nav-item"
-              style={{
-                background: 'rgba(0, 169, 195, 0.08)',
-                border: '1px solid rgba(0, 169, 195, 0.25)',
-                borderRadius: '14px',
-                marginTop: '4px'
-              }}
-              onClick={() => { closeModal(); setActiveTab('dashboard'); }}
+              onClick={() => { closeModal(); setActiveTab('profile'); }}
+              style={{ background: 'rgba(245, 158, 11, 0.1)' }}
             >
-              <span style={{ fontSize: '1.25rem', width: '28px', textAlign: 'center', display: 'inline-block' }}>📊</span>
-              <span className={lang === 'ar' ? 'font-alexandria' : ''} style={{ color: '#00839c', fontWeight: 700 }}>
-                {lang === 'ar' ? 'لوحة التحكم والإدارة (Dashboard)' : 'Admin Dashboard'}
+              <img 
+                src="/photo/profile/ahmed-avatar-overview.png" 
+                alt="Profile" 
+                className="drawer-icon" 
+                style={{ borderRadius: '50%', border: '1px solid #f59e0b' }} 
+                onError={(e) => { e.currentTarget.src = '/photo/kid area pic/icon/Symbol.png'; }}
+              />
+              <span className={lang === 'ar' ? 'font-alexandria' : ''} style={{ color: '#f59e0b', fontWeight: 800 }}>
+                {lang === 'ar' ? 'ملفي الشخصي (My Profile)' : 'My Profile (Ahmed)'}
               </span>
             </button>
+
           </div>
 
           <div className="drawer-divider" />
@@ -571,27 +586,6 @@ export default function MobileModals({
               <span className="info-val">
                 {lang === 'ar' ? 'أمريكان دريم بارك، الإسماعيلية' : 'American Dream Park, Ismailia'}
               </span>
-            </div>
-            <div className="info-row">
-              <span className="info-label">
-                <svg className="drawer-info-icon icon-yellow" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="10" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>
-                {lang === 'ar' ? 'مواعيد العمل:' : 'Working Hours:'}
-              </span>
-              <span className="info-val">
-                {lang === 'ar' ? 'يومياً: ١٠:٠٠ ص – ١١:٣٠ م' : '10:00 AM – 11:30 PM Daily'}
-              </span>
-            </div>
-            <div className="info-row">
-              <span className="info-label">
-                <svg className="drawer-info-icon icon-cyan" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                </svg>
-                {lang === 'ar' ? 'خدمة العملاء:' : 'Support Hotline:'}
-              </span>
-              <span className="info-val">٠١٠١٢٣٤٥٦٧٨</span>
             </div>
           </div>
         </div>
@@ -646,6 +640,25 @@ export default function MobileModals({
               </div>
 
               <div className="profile-actions-list">
+                <button 
+                  className="profile-action-btn"
+                  onClick={() => {
+                    setActiveTab('profile');
+                    closeModal();
+                  }}
+                  style={{ background: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.5)' }}
+                >
+                  <div className="profile-btn-icon-wrap wrap-orange">
+                    <svg className="profile-btn-svg" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  </div>
+                  <span className="profile-btn-text" style={{ color: '#f59e0b', fontWeight: 800 }}>
+                    {lang === 'ar' ? 'فتح صفحة الحساب الكاملة (My Profile)' : 'Open Full Profile Page (My Profile)'}
+                  </span>
+                </button>
+
                 <button 
                   className="profile-action-btn"
                   onClick={() => setProfileView('passes')}

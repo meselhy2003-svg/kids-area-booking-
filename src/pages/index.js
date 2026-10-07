@@ -25,5 +25,5 @@ export { default as DesktopAboutPage } from './desktop/DesktopAboutPage';
 export { default as DesktopRestaurantPage } from './desktop/DesktopRestaurantPage';
 export { default as DesktopDashboardPage } from './desktop/DesktopDashboardPage';
 
-
-
+// Lobby Gateway Page
+export { default as LobbyPage } from './LobbyPage';

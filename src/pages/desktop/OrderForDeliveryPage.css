@@ -4,10 +4,13 @@
 
 .delivery-order-page {
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   background-color: #f1f4f7;
   color: #0b2533;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  padding: 0 0 60px 0;
+  padding: 0 0 120px 0;
   box-sizing: border-box;
   direction: ltr;
 }
@@ -25,7 +28,7 @@
   padding: 16px 24px 8px 24px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 16px;
 }
 
@@ -145,6 +148,7 @@
 /* ------------------------------------------------------------------------- */
 .deliv-controls-row {
   max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
   padding: 0 24px 24px 24px;
   display: flex;
@@ -152,19 +156,87 @@
   justify-content: space-between;
   gap: 20px;
   flex-wrap: wrap;
+  box-sizing: border-box;
 }
 
+/* Category Slider Wrapper with navigation chevrons */
+.deliv-category-slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 680px;
+  min-width: 0;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.deliv-slide-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #028090;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  user-select: none;
+  z-index: 2;
+}
+
+.deliv-slide-btn:hover {
+  background: #028090;
+  color: #ffffff;
+  border-color: #028090;
+  transform: scale(1.06);
+}
+
+.deliv-slide-btn:active {
+  transform: scale(0.95);
+}
+
+/* Category Pills Horizontal Scroll Container with VISIBLE SLIDE BAR */
 .deliv-category-pills {
   display: flex;
   align-items: center;
   gap: 10px;
   overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: none;
+  overflow-y: hidden;
+  padding: 4px 6px 12px 6px;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #028090 #e2e8f0;
 }
 
+/* Visible Custom Slide Bar (Scrollbar Track & Thumb) */
 .deliv-category-pills::-webkit-scrollbar {
-  display: none;
+  height: 6px;
+  display: block !important;
+}
+
+.deliv-category-pills::-webkit-scrollbar-track {
+  background: #e2e8f0;
+  border-radius: 9999px;
+  margin: 0 4px;
+}
+
+.deliv-category-pills::-webkit-scrollbar-thumb {
+  background: #028090;
+  border-radius: 9999px;
+  border: 1px solid #ffffff;
+  transition: background 0.2s ease;
+}
+
+.deliv-category-pills::-webkit-scrollbar-thumb:hover {
+  background: #ff8a00;
 }
 
 .cat-pill-btn {
@@ -1217,6 +1289,10 @@
 /* RESPONSIVE BREAKPOINTS                                                    */
 /* ------------------------------------------------------------------------- */
 @media (max-width: 960px) {
+  .delivery-order-page {
+    padding-bottom: 140px;
+  }
+
   .deliv-layout-grid {
     grid-template-columns: 1fr;
     gap: 30px;
@@ -1224,6 +1300,12 @@
 
   .deliv-cart-sidebar {
     position: static;
+    margin-bottom: 40px;
+  }
+
+  .deliv-category-slider-wrapper {
+    max-width: 100%;
+    width: 100%;
   }
 }
 
@@ -1245,10 +1327,17 @@
     padding: 0 16px 16px 16px;
     flex-direction: column;
     align-items: stretch;
+    gap: 14px;
+  }
+
+  .deliv-category-slider-wrapper {
+    width: 100%;
+    max-width: 100%;
   }
 
   .deliv-search-bar {
     max-width: 100%;
+    width: 100%;
   }
 
   .deliv-dishes-grid {
@@ -1257,6 +1346,10 @@
 
   .deliv-layout-grid {
     padding: 0 16px;
+  }
+
+  .deliv-cart-sidebar {
+    margin-bottom: 60px;
   }
 
   .payment-methods-grid {
