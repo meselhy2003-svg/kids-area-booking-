@@ -279,17 +279,22 @@ export default function LobbyPage({
   const [authTab, setAuthTab] = useState('login'); // 'login' | 'register'
   const [pendingSign, setPendingSign] = useState(null);
 
-  // Guest Registration Form (strictly matches backend Mongoose guestSchema)
+  // Guest Registration Form (matches backend Mongoose guestSchema + password security)
   const [guestForm, setGuestForm] = useState({
     name: '',
     phone: '',
     age: '',
     gender: 'male', // 'male' | 'female'
+    password: '',
+    confirmPassword: '',
     children: [] // array of { name: '', age: '', gender: 'female' }
   });
 
-  // Login Phone State (Unique identifier in guestSchema)
+  // Login Form States (Phone + Password)
   const [loginPhone, setLoginPhone] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [authError, setAuthError] = useState('');
   const [authSuccessMsg, setAuthSuccessMsg] = useState('');
 
@@ -339,7 +344,7 @@ export default function LobbyPage({
     return false;
   };
 
-  // Sign In submit handler (Authenticates uniquely by phone)
+  // Sign In submit handler (Authenticates by phone & password)
   const handleAuthLogin = (e) => {
     e.preventDefault();
     setAuthError('');
@@ -347,6 +352,11 @@ export default function LobbyPage({
     const cleanPhone = loginPhone.trim();
     if (!cleanPhone) {
       setAuthError(lang === 'ar' ? 'يرجى إدخال رقم الهاتف المسجل' : 'Please enter your registered phone number');
+      return;
+    }
+
+    if (!loginPassword.trim()) {
+      setAuthError(lang === 'ar' ? 'يرجى إدخال كلمة المرور' : 'Please enter your password');
       return;
     }
 
@@ -359,6 +369,12 @@ export default function LobbyPage({
       );
     } catch (err) {
       console.warn('Error reading registered guests:', err);
+    }
+
+    // If registered guest has a password, verify it
+    if (guestFound && guestFound.password && guestFound.password !== loginPassword.trim()) {
+      setAuthError(lang === 'ar' ? 'كلمة المرور غير صحيحة، يرجى المحاولة مرة أخرى' : 'Incorrect password, please try again');
+      return;
     }
 
     // If not found in registered guests, check existing profile or create a recognized profile
@@ -462,6 +478,14 @@ export default function LobbyPage({
       setAuthError(lang === 'ar' ? 'يرجى اختيار النوع (ذكر / أنثى)' : 'Please select gender');
       return;
     }
+    if (!guestForm.password || guestForm.password.length < 4) {
+      setAuthError(lang === 'ar' ? 'يرجى إدخال كلمة مرور من 4 خانات على الأقل' : 'Password must be at least 4 characters');
+      return;
+    }
+    if (guestForm.password !== guestForm.confirmPassword) {
+      setAuthError(lang === 'ar' ? 'كلمة المرور وتأكيدها غير متطابقين' : 'Passwords do not match');
+      return;
+    }
 
     // Validate children if any added
     for (let i = 0; i < guestForm.children.length; i++) {
@@ -476,13 +500,14 @@ export default function LobbyPage({
       }
     }
 
-    // Construct full Guest document strictly matching mongoose guestSchema
+    // Construct full Guest document strictly matching mongoose guestSchema + password
     const newGuest = {
       _id: 'guest_' + Date.now(),
       name: guestForm.name.trim(),
       phone: guestForm.phone.trim(),
       age: String(guestForm.age).trim(),
       gender: guestForm.gender, // 'male' | 'female'
+      password: guestForm.password,
       children: guestForm.children.map((c, idx) => ({
         _id: `child_${Date.now()}_${idx}`,
         name: c.name.trim(),
@@ -562,6 +587,9 @@ export default function LobbyPage({
 
   // Quick Demo Login (Ahmed Mohamed Account)
   const handleQuickDemoLogin = () => {
+    setLoginPhone('+20 101 234 5678');
+    setLoginPassword('123456');
+
     const demoGuest = {
       _id: 'guest_demo_ahmed',
       name: 'Ahmed Mohamed',
@@ -933,6 +961,32 @@ export default function LobbyPage({
                     </div>
                   </div>
 
+                  {/* Password */}
+                  <div className="lobby-auth-field-group">
+                    <label className="lobby-auth-label">
+                      {lang === 'ar' ? 'كلمة المرور:' : 'Password:'} *
+                    </label>
+                    <div className="lobby-auth-input-wrap">
+                      <Lock size={18} className="lobby-auth-input-icon" />
+                      <input 
+                        type={showLoginPassword ? 'text' : 'password'} 
+                        required
+                        className="lobby-auth-input"
+                        placeholder="••••••••"
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                      />
+                      <button 
+                        type="button" 
+                        className="lobby-auth-eye-btn"
+                        onClick={() => setShowLoginPassword(!showLoginPassword)}
+                        aria-label="Toggle password visibility"
+                      >
+                        {showLoginPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Quick Demo Login Pill */}
                   <button 
                     type="button" 
@@ -1063,6 +1117,53 @@ export default function LobbyPage({
                           <span>👩</span>
                           <span>{lang === 'ar' ? 'أنثى' : 'Female'}</span>
                         </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Password & Confirm Password (Security) */}
+                  <div className="lobby-auth-grid-2">
+                    {/* Password */}
+                    <div className="lobby-auth-field-group">
+                      <label className="lobby-auth-label">
+                        {lang === 'ar' ? 'كلمة المرور:' : 'Password:'} *
+                      </label>
+                      <div className="lobby-auth-input-wrap">
+                        <Lock size={18} className="lobby-auth-input-icon" />
+                        <input 
+                          type={showRegisterPassword ? 'text' : 'password'} 
+                          required
+                          className="lobby-auth-input"
+                          placeholder="••••••••"
+                          value={guestForm.password}
+                          onChange={(e) => setGuestForm(prev => ({ ...prev, password: e.target.value }))}
+                        />
+                        <button 
+                          type="button" 
+                          className="lobby-auth-eye-btn"
+                          onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                          aria-label="Toggle password visibility"
+                        >
+                          {showRegisterPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div className="lobby-auth-field-group">
+                      <label className="lobby-auth-label">
+                        {lang === 'ar' ? 'تأكيد كلمة المرور:' : 'Confirm Password:'} *
+                      </label>
+                      <div className="lobby-auth-input-wrap">
+                        <Lock size={18} className="lobby-auth-input-icon" />
+                        <input 
+                          type={showRegisterPassword ? 'text' : 'password'} 
+                          required
+                          className="lobby-auth-input"
+                          placeholder="••••••••"
+                          value={guestForm.confirmPassword}
+                          onChange={(e) => setGuestForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                        />
                       </div>
                     </div>
                   </div>
