@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { 
   ArrowLeft, 
@@ -15,7 +15,11 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
-  X
+  X,
+  User,
+  Phone,
+  Building2,
+  ShieldCheck
 } from 'lucide-react';
 import './OrderForDeliveryPage.css';
 
@@ -127,16 +131,9 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
   const [customAddress, setCustomAddress] = useState('');
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
-  // Notes & cutlery
-  const [deliveryNotes, setDeliveryNotes] = useState('');
-
-  // Checkout modal flow
+  // Legacy modal fallback state
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [checkoutStep, setCheckoutStep] = useState('form'); // 'form' | 'success'
-  const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cod'); // 'cod' | 'card' | 'wallet'
-  const [orderTrackingCode, setOrderTrackingCode] = useState('');
 
   // Cart calculations
   const cartItems = useMemo(() => {
@@ -215,44 +212,390 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
     }
   };
 
-  // Checkout submission
-  const handleConfirmOrder = (e) => {
+  // Page View: 'menu' | 'checkout' | 'success'
+  const [pageView, setPageView] = useState('menu');
+
+  // Delivery Checkout Form State (Matching exact design screenshot)
+  const [deliveryFullName, setDeliveryFullName] = useState(() => {
+    try {
+      const p = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
+      return p.name || '';
+    } catch { return ''; }
+  });
+  const [deliveryPhone, setDeliveryPhone] = useState(() => {
+    try {
+      const p = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
+      return p.phone || '';
+    } catch { return ''; }
+  });
+  const [deliveryAddress, setDeliveryAddress] = useState(() => {
+    try {
+      const p = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
+      return p.address || '';
+    } catch { return ''; }
+  });
+  const [deliveryNotes, setDeliveryNotes] = useState('');
+  const [checkoutError, setCheckoutError] = useState('');
+  const [orderTrackingCode, setOrderTrackingCode] = useState('');
+
+  // Auto-sync initial delivery destination if customAddress or selectedZone changed
+  useEffect(() => {
+    if (!deliveryAddress) {
+      if (customAddress) {
+        setDeliveryAddress(customAddress);
+      } else if (selectedZone) {
+        setDeliveryAddress(isAr ? selectedZone.nameAr : selectedZone.nameEn);
+      }
+    }
+  }, [customAddress, selectedZone, isAr]);
+
+  // Confirm Delivery Order from Delivery Details Page
+  const handleConfirmDeliveryOrder = (e) => {
     e.preventDefault();
-    if (!customerName || !customerPhone) {
-      alert(isAr ? 'يرجى إدخال الاسم ورقم الهاتف' : 'Please provide your name and phone number');
+    setCheckoutError('');
+
+    if (!deliveryFullName.trim()) {
+      setCheckoutError(isAr ? 'يرجى إدخال الاسم بالكامل' : 'Please enter your full name');
+      return;
+    }
+    if (!deliveryPhone.trim()) {
+      setCheckoutError(isAr ? 'يرجى إدخال رقم الهاتف للتواصل' : 'Please enter your phone number');
+      return;
+    }
+    if (!deliveryAddress.trim()) {
+      setCheckoutError(isAr ? 'يرجى إدخال عنوان التوصيل بالتفصيل' : 'Please enter your delivery address');
       return;
     }
 
     const code = `AD-DLV-${Math.floor(1000 + Math.random() * 9000)}`;
     setOrderTrackingCode(code);
-    setCheckoutStep('success');
 
-    // Trigger celebration confetti
+    // Save order in localStorage
+    try {
+      const existingOrders = JSON.parse(localStorage.getItem('american_dream_orders') || '[]');
+      existingOrders.unshift({
+        orderId: code,
+        type: 'restaurant-delivery',
+        date: new Date().toLocaleDateString(isAr ? 'ar-EG' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
+        time: new Date().toLocaleTimeString(isAr ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' }),
+        customerName: deliveryFullName,
+        customerPhone: deliveryPhone,
+        address: deliveryAddress,
+        notes: deliveryNotes,
+        itemsCount: totalItemsCount,
+        items: cartItems.map(i => ({ name: isAr ? i.nameAr : i.nameEn, qty: i.qty, price: i.price, lineTotal: i.lineTotal })),
+        total: grandTotal,
+        status: 'preparing',
+        statusTextAr: 'قيد التحضير في مطبخ أمريكان دريم',
+        statusTextEn: 'Preparing in American Dream Kitchen',
+        eta: '35–45 MIN'
+      });
+      localStorage.setItem('american_dream_orders', JSON.stringify(existingOrders));
+    } catch {}
+
+    // Confetti celebration
     try {
       confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
+        particleCount: 120,
+        spread: 90,
+        origin: { y: 0.5 },
+        colors: ['#f59e0b', '#00a9c3', '#fde047', '#ffffff']
       });
-    } catch {
-      // ignore
-    }
+    } catch {}
+
+    setPageView('success');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // WhatsApp order dispatch
   const handleSendToWhatsApp = () => {
     const phone = '201012345678';
-    const destination = customAddress ? customAddress : (isAr ? selectedZone.nameAr : selectedZone.nameEn);
     const itemsList = cartItems.map(i => 
-      `- ${isAr ? i.nameAr : i.nameEn} (${i.qty}x) = ${i.lineTotal} EGP`
+      `- ${isAr ? i.nameAr : i.nameEn} (${i.qty}x) = ${i.lineTotal.toFixed(2)} EGP`
     ).join('%0A');
 
     const msg = isAr
-      ? `طلب توصيل جديد من موقع أمريكان دريم:%0A- كود الطلب: ${orderTrackingCode}%0A- اسم العميل: ${customerName}%0A- الهاتف: ${customerPhone}%0A- العنوان: ${destination}%0A- الوجبات المطلوبة:%0A${itemsList}%0A- الإجمالي الفرعي: ${subtotal.toFixed(2)} ج.م%0A- التوصيل: مجاني (عرض ترويجي)%0A- الضريبة والخدمة (14%): ${vatAmount.toFixed(2)} ج.م%0A- الإجمالي الكلي: ${grandTotal.toFixed(2)} ج.م%0A- طريقة الدفع: ${paymentMethod === 'cod' ? 'نقداً عند الاستلام' : paymentMethod === 'card' ? 'فيزا / بطاقة بنكية' : 'إنستاباي / فودافون كاش'}%0A- ملاحظات وأدوات المائدة: ${deliveryNotes || 'لا يوجد'}`
-      : `New Delivery Order from American Dream Website:%0A- Order Ref: ${orderTrackingCode}%0A- Name: ${customerName}%0A- Phone: ${customerPhone}%0A- Delivery Address: ${destination}%0A- Items:%0A${itemsList}%0A- Subtotal: ${subtotal.toFixed(2)} EGP%0A- Delivery: 0.00 EGP (FREE PROMO)%0A- VAT & Service (14%): ${vatAmount.toFixed(2)} EGP%0A- Grand TOTAL: ${grandTotal.toFixed(2)} EGP%0A- Payment: ${paymentMethod.toUpperCase()}%0A- Cutlery & Notes: ${deliveryNotes || 'None'}`;
+      ? `طلب توصيل جديد من مطعم أمريكان دريم الإسماعيلية:%0A- كود الطلب: ${orderTrackingCode}%0A- اسم العميل: ${deliveryFullName}%0A- الهاتف: ${deliveryPhone}%0A- العنوان: ${deliveryAddress}%0A- الوجبات المطلوبة:%0A${itemsList}%0A- الإجمالي الكلي: ${grandTotal.toFixed(2)} ج.م (شامل الضريبة)%0A- وقت الوصول التقديري: 35-45 دقيقة%0A- ملاحظات: ${deliveryNotes || 'لا يوجد'}`
+      : `New Delivery Order from American Dream Ismailia:%0A- Order Ref: ${orderTrackingCode}%0A- Name: ${deliveryFullName}%0A- Phone: ${deliveryPhone}%0A- Address: ${deliveryAddress}%0A- Items:%0A${itemsList}%0A- Grand TOTAL: ${grandTotal.toFixed(2)} EGP (All Taxes Included)%0A- ETA: 35-45 MIN%0A- Notes: ${deliveryNotes || 'None'}`;
 
     window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
   };
+
+  // -------------------------------------------------------------------------
+  // VIEW 1: CHECKOUT - "DELIVERY DETAILS" (Exact match to design screenshot)
+  // -------------------------------------------------------------------------
+  if (pageView === 'checkout') {
+    return (
+      <div className={`deliv-checkout-wrapper ${isAr ? 'font-alexandria lang-ar' : 'lang-en'}`}>
+        <div className="deliv-details-card" dir={isAr ? 'rtl' : 'ltr'}>
+          {/* Top Badge Pill */}
+          <div className="deliv-badge-pill">
+            <span className="deliv-badge-dot">●</span>
+            <span className="deliv-badge-text">
+              <span className="deliv-badge-bolt">⚡</span> 35–45 MIN • ISMAILIA ZONE
+            </span>
+          </div>
+
+          {/* Title & Subtitle */}
+          <div className="deliv-title-wrap">
+            <h2 className="deliv-main-heading">
+              {isAr ? (
+                <>
+                  <span className="deliv-title-white">تفاصيل </span>
+                  <span className="deliv-title-yellow">التوصيل </span>
+                  <span className="deliv-title-cyan">السريع</span>
+                </>
+              ) : (
+                <>
+                  <span className="deliv-title-white">D</span>
+                  <span className="deliv-title-yellow">eliv</span>
+                  <span className="deliv-title-white">er</span>
+                  <span className="deliv-title-cyan">y</span>{' '}
+                  <span className="deliv-title-white">D</span>
+                  <span className="deliv-title-white">et</span>
+                  <span className="deliv-title-yellow">a</span>
+                  <span className="deliv-title-white">i</span>
+                  <span className="deliv-title-cyan">ls</span>
+                </>
+              )}
+            </h2>
+            <p className="deliv-main-subtitle">
+              {isAr 
+                ? 'أين نوصّل وجباتك الطازجة المفضلة من أمريكان دريم في الإسماعيلية؟' 
+                : 'Where should we bring your fresh American Dream favorites in Ismailia?'}
+            </p>
+          </div>
+
+          {/* Error Message */}
+          {checkoutError && (
+            <div className="deliv-checkout-error">
+              <span>⚠️</span>
+              <span>{checkoutError}</span>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleConfirmDeliveryOrder} className="deliv-form-block">
+            {/* Field 1: Full Name */}
+            <div className="deliv-field-group">
+              <div className="deliv-field-row-header">
+                <label className="deliv-field-label">
+                  {isAr ? 'الاسم بالكامل' : 'Full Name'}
+                </label>
+                <span className="deliv-field-hint">
+                  {isAr ? 'مطلوب' : 'Required'}
+                </span>
+              </div>
+              <div className="deliv-white-input-wrap">
+                <User size={18} className="deliv-white-input-icon" />
+                <input 
+                  type="text" 
+                  required
+                  className="deliv-white-input"
+                  placeholder={isAr ? 'مثال: عمر عبد الرحمن' : 'e.g. Omar Abdelrahman'}
+                  value={deliveryFullName}
+                  onChange={(e) => setDeliveryFullName(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Field 2: Phone Number */}
+            <div className="deliv-field-group">
+              <div className="deliv-field-row-header">
+                <label className="deliv-field-label">
+                  {isAr ? 'رقم الهاتف' : 'Phone Number'}
+                </label>
+                <span className="deliv-field-hint">
+                  {isAr ? 'لتواصل مندوب التوصيل' : 'For delivery courier call'}
+                </span>
+              </div>
+              <div className="deliv-white-input-wrap">
+                <Phone size={18} className="deliv-white-input-icon" />
+                <input 
+                  type="tel" 
+                  required
+                  className="deliv-white-input"
+                  placeholder="101 234 5678"
+                  value={deliveryPhone}
+                  onChange={(e) => setDeliveryPhone(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Field 3: Delivery Address */}
+            <div className="deliv-field-group">
+              <div className="deliv-field-row-header">
+                <label className="deliv-field-label">
+                  <span style={{ color: '#f59e0b' }}>📍</span>
+                  <span>{isAr ? 'عنوان التوصيل' : 'Delivery Address'}</span>
+                </label>
+              </div>
+              <textarea 
+                required
+                className="deliv-white-textarea"
+                placeholder={isAr ? 'اسم الحي، الشارع، رقم العمارة، الإسماعيلية...' : 'District name, street name, building number, Ismailia...'}
+                value={deliveryAddress}
+                onChange={(e) => setDeliveryAddress(e.target.value)}
+              />
+            </div>
+
+            {/* Field 4: Optional Address Notes */}
+            <div className="deliv-field-group">
+              <div className="deliv-field-row-header">
+                <label className="deliv-field-label">
+                  {isAr ? 'ملاحظات إضافية للعنوان' : 'Optional Address Notes'}
+                </label>
+                <span className="deliv-field-hint">
+                  {isAr ? '(اختياري)' : '(Optional)'}
+                </span>
+              </div>
+              <div className="deliv-white-input-wrap">
+                <Building2 size={18} className="deliv-white-input-icon" />
+                <input 
+                  type="text" 
+                  className="deliv-white-input"
+                  placeholder={isAr ? 'رقم الشقة، الدور، علامة مميزة، كود البوابة...' : 'Apartment, floor, landmark, gate code...'}
+                  value={deliveryNotes}
+                  onChange={(e) => setDeliveryNotes(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Summary Box */}
+            <div className="deliv-summary-box">
+              <div className="deliv-summary-left">
+                <div className="deliv-summary-icon-box">
+                  <ShoppingBag size={22} color="#f59e0b" />
+                </div>
+                <div className="deliv-summary-text-col">
+                  <span className="deliv-summary-items-count">
+                    {totalItemsCount} {isAr ? 'عناصر في الطلب' : 'items in order'}
+                  </span>
+                  <span className="deliv-summary-pay-note">
+                    {isAr ? 'الدفع عند الاستلام • كاش أو فيزا' : 'Pay on arrival • Cash or Card'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="deliv-summary-right">
+                <span className="deliv-summary-due-label">
+                  {isAr ? 'المبلغ المستحق' : 'TOTAL DUE'}
+                </span>
+                <span className="deliv-summary-due-amount">
+                  {grandTotal.toFixed(2)} <span className="deliv-summary-egp">{isAr ? 'ج.م' : 'EGP'}</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Confirm Button */}
+            <button type="submit" className="deliv-confirm-btn">
+              <span>{isAr ? 'تأكيد الطلب ←' : 'Confirm Order →'}</span>
+            </button>
+
+            {/* Back to Cart Link */}
+            <button 
+              type="button" 
+              className="deliv-back-link"
+              onClick={() => {
+                setPageView('menu');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            >
+              <span>{isAr ? '← العودة إلى السلة' : '← Back to Cart'}</span>
+            </button>
+          </form>
+
+          {/* Footer note */}
+          <div className="deliv-footer-note">
+            <span className="deliv-footer-secure">
+              <ShieldCheck size={14} color="#00a9c3" />
+              <span>
+                {isAr 
+                  ? 'طلب آمن ومضمون 100% • محضر طازجاً في مطبخ أمريكان دريم' 
+                  : '100% secure order • Freshly prepared at American Dream Kitchen'}
+              </span>
+            </span>
+            <span className="deliv-footer-branch">
+              ISMAILIA CANAL PROMENADE BRANCH
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // VIEW 2: SUCCESS - ORDER CONFIRMATION
+  // -------------------------------------------------------------------------
+  if (pageView === 'success') {
+    return (
+      <div className={`deliv-checkout-wrapper ${isAr ? 'font-alexandria lang-ar' : 'lang-en'}`}>
+        <div className="deliv-success-card" dir={isAr ? 'rtl' : 'ltr'}>
+          {/* Top Badge Pill */}
+          <div className="deliv-badge-pill">
+            <span className="deliv-badge-dot">●</span>
+            <span className="deliv-badge-text">
+              <span className="deliv-badge-bolt">⚡</span> 35–45 MIN • ISMAILIA ZONE
+            </span>
+          </div>
+
+          <div className="deliv-success-check-badge">✓</div>
+
+          <h2 className="deliv-success-title">
+            {isAr ? 'تم استلام طلب التوصيل بنجاح!' : 'Order Placed Successfully!'}
+          </h2>
+
+          <p className="deliv-success-desc">
+            {isAr 
+              ? `شكراً لك يا ${deliveryFullName}! وجباتك بقيمة ${grandTotal.toFixed(2)} ج.م قيد التحضير في مطبخ أمريكان دريم الآن، وسيتصل بك الطيار فور انطلاقه.`
+              : `Thank you ${deliveryFullName}! Your fresh American Dream favorites (${grandTotal.toFixed(2)} EGP) are being prepared now and on the way.`}
+          </p>
+
+          <div className="deliv-tracking-code-pill">
+            <span className="deliv-tracking-label">{isAr ? 'كود تتبع الطلب:' : 'Order Tracking Code:'}</span>
+            <strong className="deliv-tracking-val">{orderTrackingCode}</strong>
+          </div>
+
+          {/* Items breakdown */}
+          <div className="deliv-success-breakdown">
+            {cartItems.map((item) => (
+              <div key={item.id} className="deliv-success-row">
+                <span>{item.qty}x {isAr ? item.nameAr : item.nameEn}</span>
+                <span>{item.lineTotal.toFixed(2)} {isAr ? 'ج.م' : 'EGP'}</span>
+              </div>
+            ))}
+            <div className="deliv-success-row grand">
+              <span>{isAr ? 'المجموع الكلي:' : 'Total Amount:'}</span>
+              <span style={{ color: '#fde047' }}>{grandTotal.toFixed(2)} {isAr ? 'ج.م' : 'EGP'}</span>
+            </div>
+          </div>
+
+          {/* WhatsApp Button */}
+          <button 
+            type="button" 
+            className="btn-whatsapp-order"
+            onClick={handleSendToWhatsApp}
+          >
+            <Share2 size={18} />
+            <span>{isAr ? 'إرسال الفاتورة للمطعم عبر واتساب' : 'Send Invoice to WhatsApp'}</span>
+          </button>
+
+          {/* Back to Menu Button */}
+          <button 
+            type="button" 
+            className="deliv-confirm-btn"
+            style={{ marginTop: '4px' }}
+            onClick={() => {
+              setPageView('menu');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          >
+            <span>{isAr ? 'العودة لقائمة المطعم' : 'Return to Restaurant Menu'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`delivery-order-page ${isAr ? 'rtl' : ''}`}>
@@ -697,8 +1040,9 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
             className="btn-proceed-checkout"
             disabled={cartItems.length === 0}
             onClick={() => {
-              setCheckoutStep('form');
-              setIsCheckoutModalOpen(true);
+              setPageView('checkout');
+              setCheckoutError('');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           >
             <img 
