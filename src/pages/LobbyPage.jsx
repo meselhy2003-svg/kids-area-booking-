@@ -1,5 +1,19 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import confetti from 'canvas-confetti';
+import { 
+  User, 
+  Phone, 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  X, 
+  ArrowRight, 
+  ArrowLeft, 
+  Check, 
+  Sparkles, 
+  Zap 
+} from 'lucide-react';
 import './LobbyPage.css';
 
 // 4 Hanging Attraction Signs (Corrected file paths matching public/photo/lobby/)
@@ -228,7 +242,178 @@ export default function LobbyPage({
     };
   }, []);
 
-  // Handle Sign Click: Golden celebratory feedback & navigation to page
+  // Auth Modal & Flow State (Sign In / Sign Up when clicking 4 signs)
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authTab, setAuthTab] = useState('login'); // 'login' | 'register'
+  const [pendingSign, setPendingSign] = useState(null);
+  const [authForm, setAuthForm] = useState({
+    identifier: '',
+    password: '',
+    name: '',
+    phone: '',
+    email: '',
+    confirmPassword: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [authError, setAuthError] = useState('');
+  const [authSuccessMsg, setAuthSuccessMsg] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
+
+  // Helper: check if client already has account / is logged in
+  const checkIsAuthenticated = () => {
+    try {
+      const status = localStorage.getItem('american_dream_user_logged_in');
+      if (status === 'true') return true;
+      const activeUser = localStorage.getItem('american_dream_active_user');
+      if (activeUser) {
+        const parsed = JSON.parse(activeUser);
+        if (parsed && parsed.id && parsed.id !== 'guest') return true;
+      }
+    } catch {
+      // ignore
+    }
+    return false;
+  };
+
+  // Sign In submit handler
+  const handleAuthLogin = (e) => {
+    e.preventDefault();
+    setAuthError('');
+
+    if (!authForm.identifier.trim() || !authForm.password.trim()) {
+      setAuthError(lang === 'ar' ? 'يرجى إدخال رقم الهاتف/البريد وكلمة المرور' : 'Please enter your phone/email and password');
+      return;
+    }
+
+    // Persist login state
+    localStorage.setItem('american_dream_user_logged_in', 'true');
+    const existingProfile = localStorage.getItem('american_dream_user_profile');
+    if (!existingProfile) {
+      localStorage.setItem('american_dream_user_profile', JSON.stringify({
+        name: authForm.identifier.includes('@') ? authForm.identifier.split('@')[0] : 'Ahmed Mohamed',
+        phone: authForm.identifier.includes('@') ? '+20 101 234 5678' : authForm.identifier,
+        email: authForm.identifier.includes('@') ? authForm.identifier : 'ahmed@americandream.com',
+        address: 'Canal Waterfront Road, Ferdan District, Ismailia',
+        gender: 'male',
+        passId: '#AD-84920',
+        memberSince: 'March 2027',
+        points: 1350,
+        storeCredit: 135.00
+      }));
+    }
+
+    playCoinSound();
+    try {
+      confetti({
+        particleCount: 90,
+        spread: 80,
+        origin: { y: 0.5 },
+        colors: ['#fde047', '#f59e0b', '#00a9c3', '#ffffff']
+      });
+    } catch {}
+
+    const targetTitle = pendingSign ? (lang === 'ar' ? pendingSign.titleAr : pendingSign.titleEn) : (lang === 'ar' ? 'الحديقة' : 'the park');
+    setAuthSuccessMsg(lang === 'ar' ? `تم تسجيل الدخول بنجاح! جاري نقلك إلى ${targetTitle}...` : `Signed in successfully! Redirecting to ${targetTitle}...`);
+
+    setTimeout(() => {
+      setShowAuthModal(false);
+      if (setActiveTab) {
+        setActiveTab(pendingSign ? pendingSign.tab : 'home');
+      }
+    }, 450);
+  };
+
+  // Sign Up submit handler
+  const handleAuthRegister = (e) => {
+    e.preventDefault();
+    setAuthError('');
+
+    if (!authForm.name.trim() || !authForm.phone.trim() || !authForm.password.trim()) {
+      setAuthError(lang === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill in all required fields');
+      return;
+    }
+
+    if (authForm.password !== authForm.confirmPassword) {
+      setAuthError(lang === 'ar' ? 'كلمة المرور وتأكيدها غير متطابقين' : 'Passwords do not match');
+      return;
+    }
+
+    // Persist registered profile
+    localStorage.setItem('american_dream_user_logged_in', 'true');
+    localStorage.setItem('american_dream_user_profile', JSON.stringify({
+      name: authForm.name.trim(),
+      phone: authForm.phone.trim(),
+      email: authForm.email.trim() || 'member@americandream.com',
+      address: 'Canal Waterfront Road, Ferdan District, Ismailia',
+      gender: 'male',
+      passId: `#AD-${Math.floor(10000 + Math.random() * 90000)}`,
+      memberSince: 'October 2026',
+      points: 500, // Welcome bonus points!
+      storeCredit: 50.00
+    }));
+
+    playCoinSound();
+    try {
+      confetti({
+        particleCount: 110,
+        spread: 90,
+        origin: { y: 0.5 },
+        colors: ['#fde047', '#f59e0b', '#00a9c3', '#10b981', '#ffffff']
+      });
+    } catch {}
+
+    const targetTitle = pendingSign ? (lang === 'ar' ? pendingSign.titleAr : pendingSign.titleEn) : (lang === 'ar' ? 'الحديقة' : 'the park');
+    setAuthSuccessMsg(lang === 'ar' ? `مرحباً بك ${authForm.name}! تم إنشاء حسابك بنجاح وجاري نقلك إلى ${targetTitle}...` : `Welcome ${authForm.name}! Account created! Redirecting to ${targetTitle}...`);
+
+    setTimeout(() => {
+      setShowAuthModal(false);
+      if (setActiveTab) {
+        setActiveTab(pendingSign ? pendingSign.tab : 'home');
+      }
+    }, 500);
+  };
+
+  // Quick Demo Login (Ahmed Account)
+  const handleQuickDemoLogin = () => {
+    localStorage.setItem('american_dream_user_logged_in', 'true');
+    localStorage.setItem('american_dream_user_profile', JSON.stringify({
+      name: 'Ahmed Mohamed',
+      phone: '+20 101 234 5678',
+      email: 'ahmed@americandream.com',
+      address: 'Canal Waterfront Road, Ferdan District, Ismailia',
+      gender: 'male',
+      passId: '#AD-84920',
+      memberSince: 'March 2027',
+      points: 1350,
+      storeCredit: 135.00
+    }));
+
+    playCoinSound();
+    try {
+      confetti({ particleCount: 80, spread: 75, origin: { y: 0.5 } });
+    } catch {}
+
+    const targetTitle = pendingSign ? (lang === 'ar' ? pendingSign.titleAr : pendingSign.titleEn) : (lang === 'ar' ? 'الحديقة' : 'the park');
+    setAuthSuccessMsg(lang === 'ar' ? `مرحباً بعودتك أحمد! جاري نقلك إلى ${targetTitle}...` : `Welcome back Ahmed! Redirecting to ${targetTitle}...`);
+
+    setTimeout(() => {
+      setShowAuthModal(false);
+      if (setActiveTab) {
+        setActiveTab(pendingSign ? pendingSign.tab : 'home');
+      }
+    }, 400);
+  };
+
+  // Continue as Guest handler
+  const handleContinueAsGuest = () => {
+    playCoinSound();
+    setShowAuthModal(false);
+    if (setActiveTab) {
+      setActiveTab(pendingSign ? pendingSign.tab : 'home');
+    }
+  };
+
+  // Handle Sign Click: Golden celebratory feedback & auth check
   const handleSignClick = (sign) => {
     setActiveSignHit(sign.id);
     setShowCoinSign(sign.id);
@@ -249,11 +434,23 @@ export default function LobbyPage({
       triggerMarioJump(sign.id);
     }
 
-    setTimeout(() => {
-      if (setActiveTab) {
-        setActiveTab(sign.tab);
-      }
-    }, 320);
+    // Check if client is already authenticated
+    const hasAccount = checkIsAuthenticated();
+    if (hasAccount) {
+      setTimeout(() => {
+        if (setActiveTab) {
+          setActiveTab(sign.tab);
+        }
+      }, 320);
+    } else {
+      setPendingSign(sign);
+      setAuthError('');
+      setAuthSuccessMsg('');
+      setTimeout(() => {
+        setShowAuthModal(true);
+        setAuthTab('login');
+      }, 350);
+    }
   };
 
   // Direct entry to main park home page
@@ -268,11 +465,28 @@ export default function LobbyPage({
     } catch {
       // ignore
     }
-    setTimeout(() => {
-      if (setActiveTab) {
-        setActiveTab('home');
-      }
-    }, 280);
+
+    const hasAccount = checkIsAuthenticated();
+    if (hasAccount) {
+      setTimeout(() => {
+        if (setActiveTab) {
+          setActiveTab('home');
+        }
+      }, 280);
+    } else {
+      setPendingSign({
+        id: 'home',
+        tab: 'home',
+        titleAr: 'حديقة أمريكان دريم',
+        titleEn: 'American Dream Park'
+      });
+      setAuthError('');
+      setAuthSuccessMsg('');
+      setTimeout(() => {
+        setShowAuthModal(true);
+        setAuthTab('login');
+      }, 320);
+    }
   };
 
   return (
@@ -386,6 +600,314 @@ export default function LobbyPage({
           <div className="character-ground-shadow" />
         </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* AUTH GATEWAY MODAL (SIGN IN / SIGN UP WHEN CLICKING 4 SIGNS) */}
+      {/* ========================================================================= */}
+      {showAuthModal && (
+        <div 
+          className="lobby-auth-backdrop" 
+          onClick={() => setShowAuthModal(false)}
+        >
+          <div 
+            className="lobby-auth-card" 
+            onClick={(e) => e.stopPropagation()}
+            dir={lang === 'ar' ? 'rtl' : 'ltr'}
+          >
+            {/* Header */}
+            <div className="lobby-auth-header">
+              <div className="lobby-auth-logo-row">
+                <img 
+                  src="/photo/logo/logo nav bar and footer.png" 
+                  alt="American Dream" 
+                  className="lobby-auth-logo"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+                <h3 className="lobby-auth-title">
+                  {lang === 'ar' ? 'بوابة دخول أمريكان دريم' : 'American Dream Gateway'}
+                </h3>
+              </div>
+              <button 
+                type="button" 
+                className="lobby-auth-close-btn"
+                onClick={() => setShowAuthModal(false)}
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Destination Pill */}
+            {pendingSign && (
+              <div className="lobby-auth-destination-pill">
+                <Sparkles size={16} color="#fde047" />
+                <span>
+                  {lang === 'ar' ? 'الوجهة المختارة:' : 'Selected Destination:'}{' '}
+                  <strong>{lang === 'ar' ? pendingSign.titleAr : pendingSign.titleEn}</strong>
+                </span>
+              </div>
+            )}
+
+            {/* Tabs: Sign In / Sign Up */}
+            <div className="lobby-auth-tabs">
+              <button 
+                type="button"
+                className={`lobby-auth-tab-btn ${authTab === 'login' ? 'active' : ''}`}
+                onClick={() => { setAuthTab('login'); setAuthError(''); }}
+              >
+                {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+              </button>
+              <button 
+                type="button"
+                className={`lobby-auth-tab-btn ${authTab === 'register' ? 'active' : ''}`}
+                onClick={() => { setAuthTab('register'); setAuthError(''); }}
+              >
+                {lang === 'ar' ? 'إنشاء حساب جديد' : 'Sign Up'}
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="lobby-auth-body">
+              {/* Error Message */}
+              {authError && (
+                <div className="lobby-auth-error">
+                  <span>⚠️</span>
+                  <span>{authError}</span>
+                </div>
+              )}
+
+              {/* Success Message */}
+              {authSuccessMsg && (
+                <div className="lobby-auth-success">
+                  <Check size={18} />
+                  <span>{authSuccessMsg}</span>
+                </div>
+              )}
+
+              {/* TAB 1: SIGN IN */}
+              {authTab === 'login' && (
+                <form onSubmit={handleAuthLogin} className="lobby-auth-form">
+                  {/* Phone or Email */}
+                  <div className="lobby-auth-field-group">
+                    <label className="lobby-auth-label">
+                      {lang === 'ar' ? 'رقم الهاتف أو البريد الإلكتروني:' : 'Phone or Email:'}
+                    </label>
+                    <div className="lobby-auth-input-wrap">
+                      <User size={18} className="lobby-auth-input-icon" />
+                      <input 
+                        type="text" 
+                        required
+                        className="lobby-auth-input"
+                        placeholder={lang === 'ar' ? '01012345678 أو البريد' : '01012345678 or email'}
+                        value={authForm.identifier}
+                        onChange={(e) => setAuthForm(prev => ({ ...prev, identifier: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Password */}
+                  <div className="lobby-auth-field-group">
+                    <label className="lobby-auth-label">
+                      {lang === 'ar' ? 'كلمة المرور:' : 'Password:'}
+                    </label>
+                    <div className="lobby-auth-input-wrap">
+                      <Lock size={18} className="lobby-auth-input-icon" />
+                      <input 
+                        type={showPassword ? 'text' : 'password'} 
+                        required
+                        className="lobby-auth-input"
+                        placeholder={lang === 'ar' ? '••••••••' : '••••••••'}
+                        value={authForm.password}
+                        onChange={(e) => setAuthForm(prev => ({ ...prev, password: e.target.value }))}
+                      />
+                      <button 
+                        type="button" 
+                        className="lobby-auth-eye-btn"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button type="submit" className="lobby-auth-submit-btn">
+                    <span>
+                      {lang === 'ar' 
+                        ? `دخول ومتابعة إلى ${pendingSign ? pendingSign.titleShortAr || pendingSign.titleAr : 'الحديقة'}` 
+                        : `Sign In & Continue to ${pendingSign ? pendingSign.titleShortEn || pendingSign.titleEn : 'Park'}`}
+                    </span>
+                    {lang === 'ar' ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
+                  </button>
+
+                  {/* Quick Demo Login */}
+                  <button 
+                    type="button" 
+                    className="lobby-auth-demo-btn"
+                    onClick={handleQuickDemoLogin}
+                  >
+                    <Zap size={15} />
+                    <span>{lang === 'ar' ? '⚡ تجربة سريعة كـ أحمد (Demo Account)' : '⚡ Quick Demo Login (Ahmed)'}</span>
+                  </button>
+
+                  {/* Switch to Sign Up */}
+                  <div className="lobby-auth-switch-text">
+                    <span>{lang === 'ar' ? 'ليس لديك حساب؟' : "Don't have an account?"}</span>{' '}
+                    <button 
+                      type="button" 
+                      className="lobby-auth-switch-link"
+                      onClick={() => { setAuthTab('register'); setAuthError(''); }}
+                    >
+                      {lang === 'ar' ? 'أنشئ حسابك الآن' : 'Sign Up now'}
+                    </button>
+                  </div>
+
+                  {/* Guest Continue */}
+                  <button 
+                    type="button" 
+                    className="lobby-auth-guest-btn"
+                    onClick={handleContinueAsGuest}
+                  >
+                    {lang === 'ar' ? 'المتابعة كزائر دون تسجيل حساب ←' : 'Continue as Guest without account →'}
+                  </button>
+                </form>
+              )}
+
+              {/* TAB 2: SIGN UP */}
+              {authTab === 'register' && (
+                <form onSubmit={handleAuthRegister} className="lobby-auth-form">
+                  {/* Name */}
+                  <div className="lobby-auth-field-group">
+                    <label className="lobby-auth-label">
+                      {lang === 'ar' ? 'الاسم الكامل:' : 'Full Name:'}
+                    </label>
+                    <div className="lobby-auth-input-wrap">
+                      <User size={18} className="lobby-auth-input-icon" />
+                      <input 
+                        type="text" 
+                        required
+                        className="lobby-auth-input"
+                        placeholder={lang === 'ar' ? 'مثال: أحمد محمد' : 'e.g. Ahmed Mohamed'}
+                        value={authForm.name}
+                        onChange={(e) => setAuthForm(prev => ({ ...prev, name: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="lobby-auth-field-group">
+                    <label className="lobby-auth-label">
+                      {lang === 'ar' ? 'رقم الهاتف:' : 'Phone Number:'}
+                    </label>
+                    <div className="lobby-auth-input-wrap">
+                      <Phone size={18} className="lobby-auth-input-icon" />
+                      <input 
+                        type="tel" 
+                        required
+                        className="lobby-auth-input"
+                        placeholder="+20 101 234 5678"
+                        value={authForm.phone}
+                        onChange={(e) => setAuthForm(prev => ({ ...prev, phone: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="lobby-auth-field-group">
+                    <label className="lobby-auth-label">
+                      {lang === 'ar' ? 'البريد الإلكتروني (اختياري):' : 'Email (Optional):'}
+                    </label>
+                    <div className="lobby-auth-input-wrap">
+                      <Mail size={18} className="lobby-auth-input-icon" />
+                      <input 
+                        type="email" 
+                        className="lobby-auth-input"
+                        placeholder="user@example.com"
+                        value={authForm.email}
+                        onChange={(e) => setAuthForm(prev => ({ ...prev, email: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Password */}
+                  <div className="lobby-auth-field-group">
+                    <label className="lobby-auth-label">
+                      {lang === 'ar' ? 'كلمة المرور:' : 'Password:'}
+                    </label>
+                    <div className="lobby-auth-input-wrap">
+                      <Lock size={18} className="lobby-auth-input-icon" />
+                      <input 
+                        type={showPassword ? 'text' : 'password'} 
+                        required
+                        className="lobby-auth-input"
+                        placeholder={lang === 'ar' ? '••••••••' : '••••••••'}
+                        value={authForm.password}
+                        onChange={(e) => setAuthForm(prev => ({ ...prev, password: e.target.value }))}
+                      />
+                      <button 
+                        type="button" 
+                        className="lobby-auth-eye-btn"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Confirm Password */}
+                  <div className="lobby-auth-field-group">
+                    <label className="lobby-auth-label">
+                      {lang === 'ar' ? 'تأكيد كلمة المرور:' : 'Confirm Password:'}
+                    </label>
+                    <div className="lobby-auth-input-wrap">
+                      <Lock size={18} className="lobby-auth-input-icon" />
+                      <input 
+                        type={showPassword ? 'text' : 'password'} 
+                        required
+                        className="lobby-auth-input"
+                        placeholder={lang === 'ar' ? '••••••••' : '••••••••'}
+                        value={authForm.confirmPassword}
+                        onChange={(e) => setAuthForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button type="submit" className="lobby-auth-submit-btn">
+                    <span>
+                      {lang === 'ar' 
+                        ? `إنشاء حساب ومتابعة إلى ${pendingSign ? pendingSign.titleShortAr || pendingSign.titleAr : 'الحديقة'}` 
+                        : `Sign Up & Continue to ${pendingSign ? pendingSign.titleShortEn || pendingSign.titleEn : 'Park'}`}
+                    </span>
+                    {lang === 'ar' ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
+                  </button>
+
+                  {/* Switch to Sign In */}
+                  <div className="lobby-auth-switch-text">
+                    <span>{lang === 'ar' ? 'لديك حساب بالفعل؟' : 'Already have an account?'}</span>{' '}
+                    <button 
+                      type="button" 
+                      className="lobby-auth-switch-link"
+                      onClick={() => { setAuthTab('login'); setAuthError(''); }}
+                    >
+                      {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+                    </button>
+                  </div>
+
+                  {/* Guest Continue */}
+                  <button 
+                    type="button" 
+                    className="lobby-auth-guest-btn"
+                    onClick={handleContinueAsGuest}
+                  >
+                    {lang === 'ar' ? 'المتابعة كزائر دون تسجيل حساب ←' : 'Continue as Guest without account →'}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
