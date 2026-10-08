@@ -180,16 +180,33 @@
 }
 
 .desktop-nav-user-name {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 750;
   color: #ffffff;
 }
 
-.desktop-nav-user-avatar {
+.desktop-nav-user-icon-wrap {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.desktop-nav-user-svg {
   width: 24px;
   height: 24px;
-  border-radius: 50%;
-  object-fit: cover;
+  stroke: #00c5de;
+  transition: stroke 0.2s ease;
+}
+
+.desktop-nav-user-pill:hover .desktop-nav-user-svg {
+  stroke: #38bdf8;
+}
+
+.desktop-nav-user-pill.active .desktop-nav-user-svg {
+  stroke: #012b32;
 }
 
 /* Floating 2250 pts Badge right beneath navbar */

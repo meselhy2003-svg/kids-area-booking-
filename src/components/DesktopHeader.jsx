@@ -153,17 +153,23 @@ export default function DesktopHeader({
           <button 
             className={`desktop-nav-user-pill ${activeTab === 'profile' ? 'active' : ''}`}
             onClick={() => setActiveTab('profile')}
-            title={t.nav.profileName}
+            aria-label={t.nav.profileName}
           >
             <span className="desktop-nav-user-name">{t.nav.profileName}</span>
-            <img 
-              src="/photo/profile/ahmed-avatar-overview.png" 
-              alt="Avatar" 
-              className="desktop-nav-user-avatar" 
-              onError={(e) => {
-                e.currentTarget.src = '/photo/kid area pic/icon/Symbol.png';
-              }}
-            />
+            <span className="desktop-nav-user-icon-wrap">
+              <svg 
+                className="desktop-nav-user-svg" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                strokeWidth="2.2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <circle cx="12" cy="10" r="3.2" />
+                <path d="M7 20.662V19a2.5 2.5 0 0 1 2.5-2.5h5a2.5 2.5 0 0 1 2.5 2.5v1.662" />
+              </svg>
+            </span>
           </button>
 
           {/* About us Button */}
