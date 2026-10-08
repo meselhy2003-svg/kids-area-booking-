@@ -12,7 +12,11 @@ import {
   ArrowLeft, 
   Check, 
   Sparkles, 
-  Zap 
+  Zap,
+  Calendar,
+  Plus,
+  Trash2,
+  Users
 } from 'lucide-react';
 import './LobbyPage.css';
 
@@ -72,6 +76,7 @@ export default function LobbyPage({
 }) {
   // Animation & Interactive States
   const [isJumping, setIsJumping] = useState(false);
+  const [isBoyJumping, setIsBoyJumping] = useState(false);
   const [girlPose, setGirlPose] = useState('idle'); // 'idle' | 'jumping'
   const [activeSignHit, setActiveSignHit] = useState(null);
   const [showCoinSign, setShowCoinSign] = useState(null);
@@ -79,6 +84,7 @@ export default function LobbyPage({
 
   // Timeouts ref to prevent race conditions
   const animTimeoutRef = useRef(null);
+  const boyAnimTimeoutRef = useRef(null);
   const hitTimeoutRef = useRef(null);
   const audioCtxRef = useRef(null);
 
@@ -234,10 +240,36 @@ export default function LobbyPage({
     }, 950);
   }, [isJumping, playJumpSound, playCoinSound]);
 
+  // Trigger Boy Jump sequence
+  const triggerBoyJump = useCallback(() => {
+    if (isBoyJumping) return;
+    setIsBoyJumping(true);
+    playJumpSound();
+    playCoinSound();
+    try {
+      confetti({
+        particleCount: 26,
+        spread: 50,
+        startVelocity: 16,
+        ticks: 45,
+        origin: { x: 0.85, y: 0.45 },
+        colors: ['#38bdf8', '#0284c7', '#fde047', '#ffffff'],
+        shapes: ['circle']
+      });
+    } catch {
+      // ignore
+    }
+
+    boyAnimTimeoutRef.current = setTimeout(() => {
+      setIsBoyJumping(false);
+    }, 950);
+  }, [isBoyJumping, playJumpSound, playCoinSound]);
+
   // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
       if (animTimeoutRef.current) clearTimeout(animTimeoutRef.current);
+      if (boyAnimTimeoutRef.current) clearTimeout(boyAnimTimeoutRef.current);
       if (hitTimeoutRef.current) clearTimeout(hitTimeoutRef.current);
     };
   }, []);
@@ -246,18 +278,50 @@ export default function LobbyPage({
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authTab, setAuthTab] = useState('login'); // 'login' | 'register'
   const [pendingSign, setPendingSign] = useState(null);
-  const [authForm, setAuthForm] = useState({
-    identifier: '',
-    password: '',
+
+  // Guest Registration Form (strictly matches backend Mongoose guestSchema)
+  const [guestForm, setGuestForm] = useState({
     name: '',
     phone: '',
-    email: '',
-    confirmPassword: ''
+    age: '',
+    gender: 'male', // 'male' | 'female'
+    children: [] // array of { name: '', age: '', gender: 'female' }
   });
-  const [showPassword, setShowPassword] = useState(false);
+
+  // Login Phone State (Unique identifier in guestSchema)
+  const [loginPhone, setLoginPhone] = useState('');
   const [authError, setAuthError] = useState('');
   const [authSuccessMsg, setAuthSuccessMsg] = useState('');
-  const [rememberMe, setRememberMe] = useState(true);
+
+  // Children management helpers
+  const handleAddChild = () => {
+    setGuestForm(prev => ({
+      ...prev,
+      children: [
+        ...prev.children,
+        { name: '', age: '', gender: 'female' }
+      ]
+    }));
+  };
+
+  const handleRemoveChild = (index) => {
+    setGuestForm(prev => ({
+      ...prev,
+      children: prev.children.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleUpdateChild = (index, field, value) => {
+    setGuestForm(prev => ({
+      ...prev,
+      children: prev.children.map((child, i) => {
+        if (i === index) {
+          return { ...child, [field]: value };
+        }
+        return child;
+      })
+    }));
+  };
 
   // Helper: check if client already has account / is logged in
   const checkIsAuthenticated = () => {
@@ -267,7 +331,7 @@ export default function LobbyPage({
       const activeUser = localStorage.getItem('american_dream_active_user');
       if (activeUser) {
         const parsed = JSON.parse(activeUser);
-        if (parsed && parsed.id && parsed.id !== 'guest') return true;
+        if (parsed && (parsed.id || parsed.phone) && parsed.id !== 'guest') return true;
       }
     } catch {
       // ignore
@@ -275,32 +339,85 @@ export default function LobbyPage({
     return false;
   };
 
-  // Sign In submit handler
+  // Sign In submit handler (Authenticates uniquely by phone)
   const handleAuthLogin = (e) => {
     e.preventDefault();
     setAuthError('');
 
-    if (!authForm.identifier.trim() || !authForm.password.trim()) {
-      setAuthError(lang === 'ar' ? 'يرجى إدخال رقم الهاتف/البريد وكلمة المرور' : 'Please enter your phone/email and password');
+    const cleanPhone = loginPhone.trim();
+    if (!cleanPhone) {
+      setAuthError(lang === 'ar' ? 'يرجى إدخال رقم الهاتف المسجل' : 'Please enter your registered phone number');
       return;
     }
 
+    // Check existing registered guests in localStorage
+    let guestFound = null;
+    try {
+      const registered = JSON.parse(localStorage.getItem('american_dream_registered_guests') || '[]');
+      guestFound = registered.find(g => 
+        g.phone && g.phone.replace(/[^0-9]/g, '') === cleanPhone.replace(/[^0-9]/g, '')
+      );
+    } catch (err) {
+      console.warn('Error reading registered guests:', err);
+    }
+
+    // If not found in registered guests, check existing profile or create a recognized profile
+    if (!guestFound) {
+      const existingProfile = localStorage.getItem('american_dream_user_profile');
+      if (existingProfile) {
+        try {
+          const parsed = JSON.parse(existingProfile);
+          if (parsed && parsed.phone && parsed.phone.replace(/[^0-9]/g, '') === cleanPhone.replace(/[^0-9]/g, '')) {
+            guestFound = parsed;
+          }
+        } catch {}
+      }
+    }
+
+    const guestData = guestFound || {
+      name: cleanPhone.includes('1012345678') ? 'Ahmed Mohamed' : `ضيف كريم (${cleanPhone.slice(-4)})`,
+      phone: cleanPhone,
+      age: '30',
+      gender: 'male',
+      children: []
+    };
+
     // Persist login state
     localStorage.setItem('american_dream_user_logged_in', 'true');
-    const existingProfile = localStorage.getItem('american_dream_user_profile');
-    if (!existingProfile) {
-      localStorage.setItem('american_dream_user_profile', JSON.stringify({
-        name: authForm.identifier.includes('@') ? authForm.identifier.split('@')[0] : 'Ahmed Mohamed',
-        phone: authForm.identifier.includes('@') ? '+20 101 234 5678' : authForm.identifier,
-        email: authForm.identifier.includes('@') ? authForm.identifier : 'ahmed@americandream.com',
-        address: 'Canal Waterfront Road, Ferdan District, Ismailia',
-        gender: 'male',
-        passId: '#AD-84920',
-        memberSince: 'March 2027',
-        points: 1350,
-        storeCredit: 135.00
-      }));
+    localStorage.setItem('american_dream_user_profile', JSON.stringify({
+      name: guestData.name,
+      phone: guestData.phone,
+      age: guestData.age || '30',
+      gender: guestData.gender || 'male',
+      email: `${guestData.phone.replace(/[^0-9]/g, '')}@americandream.com`,
+      address: 'Canal Waterfront Road, Ferdan District, Ismailia',
+      passId: guestData.passId || `#AD-${Math.floor(10000 + Math.random() * 90000)}`,
+      memberSince: guestData.memberSince || 'October 2026',
+      points: guestData.points || 1350,
+      storeCredit: guestData.storeCredit || 135.00
+    }));
+
+    if (guestData.children && guestData.children.length > 0) {
+      localStorage.setItem('american_dream_user_children', JSON.stringify(
+        guestData.children.map((c, i) => ({
+          id: c.id || c._id || `child-${i + 1}`,
+          name: c.name,
+          age: c.age,
+          gender: c.gender,
+          wristband: c.wristband || `#WB-${1000 + i}`
+        }))
+      ));
     }
+
+    localStorage.setItem('american_dream_active_user', JSON.stringify({
+      id: 'guest-' + (guestData.phone.replace(/[^0-9]/g, '') || Date.now()),
+      name: guestData.name,
+      phone: guestData.phone,
+      age: guestData.age,
+      gender: guestData.gender,
+      children: guestData.children || [],
+      points: 1350
+    }));
 
     playCoinSound();
     try {
@@ -313,7 +430,7 @@ export default function LobbyPage({
     } catch {}
 
     const targetTitle = pendingSign ? (lang === 'ar' ? pendingSign.titleAr : pendingSign.titleEn) : (lang === 'ar' ? 'الحديقة' : 'the park');
-    setAuthSuccessMsg(lang === 'ar' ? `تم تسجيل الدخول بنجاح! جاري نقلك إلى ${targetTitle}...` : `Signed in successfully! Redirecting to ${targetTitle}...`);
+    setAuthSuccessMsg(lang === 'ar' ? `مرحباً بك ${guestData.name}! تم تسجيل الدخول بنجاح، جاري نقلك إلى ${targetTitle}...` : `Welcome ${guestData.name}! Signed in successfully, redirecting to ${targetTitle}...`);
 
     setTimeout(() => {
       setShowAuthModal(false);
@@ -323,33 +440,103 @@ export default function LobbyPage({
     }, 450);
   };
 
-  // Sign Up submit handler
+  // Sign Up submit handler (Validates & saves guestSchema: name, phone, age, gender, children)
   const handleAuthRegister = (e) => {
     e.preventDefault();
     setAuthError('');
 
-    if (!authForm.name.trim() || !authForm.phone.trim() || !authForm.password.trim()) {
-      setAuthError(lang === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill in all required fields');
+    // Validate required parent / guest fields
+    if (!guestForm.name.trim()) {
+      setAuthError(lang === 'ar' ? 'يرجى إدخال اسم الضيف' : 'Please enter guest name');
+      return;
+    }
+    if (!guestForm.phone.trim()) {
+      setAuthError(lang === 'ar' ? 'يرجى إدخال رقم الهاتف' : 'Please enter phone number');
+      return;
+    }
+    if (!guestForm.age || !String(guestForm.age).trim()) {
+      setAuthError(lang === 'ar' ? 'يرجى إدخال العمر' : 'Please enter age');
+      return;
+    }
+    if (!guestForm.gender) {
+      setAuthError(lang === 'ar' ? 'يرجى اختيار النوع (ذكر / أنثى)' : 'Please select gender');
       return;
     }
 
-    if (authForm.password !== authForm.confirmPassword) {
-      setAuthError(lang === 'ar' ? 'كلمة المرور وتأكيدها غير متطابقين' : 'Passwords do not match');
-      return;
+    // Validate children if any added
+    for (let i = 0; i < guestForm.children.length; i++) {
+      const child = guestForm.children[i];
+      if (!child.name.trim() || !child.age || !String(child.age).trim()) {
+        setAuthError(
+          lang === 'ar' 
+            ? `يرجى إكمال بيانات الطفل رقم (${i + 1}) أو حذفه` 
+            : `Please fill details for child #${i + 1} or remove it`
+        );
+        return;
+      }
     }
 
-    // Persist registered profile
+    // Construct full Guest document strictly matching mongoose guestSchema
+    const newGuest = {
+      _id: 'guest_' + Date.now(),
+      name: guestForm.name.trim(),
+      phone: guestForm.phone.trim(),
+      age: String(guestForm.age).trim(),
+      gender: guestForm.gender, // 'male' | 'female'
+      children: guestForm.children.map((c, idx) => ({
+        _id: `child_${Date.now()}_${idx}`,
+        name: c.name.trim(),
+        age: String(c.age).trim(),
+        gender: c.gender || 'male',
+        wristband: `#WB-${Math.floor(1000 + Math.random() * 9000)}`
+      })),
+      createdAt: new Date().toISOString()
+    };
+
+    // Store in registered guests collection
+    try {
+      const existing = JSON.parse(localStorage.getItem('american_dream_registered_guests') || '[]');
+      const filtered = existing.filter(g => g.phone !== newGuest.phone);
+      filtered.push(newGuest);
+      localStorage.setItem('american_dream_registered_guests', JSON.stringify(filtered));
+    } catch {}
+
+    // Persist active logged in state
     localStorage.setItem('american_dream_user_logged_in', 'true');
     localStorage.setItem('american_dream_user_profile', JSON.stringify({
-      name: authForm.name.trim(),
-      phone: authForm.phone.trim(),
-      email: authForm.email.trim() || 'member@americandream.com',
+      id: newGuest._id,
+      name: newGuest.name,
+      phone: newGuest.phone,
+      age: newGuest.age,
+      gender: newGuest.gender,
+      email: `${newGuest.phone.replace(/[^0-9]/g, '')}@americandream.com`,
       address: 'Canal Waterfront Road, Ferdan District, Ismailia',
-      gender: 'male',
       passId: `#AD-${Math.floor(10000 + Math.random() * 90000)}`,
       memberSince: 'October 2026',
       points: 500, // Welcome bonus points!
       storeCredit: 50.00
+    }));
+
+    // Persist children list for instant sync with DesktopProfilePage and Booking flow
+    localStorage.setItem('american_dream_user_children', JSON.stringify(
+      newGuest.children.map((c) => ({
+        id: c._id,
+        name: c.name,
+        age: c.age,
+        gender: c.gender,
+        wristband: c.wristband
+      }))
+    ));
+
+    // Active user for topbars & headers
+    localStorage.setItem('american_dream_active_user', JSON.stringify({
+      id: newGuest._id,
+      name: newGuest.name,
+      phone: newGuest.phone,
+      age: newGuest.age,
+      gender: newGuest.gender,
+      children: newGuest.children,
+      points: 500
     }));
 
     playCoinSound();
@@ -363,7 +550,7 @@ export default function LobbyPage({
     } catch {}
 
     const targetTitle = pendingSign ? (lang === 'ar' ? pendingSign.titleAr : pendingSign.titleEn) : (lang === 'ar' ? 'الحديقة' : 'the park');
-    setAuthSuccessMsg(lang === 'ar' ? `مرحباً بك ${authForm.name}! تم إنشاء حسابك بنجاح وجاري نقلك إلى ${targetTitle}...` : `Welcome ${authForm.name}! Account created! Redirecting to ${targetTitle}...`);
+    setAuthSuccessMsg(lang === 'ar' ? `مرحباً بك ${newGuest.name}! تم تسجيل حسابك بنجاح وجاري نقلك إلى ${targetTitle}...` : `Welcome ${newGuest.name}! Account created! Redirecting to ${targetTitle}...`);
 
     setTimeout(() => {
       setShowAuthModal(false);
@@ -373,19 +560,56 @@ export default function LobbyPage({
     }, 500);
   };
 
-  // Quick Demo Login (Ahmed Account)
+  // Quick Demo Login (Ahmed Mohamed Account)
   const handleQuickDemoLogin = () => {
-    localStorage.setItem('american_dream_user_logged_in', 'true');
-    localStorage.setItem('american_dream_user_profile', JSON.stringify({
+    const demoGuest = {
+      _id: 'guest_demo_ahmed',
       name: 'Ahmed Mohamed',
       phone: '+20 101 234 5678',
+      age: '34',
+      gender: 'male',
+      children: [
+        {
+          _id: 'child_demo_leila',
+          name: 'ليلى أحمد',
+          age: '7',
+          gender: 'female',
+          wristband: '#KW-01'
+        }
+      ]
+    };
+
+    localStorage.setItem('american_dream_user_logged_in', 'true');
+    localStorage.setItem('american_dream_user_profile', JSON.stringify({
+      id: demoGuest._id,
+      name: demoGuest.name,
+      phone: demoGuest.phone,
+      age: demoGuest.age,
+      gender: demoGuest.gender,
       email: 'ahmed@americandream.com',
       address: 'Canal Waterfront Road, Ferdan District, Ismailia',
-      gender: 'male',
       passId: '#AD-84920',
       memberSince: 'March 2027',
       points: 1350,
       storeCredit: 135.00
+    }));
+    localStorage.setItem('american_dream_user_children', JSON.stringify([
+      {
+        id: 'child-1',
+        name: 'Leila Ahmed',
+        gender: 'female',
+        age: 7,
+        wristband: '#KW-01'
+      }
+    ]));
+    localStorage.setItem('american_dream_active_user', JSON.stringify({
+      id: demoGuest._id,
+      name: demoGuest.name,
+      phone: demoGuest.phone,
+      age: demoGuest.age,
+      gender: demoGuest.gender,
+      children: demoGuest.children,
+      points: 1350
     }));
 
     playCoinSound();
@@ -584,8 +808,11 @@ export default function LobbyPage({
 
         {/* BOY CHARACTER (Bottom-Right) Waving & Welcoming */}
         <div 
-          className="boy-character-anchor"
-          onClick={handleEnterPark}
+          className={`boy-character-anchor ${isBoyJumping ? 'jumping' : ''}`}
+          onClick={() => {
+            triggerBoyJump();
+            handleEnterPark();
+          }}
           style={{ cursor: 'pointer', pointerEvents: 'auto' }}
           title={lang === 'ar' ? 'اضغط للدخول إلى الحديقة' : 'Click to enter the park'}
         >
@@ -687,48 +914,38 @@ export default function LobbyPage({
               {/* TAB 1: SIGN IN */}
               {authTab === 'login' && (
                 <form onSubmit={handleAuthLogin} className="lobby-auth-form">
-                  {/* Phone or Email */}
+                  {/* Registered Phone */}
                   <div className="lobby-auth-field-group">
                     <label className="lobby-auth-label">
-                      {lang === 'ar' ? 'رقم الهاتف أو البريد الإلكتروني:' : 'Phone or Email:'}
+                      {lang === 'ar' ? 'رقم الهاتف المسجل:' : 'Registered Phone Number:'}
                     </label>
                     <div className="lobby-auth-input-wrap">
-                      <User size={18} className="lobby-auth-input-icon" />
+                      <Phone size={18} className="lobby-auth-input-icon" />
                       <input 
-                        type="text" 
+                        type="tel" 
                         required
                         className="lobby-auth-input"
-                        placeholder={lang === 'ar' ? '01012345678 أو البريد' : '01012345678 or email'}
-                        value={authForm.identifier}
-                        onChange={(e) => setAuthForm(prev => ({ ...prev, identifier: e.target.value }))}
+                        placeholder={lang === 'ar' ? '01012345678 أو +20...' : '01012345678 or +20...'}
+                        value={loginPhone}
+                        onChange={(e) => setLoginPhone(e.target.value)}
+                        autoFocus
                       />
                     </div>
                   </div>
 
-                  {/* Password */}
-                  <div className="lobby-auth-field-group">
-                    <label className="lobby-auth-label">
-                      {lang === 'ar' ? 'كلمة المرور:' : 'Password:'}
-                    </label>
-                    <div className="lobby-auth-input-wrap">
-                      <Lock size={18} className="lobby-auth-input-icon" />
-                      <input 
-                        type={showPassword ? 'text' : 'password'} 
-                        required
-                        className="lobby-auth-input"
-                        placeholder={lang === 'ar' ? '••••••••' : '••••••••'}
-                        value={authForm.password}
-                        onChange={(e) => setAuthForm(prev => ({ ...prev, password: e.target.value }))}
-                      />
-                      <button 
-                        type="button" 
-                        className="lobby-auth-eye-btn"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
-                    </div>
-                  </div>
+                  {/* Quick Demo Login Pill */}
+                  <button 
+                    type="button" 
+                    className="lobby-auth-demo-btn"
+                    onClick={handleQuickDemoLogin}
+                  >
+                    <Zap size={15} />
+                    <span>
+                      {lang === 'ar' 
+                        ? '⚡ تجربة فورية سريعة بحساب (أحمد محمد)' 
+                        : '⚡ Quick Demo Login (Ahmed Mohamed)'}
+                    </span>
+                  </button>
 
                   {/* Submit Button */}
                   <button type="submit" className="lobby-auth-submit-btn">
@@ -740,16 +957,6 @@ export default function LobbyPage({
                     {lang === 'ar' ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
                   </button>
 
-                  {/* Quick Demo Login */}
-                  <button 
-                    type="button" 
-                    className="lobby-auth-demo-btn"
-                    onClick={handleQuickDemoLogin}
-                  >
-                    <Zap size={15} />
-                    <span>{lang === 'ar' ? '⚡ تجربة سريعة كـ أحمد (Demo Account)' : '⚡ Quick Demo Login (Ahmed)'}</span>
-                  </button>
-
                   {/* Switch to Sign Up */}
                   <div className="lobby-auth-switch-text">
                     <span>{lang === 'ar' ? 'ليس لديك حساب؟' : "Don't have an account?"}</span>{' '}
@@ -758,7 +965,7 @@ export default function LobbyPage({
                       className="lobby-auth-switch-link"
                       onClick={() => { setAuthTab('register'); setAuthError(''); }}
                     >
-                      {lang === 'ar' ? 'أنشئ حسابك الآن' : 'Sign Up now'}
+                      {lang === 'ar' ? 'سجّل بياناتك كـ Guest الآن' : 'Sign Up as Guest now'}
                     </button>
                   </div>
 
@@ -773,13 +980,13 @@ export default function LobbyPage({
                 </form>
               )}
 
-              {/* TAB 2: SIGN UP */}
+              {/* TAB 2: SIGN UP (Strictly adheres to Mongoose guestSchema) */}
               {authTab === 'register' && (
                 <form onSubmit={handleAuthRegister} className="lobby-auth-form">
-                  {/* Name */}
+                  {/* Name: { type: String, required: true } */}
                   <div className="lobby-auth-field-group">
                     <label className="lobby-auth-label">
-                      {lang === 'ar' ? 'الاسم الكامل:' : 'Full Name:'}
+                      {lang === 'ar' ? 'الاسم بالكامل:' : 'Full Name:'} *
                     </label>
                     <div className="lobby-auth-input-wrap">
                       <User size={18} className="lobby-auth-input-icon" />
@@ -788,16 +995,16 @@ export default function LobbyPage({
                         required
                         className="lobby-auth-input"
                         placeholder={lang === 'ar' ? 'مثال: أحمد محمد' : 'e.g. Ahmed Mohamed'}
-                        value={authForm.name}
-                        onChange={(e) => setAuthForm(prev => ({ ...prev, name: e.target.value }))}
+                        value={guestForm.name}
+                        onChange={(e) => setGuestForm(prev => ({ ...prev, name: e.target.value }))}
                       />
                     </div>
                   </div>
 
-                  {/* Phone */}
+                  {/* Phone: { type: String, required: true, unique: true } */}
                   <div className="lobby-auth-field-group">
                     <label className="lobby-auth-label">
-                      {lang === 'ar' ? 'رقم الهاتف:' : 'Phone Number:'}
+                      {lang === 'ar' ? 'رقم الهاتف:' : 'Phone Number:'} *
                     </label>
                     <div className="lobby-auth-input-wrap">
                       <Phone size={18} className="lobby-auth-input-icon" />
@@ -805,71 +1012,140 @@ export default function LobbyPage({
                         type="tel" 
                         required
                         className="lobby-auth-input"
-                        placeholder="+20 101 234 5678"
-                        value={authForm.phone}
-                        onChange={(e) => setAuthForm(prev => ({ ...prev, phone: e.target.value }))}
+                        placeholder={lang === 'ar' ? '01012345678 أو +20...' : '+20 101 234 5678'}
+                        value={guestForm.phone}
+                        onChange={(e) => setGuestForm(prev => ({ ...prev, phone: e.target.value }))}
                       />
                     </div>
                   </div>
 
-                  {/* Email */}
-                  <div className="lobby-auth-field-group">
-                    <label className="lobby-auth-label">
-                      {lang === 'ar' ? 'البريد الإلكتروني (اختياري):' : 'Email (Optional):'}
-                    </label>
-                    <div className="lobby-auth-input-wrap">
-                      <Mail size={18} className="lobby-auth-input-icon" />
-                      <input 
-                        type="email" 
-                        className="lobby-auth-input"
-                        placeholder="user@example.com"
-                        value={authForm.email}
-                        onChange={(e) => setAuthForm(prev => ({ ...prev, email: e.target.value }))}
-                      />
+                  {/* Age & Gender Grid (schema: age String, gender enum['male', 'female']) */}
+                  <div className="lobby-auth-grid-2">
+                    {/* Age: { type: String, required: true } */}
+                    <div className="lobby-auth-field-group">
+                      <label className="lobby-auth-label">
+                        {lang === 'ar' ? 'العمر (السن):' : 'Age:'} *
+                      </label>
+                      <div className="lobby-auth-input-wrap">
+                        <Calendar size={18} className="lobby-auth-input-icon" />
+                        <input 
+                          type="number" 
+                          required
+                          min="1"
+                          max="120"
+                          className="lobby-auth-input"
+                          placeholder={lang === 'ar' ? 'مثال: 32' : 'e.g. 32'}
+                          value={guestForm.age}
+                          onChange={(e) => setGuestForm(prev => ({ ...prev, age: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Gender: { type: String, enum: ["male", "female"], required: true } */}
+                    <div className="lobby-auth-field-group">
+                      <label className="lobby-auth-label">
+                        {lang === 'ar' ? 'النوع:' : 'Gender:'} *
+                      </label>
+                      <div className="lobby-gender-toggles">
+                        <button
+                          type="button"
+                          className={`lobby-gender-btn ${guestForm.gender === 'male' ? 'active' : ''}`}
+                          onClick={() => setGuestForm(prev => ({ ...prev, gender: 'male' }))}
+                        >
+                          <span>👨</span>
+                          <span>{lang === 'ar' ? 'ذكر' : 'Male'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          className={`lobby-gender-btn ${guestForm.gender === 'female' ? 'active' : ''}`}
+                          onClick={() => setGuestForm(prev => ({ ...prev, gender: 'female' }))}
+                        >
+                          <span>👩</span>
+                          <span>{lang === 'ar' ? 'أنثى' : 'Female'}</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Password */}
-                  <div className="lobby-auth-field-group">
-                    <label className="lobby-auth-label">
-                      {lang === 'ar' ? 'كلمة المرور:' : 'Password:'}
-                    </label>
-                    <div className="lobby-auth-input-wrap">
-                      <Lock size={18} className="lobby-auth-input-icon" />
-                      <input 
-                        type={showPassword ? 'text' : 'password'} 
-                        required
-                        className="lobby-auth-input"
-                        placeholder={lang === 'ar' ? '••••••••' : '••••••••'}
-                        value={authForm.password}
-                        onChange={(e) => setAuthForm(prev => ({ ...prev, password: e.target.value }))}
-                      />
-                      <button 
-                        type="button" 
-                        className="lobby-auth-eye-btn"
-                        onClick={() => setShowPassword(!showPassword)}
+                  {/* Children Section: Array of { name, age, gender } */}
+                  <div className="lobby-children-card">
+                    <div className="lobby-children-header">
+                      <div className="lobby-children-title">
+                        <Users size={16} />
+                        <span>{lang === 'ar' ? 'الأطفال المرافقين' : 'Accompanying Children'}</span>
+                        <span className="lobby-child-badge">
+                          {guestForm.children.length} {lang === 'ar' ? 'طفل' : 'child'}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        className="lobby-add-child-btn"
+                        onClick={handleAddChild}
                       >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        <Plus size={14} />
+                        <span>{lang === 'ar' ? 'إضافة طفل' : 'Add Child'}</span>
                       </button>
                     </div>
-                  </div>
 
-                  {/* Confirm Password */}
-                  <div className="lobby-auth-field-group">
-                    <label className="lobby-auth-label">
-                      {lang === 'ar' ? 'تأكيد كلمة المرور:' : 'Confirm Password:'}
-                    </label>
-                    <div className="lobby-auth-input-wrap">
-                      <Lock size={18} className="lobby-auth-input-icon" />
-                      <input 
-                        type={showPassword ? 'text' : 'password'} 
-                        required
-                        className="lobby-auth-input"
-                        placeholder={lang === 'ar' ? '••••••••' : '••••••••'}
-                        value={authForm.confirmPassword}
-                        onChange={(e) => setAuthForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                      />
-                    </div>
+                    {guestForm.children.length === 0 ? (
+                      <div className="lobby-no-children-note">
+                        {lang === 'ar' 
+                          ? 'لم تتم إضافة أطفال بعد. اضغط (+ إضافة طفل) لإضافة طفل مرافق.' 
+                          : 'No children added yet. Click (+ Add Child) to register a child.'}
+                      </div>
+                    ) : (
+                      <div className="lobby-children-list">
+                        {guestForm.children.map((child, index) => (
+                          <div key={index} className="lobby-child-row">
+                            <div className="lobby-child-row-top">
+                              <span className="lobby-child-badge">
+                                {lang === 'ar' ? `الطفل ${index + 1}` : `Child ${index + 1}`}
+                              </span>
+                              <button
+                                type="button"
+                                className="lobby-child-remove-btn"
+                                onClick={() => handleRemoveChild(index)}
+                                title={lang === 'ar' ? 'حذف الطفل' : 'Remove Child'}
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            </div>
+
+                            <div className="lobby-child-fields-grid">
+                              {/* Child Name: { type: String, required: true } */}
+                              <input 
+                                type="text"
+                                required
+                                className="lobby-child-input"
+                                placeholder={lang === 'ar' ? 'اسم الطفل' : 'Child name'}
+                                value={child.name}
+                                onChange={(e) => handleUpdateChild(index, 'name', e.target.value)}
+                              />
+                              {/* Child Age: { type: String, required: true } */}
+                              <input 
+                                type="number"
+                                required
+                                min="1"
+                                max="18"
+                                className="lobby-child-input"
+                                placeholder={lang === 'ar' ? 'العمر' : 'Age'}
+                                value={child.age}
+                                onChange={(e) => handleUpdateChild(index, 'age', e.target.value)}
+                              />
+                              {/* Child Gender: { type: String, enum: ["male", "female"], required: true } */}
+                              <select
+                                className="lobby-child-gender-select"
+                                value={child.gender}
+                                onChange={(e) => handleUpdateChild(index, 'gender', e.target.value)}
+                              >
+                                <option value="male">{lang === 'ar' ? 'ولد (ذكر)' : 'Boy (Male)'}</option>
+                                <option value="female">{lang === 'ar' ? 'بنت (أنثى)' : 'Girl (Female)'}</option>
+                              </select>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Submit Button */}

@@ -346,19 +346,32 @@
   pointer-events: auto;
 }
 
-/* Ground shadow beneath girl */
+/* Ground shadow beneath characters */
 .character-ground-shadow {
-  width: clamp(120px, 15vw, 190px);
-  height: 22px;
+  width: clamp(160px, 20vw, 260px);
+  height: 26px;
   border-radius: 50%;
   background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 70%);
-  margin-top: -14px;
+  margin-top: -25px;
+  margin-bottom: 27px;
   transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Girl ground shadow specifically raised another 2.9px */
+.girl-character-anchor .character-ground-shadow {
+  margin-top: -35.1px;
+  margin-bottom: 37.1px;
+}
+
+/* Boy ground shadow specifically raised another 2.9px */
+.boy-character-anchor .character-ground-shadow {
+  margin-top: -27.9px;
+  margin-bottom: 29.9px;
 }
 
 .girl-character-img {
   width: auto;
-  height: clamp(230px, 34vh, 400px);
+  height: clamp(320px, 46vh, 550px);
   object-fit: contain;
   display: block;
   filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.6));
@@ -445,12 +458,22 @@
 
 .boy-character-img {
   width: auto;
-  height: clamp(230px, 34vh, 400px);
+  height: clamp(320px, 46vh, 550px);
   object-fit: contain;
   display: block;
   filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.6));
   transform-origin: bottom center;
   animation: characterGentleBob 3.4s ease-in-out infinite alternate-reverse;
+}
+
+/* Boy Character Jumping */
+.boy-character-anchor.jumping {
+  animation: marioJumpAnimation 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  z-index: 40;
+}
+
+.boy-character-anchor.jumping .character-ground-shadow {
+  animation: shadowShrinkAnimation 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes characterGentleBob {
@@ -556,7 +579,7 @@
   }
 
   .girl-character-img {
-    height: clamp(185px, 26vh, 250px);
+    height: clamp(260px, 37vh, 350px);
   }
 
   .boy-character-anchor {
@@ -565,13 +588,79 @@
   }
 
   .boy-character-img {
-    height: clamp(185px, 26vh, 250px);
+    height: clamp(260px, 37vh, 350px);
+  }
+
+  /* In mobile: characters DO NOT move (no idle bobbing/movement) - completely steady */
+  .girl-character-anchor:not(.jumping) .girl-character-img,
+  .boy-character-anchor:not(.jumping) .boy-character-img {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* In mobile: jump strictly in-place (purely vertical translateY, no horizontal sideways shift) */
+  .girl-character-anchor.jumping,
+  .boy-character-anchor.jumping {
+    animation: mobileVerticalJump 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+  }
+
+  .girl-character-anchor.jumping .character-ground-shadow,
+  .boy-character-anchor.jumping .character-ground-shadow {
+    animation: mobileShadowJump 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
   }
 
   .character-speech-bubble {
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     padding: 4px 10px;
-    top: -38px;
+    top: -46px;
+  }
+}
+
+/* Mobile in-place vertical jump (zero horizontal drift) */
+@keyframes mobileVerticalJump {
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
+  15% {
+    transform: translateY(8px) scale(1.08, 0.92);
+  }
+  45% {
+    transform: translateY(-85px) scale(0.96, 1.05);
+  }
+  50% {
+    transform: translateY(-80px) scale(1.02, 0.98);
+  }
+  80% {
+    transform: translateY(-6px) scale(0.98, 1.02);
+  }
+  90% {
+    transform: translateY(4px) scale(1.05, 0.95);
+  }
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+}
+
+@keyframes mobileShadowJump {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  15% {
+    transform: scale(1.15);
+    opacity: 0.7;
+  }
+  45%, 50% {
+    transform: scale(0.45);
+    opacity: 0.2;
+  }
+  80% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  90% {
+    transform: scale(1.15);
+    opacity: 0.7;
   }
 }
 
@@ -606,7 +695,7 @@
   border: 1.5px solid rgba(0, 169, 195, 0.45);
   border-radius: 24px;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 40px rgba(0, 169, 195, 0.15);
-  max-width: 470px;
+  max-width: 500px;
   width: 100%;
   color: #ffffff;
   overflow: hidden;
@@ -913,3 +1002,210 @@
   align-items: center;
   gap: 6px;
 }
+
+/* Multi-field row (e.g. Age & Gender) */
+.lobby-auth-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Gender Toggle Buttons */
+.lobby-gender-toggles {
+  display: flex;
+  gap: 8px;
+}
+
+.lobby-gender-btn {
+  flex: 1;
+  background: rgba(0, 18, 25, 0.65);
+  border: 1px solid rgba(0, 169, 195, 0.35);
+  border-radius: 10px;
+  padding: 9px 8px;
+  color: #cbd5e1;
+  font-size: 0.82rem;
+  font-weight: 750;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.lobby-gender-btn:hover {
+  background: rgba(0, 35, 48, 0.85);
+  border-color: #00a9c3;
+  color: #ffffff;
+}
+
+.lobby-gender-btn.active {
+  background: linear-gradient(135deg, #00a9c3 0%, #007788 100%);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 169, 195, 0.35);
+}
+
+/* Children Management in Sign Up */
+.lobby-children-card {
+  background: rgba(0, 18, 25, 0.5);
+  border: 1px solid rgba(0, 169, 195, 0.3);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.lobby-children-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lobby-children-title {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #a5f3fc;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lobby-add-child-btn {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  color: #fde047;
+  padding: 5px 10px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.lobby-add-child-btn:hover {
+  background: #f59e0b;
+  color: #012b32;
+  transform: translateY(-1px);
+}
+
+.lobby-child-row {
+  background: rgba(0, 32, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  animation: lobbyChildFade 0.2s ease;
+}
+
+@keyframes lobbyChildFade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.lobby-child-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lobby-child-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #38bdf8;
+  background: rgba(0, 169, 195, 0.15);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.lobby-child-remove-btn {
+  background: transparent;
+  border: none;
+  color: #f87171;
+  cursor: pointer;
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: color 0.18s ease;
+}
+
+.lobby-child-remove-btn:hover {
+  color: #ef4444;
+}
+
+.lobby-child-fields-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr 1.2fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.lobby-child-input {
+  width: 100%;
+  background: rgba(0, 18, 25, 0.8);
+  border: 1px solid rgba(0, 169, 195, 0.3);
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: #ffffff;
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.lobby-child-input:focus {
+  border-color: #fde047;
+}
+
+.lobby-child-gender-select {
+  width: 100%;
+  background: rgba(0, 18, 25, 0.8);
+  border: 1px solid rgba(0, 169, 195, 0.3);
+  border-radius: 8px;
+  padding: 7px 8px;
+  color: #ffffff;
+  font-size: 0.78rem;
+  outline: none;
+}
+
+.lobby-child-gender-select option {
+  background: #012b32;
+  color: #ffffff;
+}
+
+.lobby-no-children-note {
+  font-size: 0.76rem;
+  color: #94a3b8;
+  text-align: center;
+  padding: 6px;
+  font-style: italic;
+}
+
+.lobby-children-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.lobby-children-list::-webkit-scrollbar,
+.lobby-auth-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.lobby-children-list::-webkit-scrollbar-thumb,
+.lobby-auth-body::-webkit-scrollbar-thumb {
+  background: rgba(0, 169, 195, 0.4);
+  border-radius: 4px;
+}
+
