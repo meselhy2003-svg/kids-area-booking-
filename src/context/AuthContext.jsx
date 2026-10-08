@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { authService } from '../api/authService';
+import { authService, isUserAuthenticated } from '../api/authService';
+
+export { isUserAuthenticated };
 
 const AuthContext = createContext(null);
 

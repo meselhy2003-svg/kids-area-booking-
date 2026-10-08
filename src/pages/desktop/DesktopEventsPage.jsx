@@ -1,8 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useEventsMedia } from '../../hooks';
+import BirthdayBuilderPage from './BirthdayBuilderPage';
 import './DesktopEventsPage.css';
 
 export default function DesktopEventsPage({ setActiveTab, openModal, lang = 'ar' }) {
+  // Sub-view: 'overview' | 'birthday-builder'
+  const [eventsSubView, setEventsSubView] = useState(() => {
+    if (typeof window !== 'undefined' && window.location.hash.includes('birthday')) {
+      return 'birthday-builder';
+    }
+    return 'overview';
+  });
+
+  useEffect(() => {
+    const handleHash = () => {
+      if (typeof window !== 'undefined') {
+        if (window.location.hash.includes('birthday')) {
+          setEventsSubView('birthday-builder');
+        } else if (window.location.hash === '#events') {
+          setEventsSubView('overview');
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
   // Media Hook: Synchronous cache hydration + background revalidation with server replacement
   const { 
     heroSlides, 
@@ -81,6 +104,21 @@ export default function DesktopEventsPage({ setActiveTab, openModal, lang = 'ar'
   const openVibeModal = (item) => {
     setLightboxData(item);
   };
+
+  if (eventsSubView === 'birthday-builder') {
+    return (
+      <BirthdayBuilderPage 
+        onBack={() => {
+          setEventsSubView('overview');
+          if (typeof window !== 'undefined') window.location.hash = 'events';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        lang={lang}
+        setActiveTab={setActiveTab}
+        openModal={openModal}
+      />
+    );
+  }
 
   return (
     <div className="events-page-wrapper">
@@ -267,7 +305,15 @@ export default function DesktopEventsPage({ setActiveTab, openModal, lang = 'ar'
                   <button 
                     type="button" 
                     className="events-card-btn"
-                    onClick={() => openModal && openModal('booking', card.bookingData)}
+                    onClick={() => {
+                      if (card.id === 'birthday') {
+                        setEventsSubView('birthday-builder');
+                        if (typeof window !== 'undefined') window.location.hash = 'events/birthday';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      } else {
+                        openModal && openModal('booking', card.bookingData);
+                      }
+                    }}
                   >
                     <span>{card.btnText}</span>
                     <span className="events-card-btn-arrow">&rarr;</span>

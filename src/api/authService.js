@@ -18,17 +18,57 @@ const initializeUsers = () => {
 
 initializeUsers();
 
+/**
+ * Helper to check whether the active session is genuinely authenticated
+ */
+export const isUserAuthenticated = () => {
+  if (typeof window === 'undefined') return false;
+  try {
+    if (localStorage.getItem('american_dream_is_guest') === 'true') return false;
+    if (localStorage.getItem('american_dream_user_logged_in') === 'true') return true;
+    const active = localStorage.getItem('american_dream_active_user');
+    if (active) {
+      const parsed = JSON.parse(active);
+      if (parsed && (parsed.id || parsed.phone) && parsed.id !== 'guest') return true;
+    }
+  } catch (e) {}
+  return false;
+};
+
 export const authService = {
   /**
    * Fetch currently logged-in user session
    */
   async getCurrentUser() {
     await apiClient.get('/api/auth/me');
+
+    const isGuest = typeof window !== 'undefined' && localStorage.getItem('american_dream_is_guest') === 'true';
+    const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('american_dream_user_logged_in') === 'true';
+
+    // If client is a guest or not explicitly logged in, return default guest
+    if (isGuest || !isLoggedIn) {
+      return defaultGuestUser;
+    }
+
     const storedUser = storage.get(storage.KEYS.ACTIVE_USER);
-    if (storedUser) {
+    if (storedUser && storedUser.id !== 'guest') {
       return storedUser;
     }
-    // Return default VIP user for a rich demo experience if none is set
+
+    if (typeof window !== 'undefined') {
+      const profile = localStorage.getItem('american_dream_user_profile');
+      if (profile) {
+        try {
+          const parsed = JSON.parse(profile);
+          if (parsed && (parsed.id || parsed.phone)) {
+            storage.set(storage.KEYS.ACTIVE_USER, parsed);
+            return parsed;
+          }
+        } catch {}
+      }
+    }
+
+    // Default VIP user if logged in
     const defaultUser = mockUsers[0];
     storage.set(storage.KEYS.ACTIVE_USER, defaultUser);
     storage.set(storage.KEYS.TOKEN, 'mock-jwt-token-default-vip');
@@ -72,6 +112,13 @@ export const authService = {
     storage.set(storage.KEYS.ACTIVE_USER, matched);
     storage.set(storage.KEYS.TOKEN, token);
 
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('american_dream_user_logged_in', 'true');
+      localStorage.removeItem('american_dream_is_guest');
+      localStorage.setItem('american_dream_active_user', JSON.stringify(matched));
+      localStorage.setItem('american_dream_user_profile', JSON.stringify(matched));
+    }
+
     return {
       success: true,
       token,
@@ -97,6 +144,12 @@ export const authService = {
       // Log them in if already registered
       storage.set(storage.KEYS.ACTIVE_USER, existing);
       storage.set(storage.KEYS.TOKEN, 'mock-jwt-token-' + existing.id);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('american_dream_user_logged_in', 'true');
+        localStorage.removeItem('american_dream_is_guest');
+        localStorage.setItem('american_dream_active_user', JSON.stringify(existing));
+        localStorage.setItem('american_dream_user_profile', JSON.stringify(existing));
+      }
       return { success: true, user: existing, isExisting: true };
     }
 
@@ -117,6 +170,13 @@ export const authService = {
     storage.set(storage.KEYS.ACTIVE_USER, newUser);
     storage.set(storage.KEYS.TOKEN, 'mock-jwt-token-' + newUser.id);
 
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('american_dream_user_logged_in', 'true');
+      localStorage.removeItem('american_dream_is_guest');
+      localStorage.setItem('american_dream_active_user', JSON.stringify(newUser));
+      localStorage.setItem('american_dream_user_profile', JSON.stringify(newUser));
+    }
+
     return {
       success: true,
       user: newUser,
@@ -131,6 +191,12 @@ export const authService = {
     await apiClient.post('/api/auth/logout');
     storage.remove(storage.KEYS.ACTIVE_USER);
     storage.remove(storage.KEYS.TOKEN);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('american_dream_user_logged_in', 'false');
+      localStorage.setItem('american_dream_is_guest', 'true');
+      localStorage.removeItem('american_dream_active_user');
+      localStorage.removeItem('american_dream_user_profile');
+    }
     return { success: true };
   },
 

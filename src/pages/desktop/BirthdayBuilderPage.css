@@ -1,0 +1,1103 @@
+/* ==========================================================================
+   BIRTHDAY BUILDER PAGE STYLES (Design Your Dream Birthday)
+   American Dream Ismailia - Events & Halls Interactive Builder
+   ========================================================================== */
+
+.birthday-builder-wrapper {
+  background-color: #f8fafc;
+  color: #0f172a;
+  min-height: 100vh;
+  padding: 32px 24px 80px;
+  font-family: inherit;
+  position: relative;
+}
+
+.birthday-builder-container {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   Top Navigation / Breadcrumb Bar
+   -------------------------------------------------------------------------- */
+.bday-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.bday-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0d2847;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.bday-back-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #00a8cc;
+  transform: translateX(-2px);
+}
+
+.bday-tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(0, 168, 204, 0.1), rgba(245, 158, 11, 0.1));
+  border: 1px solid rgba(0, 168, 204, 0.25);
+  color: #008fae;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* --------------------------------------------------------------------------
+   Header / Hero Title with Alternating Letter Colors
+   -------------------------------------------------------------------------- */
+.bday-hero-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.bday-main-title {
+  font-size: 2.85rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+  line-height: 1.2;
+}
+
+.bday-letter-cyan {
+  color: #00a8cc;
+}
+
+.bday-letter-orange {
+  color: #f59e0b;
+}
+
+.bday-letter-navy {
+  color: #0d2847;
+}
+
+.bday-main-subtitle {
+  font-size: 1.05rem;
+  color: #64748b;
+  max-width: 760px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+   Main 2-Column Grid Layout (Content & Sticky Sidebar)
+   -------------------------------------------------------------------------- */
+.bday-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 390px;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 1080px) {
+  .bday-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bday-steps-column {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* --------------------------------------------------------------------------
+   Step Sections Header Styling
+   -------------------------------------------------------------------------- */
+.bday-step-section {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  padding: 32px;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  transition: border-color 0.25s ease;
+}
+
+.bday-step-section:hover {
+  border-color: #cbd5e1;
+}
+
+.bday-step-title {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #0d2847;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 0 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bday-step-subtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0 0 24px;
+}
+
+/* --------------------------------------------------------------------------
+   STEP 1: VENUE / SPACE CARDS (Indoor, Roof, Outdoor)
+   -------------------------------------------------------------------------- */
+.bday-venue-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 820px) {
+  .bday-venue-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bday-venue-card {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.bday-venue-card:hover {
+  border-color: #94a3b8;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+}
+
+.bday-venue-card.selected {
+  border-color: #00a8cc;
+  box-shadow: 0 0 0 2px rgba(0, 168, 204, 0.2), 0 12px 28px -5px rgba(0, 168, 204, 0.18);
+  background: #f0fdfa;
+}
+
+.bday-venue-header {
+  padding: 16px 16px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bday-venue-name {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #0d2847;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bday-venue-card.selected .bday-venue-name {
+  color: #008fae;
+}
+
+.bday-venue-capacity {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bday-venue-desc {
+  padding: 0 16px 14px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #64748b;
+  margin: 0;
+  min-height: 52px;
+}
+
+.bday-venue-img-wrap {
+  width: 100%;
+  height: 140px;
+  position: relative;
+  overflow: hidden;
+  background: #cbd5e1;
+}
+
+.bday-venue-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.bday-venue-card:hover .bday-venue-img {
+  transform: scale(1.05);
+}
+
+.bday-venue-selected-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #00a8cc;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bday-venue-footer {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #f1f5f9;
+  background: #ffffff;
+  margin-top: auto;
+}
+
+.bday-venue-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.bday-venue-card.selected .bday-venue-radio {
+  color: #00a8cc;
+}
+
+.bday-radio-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.bday-venue-card.selected .bday-radio-dot {
+  border-color: #00a8cc;
+  background: #00a8cc;
+}
+
+.bday-radio-dot-inner {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.bday-venue-pill-included {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #059669;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+
+/* --------------------------------------------------------------------------
+   STEP 2: PARTY DETAILS (Guests, Date, Time, Age)
+   -------------------------------------------------------------------------- */
+.bday-party-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 640px) {
+  .bday-party-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bday-detail-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.bday-detail-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.bday-detail-label {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #0d2847;
+}
+
+.bday-detail-hint {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Guests Counter */
+.bday-counter-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 8px 16px;
+  margin-bottom: 10px;
+}
+
+.bday-counter-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #f1f5f9;
+  color: #0d2847;
+  font-size: 1.25rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.bday-counter-btn:hover:not(:disabled) {
+  background: #00a8cc;
+  color: #ffffff;
+  border-color: #00a8cc;
+  transform: scale(1.08);
+}
+
+.bday-counter-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.bday-counter-val {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #0d2847;
+  text-align: center;
+}
+
+.bday-counter-val small {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-left: 4px;
+}
+
+/* Date & Time Input Boxes */
+.bday-input-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.bday-input-icon {
+  color: #00a8cc;
+  flex-shrink: 0;
+}
+
+.bday-input-field {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0d2847;
+  background: transparent;
+  cursor: pointer;
+}
+
+.bday-select-field {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0d2847;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Age Selection Pills */
+.bday-age-pills-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.bday-age-pill {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 4px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #475569;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bday-age-pill:hover {
+  border-color: #00a8cc;
+  color: #00a8cc;
+}
+
+.bday-age-pill.active {
+  background: #00a8cc;
+  color: #ffffff;
+  border-color: #00a8cc;
+  box-shadow: 0 2px 8px rgba(0, 168, 204, 0.3);
+}
+
+.bday-box-subtext {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   STEP 3: PACKAGE SELECTION CARDS
+   -------------------------------------------------------------------------- */
+.bday-packages-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .bday-packages-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bday-package-card {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.bday-package-card:hover {
+  border-color: #94a3b8;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.08);
+}
+
+.bday-package-card.selected {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2), 0 14px 30px -5px rgba(245, 158, 11, 0.15);
+  background: #fffdfa;
+}
+
+.bday-package-pop-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 14px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.35);
+  white-space: nowrap;
+}
+
+.bday-package-title {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #0d2847;
+  margin: 8px 0 6px;
+}
+
+.bday-package-price {
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: #0d2847;
+  margin: 0 0 10px;
+}
+
+.bday-package-card.selected .bday-package-price {
+  color: #f59e0b;
+}
+
+.bday-package-desc {
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 20px;
+  min-height: 48px;
+}
+
+.bday-features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.bday-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #334155;
+}
+
+.bday-check-icon {
+  color: #00a8cc;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.bday-package-card.selected .bday-check-icon {
+  color: #f59e0b;
+}
+
+.bday-select-pkg-btn {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #0d2847;
+}
+
+.bday-select-pkg-btn:hover {
+  background: #f8fafc;
+  border-color: #00a8cc;
+  color: #00a8cc;
+}
+
+.bday-package-card.selected .bday-select-pkg-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-color: #f59e0b;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   STICKY SUMMARY SIDEBAR ("STEP 3 OF 3: YOUR BIRTHDAY")
+   -------------------------------------------------------------------------- */
+.bday-sidebar-column {
+  position: sticky;
+  top: 96px;
+  z-index: 10;
+}
+
+.bday-summary-card {
+  background: #06252e;
+  border: 1px solid #134e5e;
+  border-radius: 20px;
+  padding: 28px 24px;
+  color: #ffffff;
+  box-shadow: 0 16px 36px -4px rgba(6, 37, 46, 0.45);
+}
+
+.bday-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bday-summary-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bday-summary-logo {
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Summary key-values */
+.bday-summary-details {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.bday-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.bday-summary-key {
+  color: #94a3b8;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+}
+
+.bday-summary-val-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bday-summary-val {
+  color: #38bdf8;
+  font-weight: 800;
+}
+
+.bday-summary-edit-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.bday-summary-edit-btn:hover {
+  color: #ffffff;
+}
+
+/* 4 Feature Badges Grid */
+.bday-summary-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.bday-perk-badge {
+  font-size: 0.78rem;
+  color: #e2e8f0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bday-perk-badge span {
+  color: #34d399;
+}
+
+/* Pricing Breakdown */
+.bday-pricing-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bday-price-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+
+.bday-price-line.included {
+  color: #34d399;
+  font-weight: 800;
+}
+
+.bday-price-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  margin-top: 4px;
+}
+
+.bday-price-total-label {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.bday-price-total-val {
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.bday-deposit-hint {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin: 6px 0 0;
+  line-height: 1.4;
+}
+
+/* Continue Booking CTA Button */
+.bday-continue-btn {
+  width: 100%;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  border: none;
+  border-radius: 14px;
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35);
+  transition: all 0.25s ease;
+}
+
+.bday-continue-btn:hover {
+  background: linear-gradient(135deg, #fbbf24, #ea580c);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(245, 158, 11, 0.45);
+}
+
+.bday-continue-btn:active {
+  transform: translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   BOOKING MODAL & CELEBRATION
+   -------------------------------------------------------------------------- */
+.bday-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: bdayFadeIn 0.25s ease;
+}
+
+@keyframes bdayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.bday-modal-card {
+  background: #ffffff;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  position: relative;
+  animation: bdaySlideUp 0.3s ease;
+}
+
+@keyframes bdaySlideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.bday-modal-header {
+  padding: 24px 24px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bday-modal-title {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #0d2847;
+  margin: 0;
+}
+
+.bday-modal-close {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bday-modal-close:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.bday-modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.bday-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bday-form-label {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: #334155;
+}
+
+.bday-form-input, .bday-form-select, .bday-form-textarea {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+}
+
+.bday-form-input:focus, .bday-form-select:focus, .bday-form-textarea:focus {
+  border-color: #00a8cc;
+  box-shadow: 0 0 0 3px rgba(0, 168, 204, 0.15);
+}
+
+.bday-payment-methods-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.bday-payment-pill {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 6px;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #475569;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.bday-payment-pill:hover {
+  border-color: #00a8cc;
+  color: #00a8cc;
+}
+
+.bday-payment-pill.active {
+  background: #ecfeff;
+  border-color: #00a8cc;
+  color: #008fae;
+  box-shadow: 0 2px 8px rgba(0, 168, 204, 0.2);
+}
+
+.bday-modal-footer {
+  padding: 18px 24px 24px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.bday-confirm-btn {
+  background: linear-gradient(135deg, #00a8cc, #0284c7);
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bday-confirm-btn:hover {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  transform: translateY(-1px);
+}
+
+/* Success Card */
+.bday-success-card {
+  text-align: center;
+  padding: 36px 24px;
+}
+
+.bday-success-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #ecfdf5;
+  color: #059669;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  border: 2px solid #a7f3d0;
+}
+
+.bday-success-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #0d2847;
+  margin: 0 0 10px;
+}
+
+.bday-success-desc {
+  font-size: 0.95rem;
+  color: #64748b;
+  max-width: 440px;
+  margin: 0 auto 24px;
+  line-height: 1.6;
+}
+
+.bday-booking-ref-box {
+  background: #f1f5f9;
+  border: 2px dashed #cbd5e1;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: inline-block;
+}
+
+.bday-ref-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.bday-ref-code {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #00a8cc;
+  letter-spacing: 0.08em;
+}
+
+.bday-success-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bday-whatsapp-btn {
+  background: #25d366;
+  color: #ffffff;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.bday-whatsapp-btn:hover {
+  background: #20ba5a;
+  transform: translateY(-1px);
+}
+
+.bday-profile-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0d2847;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bday-profile-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}

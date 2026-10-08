@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { useAuth } from '../context/AuthContext';
+import { isUserAuthenticated } from '../api/authService';
 import MediaUploadModal from './common/MediaUploadModal';
 
 export default function MobileModals({ 
@@ -21,6 +22,15 @@ export default function MobileModals({
   const [guestPhone, setGuestPhone] = useState('');
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [bookingCode, setBookingCode] = useState('');
+
+  // Auth Required Interception State (Guest -> Offer / Checkout / Booking)
+  const [authReqTab, setAuthReqTab] = useState('login'); // 'login' | 'register'
+  const [authReqPhone, setAuthReqPhone] = useState('');
+  const [authReqName, setAuthReqName] = useState('');
+  const [authReqPassword, setAuthReqPassword] = useState('');
+  const [authReqError, setAuthReqError] = useState('');
+  const [authReqSuccess, setAuthReqSuccess] = useState('');
+  const [authReqLoading, setAuthReqLoading] = useState(false);
 
   // 360 Tour State
   const [panX, setPanX] = useState(0);
@@ -58,11 +68,30 @@ export default function MobileModals({
       setProfileView('profile');
       setAuthMsg('');
     }
+    if (modalType === 'auth-required' || modalType === 'auth') {
+      setAuthReqTab('login');
+      setAuthReqPhone('');
+      setAuthReqName('');
+      setAuthReqPassword('');
+      setAuthReqError('');
+      setAuthReqSuccess('');
+      setAuthReqLoading(false);
+    }
   }, [modalType, modalData, user]);
 
   // Handle Confetti and Pass Persistence on successful booking
   const handleConfirmBooking = async (e) => {
     e.preventDefault();
+
+    if (!isUserAuthenticated()) {
+      openModal('auth-required', {
+        action: 'booking',
+        returnData: modalData,
+        returnType: 'booking'
+      });
+      return;
+    }
+
     const code = 'PZ-' + Math.floor(100000 + Math.random() * 900000);
     setBookingCode(code);
     setBookingSuccess(true);
@@ -89,6 +118,83 @@ export default function MobileModals({
       });
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  // Handle Auth Required Login (Guest Interception)
+  const handleAuthReqLogin = async (e) => {
+    e.preventDefault();
+    setAuthReqError('');
+    const clean = authReqPhone.trim();
+    if (!clean) {
+      setAuthReqError(lang === 'ar' ? 'يرجى إدخال رقم الهاتف' : 'Please enter your phone number');
+      return;
+    }
+    if (!authReqPassword.trim()) {
+      setAuthReqError(lang === 'ar' ? 'يرجى إدخال كلمة المرور' : 'Please enter password');
+      return;
+    }
+    setAuthReqLoading(true);
+    try {
+      await login({ identifier: clean, password: authReqPassword });
+      setAuthReqSuccess(lang === 'ar' ? 'تم تسجيل الدخول بنجاح! جاري المتابعة...' : 'Logged in successfully! Continuing...');
+      try { confetti({ particleCount: 75, spread: 70, origin: { y: 0.55 } }); } catch {}
+
+      setTimeout(() => {
+        closeModal();
+        if (modalData?.onSuccess) {
+          modalData.onSuccess();
+        } else if (modalData?.action === 'offer' || modalData?.returnType === 'booking') {
+          openModal('booking', modalData?.offerData || modalData?.returnData);
+        }
+      }, 550);
+    } catch (err) {
+      setAuthReqError(err.message || (lang === 'ar' ? 'بيانات الدخول غير صحيحة، يرجى المحاولة ثانية' : 'Login failed, please check details'));
+    } finally {
+      setAuthReqLoading(false);
+    }
+  };
+
+  // Handle Auth Required Register (Guest Interception)
+  const handleAuthReqRegister = async (e) => {
+    e.preventDefault();
+    setAuthReqError('');
+    const cleanName = authReqName.trim();
+    const cleanPhone = authReqPhone.trim();
+    if (!cleanName) {
+      setAuthReqError(lang === 'ar' ? 'يرجى إدخال الاسم بالكامل' : 'Please enter your full name');
+      return;
+    }
+    if (!cleanPhone) {
+      setAuthReqError(lang === 'ar' ? 'يرجى إدخال رقم الهاتف' : 'Please enter your phone number');
+      return;
+    }
+    if (!authReqPassword.trim()) {
+      setAuthReqError(lang === 'ar' ? 'يرجى إدخال كلمة المرور' : 'Please enter password');
+      return;
+    }
+    setAuthReqLoading(true);
+    try {
+      await register({
+        name: cleanName,
+        phone: cleanPhone,
+        password: authReqPassword
+      });
+      setAuthReqSuccess(lang === 'ar' ? 'تم إنشاء الحساب بنجاح! جاري المتابعة...' : 'Account created successfully! Continuing...');
+      try { confetti({ particleCount: 85, spread: 80, origin: { y: 0.55 } }); } catch {}
+
+      setTimeout(() => {
+        closeModal();
+        if (modalData?.onSuccess) {
+          modalData.onSuccess();
+        } else if (modalData?.action === 'offer' || modalData?.returnType === 'booking') {
+          openModal('booking', modalData?.offerData || modalData?.returnData);
+        }
+      }, 550);
+    } catch (err) {
+      setAuthReqError(err.message || (lang === 'ar' ? 'حدث خطأ في إنشاء الحساب' : 'Registration failed'));
+    } finally {
+      setAuthReqLoading(false);
     }
   };
 
@@ -587,6 +693,188 @@ export default function MobileModals({
                 {lang === 'ar' ? 'أمريكان دريم بارك، الإسماعيلية' : 'American Dream Park, Ismailia'}
               </span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3.5 AUTH REQUIRED MODAL (FOR GUEST USERS: OFFERS / CHECKOUT / PROCEED TO BOOKING) */}
+      {(modalType === 'auth-required' || modalType === 'auth') && (
+        <div 
+          className="mobile-modal-sheet auth-required-sheet" 
+          onClick={(e) => e.stopPropagation()}
+          dir={lang === 'ar' ? 'rtl' : 'ltr'}
+        >
+          <div className="sheet-drag-handle" />
+          <button className="sheet-close-x" onClick={closeModal} aria-label="Close">✕</button>
+
+          <div className="auth-required-content">
+            {/* Header Badge & Title */}
+            <div className="auth-required-header">
+              <div className="auth-required-badge-circle">
+                {modalData?.action === 'offer' ? '🎁' : modalData?.action === 'checkout' ? '🛒' : '🎟️'}
+              </div>
+              <span className="auth-required-tag">
+                {lang === 'ar' 
+                  ? (modalData?.action === 'offer' ? 'عرض حصري • مطلوب تسجيل الدخول' : modalData?.action === 'checkout' ? 'إتمام الشراء • مطلوب تسجيل الدخول' : 'تأكيد الحجز • مطلوب تسجيل الدخول')
+                  : (modalData?.action === 'offer' ? 'Exclusive Offer • Sign In Required' : modalData?.action === 'checkout' ? 'Checkout • Sign In Required' : 'Booking • Sign In Required')}
+              </span>
+              <h3 className="auth-required-title">
+                {lang === 'ar'
+                  ? (modalData?.action === 'offer' ? 'سجل دخولك للحصول على هذا العرض' : modalData?.action === 'checkout' ? 'سجل دخولك لإتمام الشراء والدفع' : 'سجل دخولك لمتابعة وتأكيد الحجز')
+                  : (modalData?.action === 'offer' ? 'Sign In to Claim This Offer' : modalData?.action === 'checkout' ? 'Sign In to Proceed to Checkout' : 'Sign In to Proceed to Booking')}
+              </h3>
+              <p className="auth-required-desc">
+                {lang === 'ar'
+                  ? 'أنت تتصفح الموقع كزائر حالياً. يرجى تسجيل الدخول أو إنشاء حساب جديد لحفظ التذاكر في أسورتك الذكية وتأكيد طلبك بنجاح.'
+                  : 'You are currently browsing as a guest. Please sign in or create an account to secure your wristband passes and confirm your order.'}
+              </p>
+            </div>
+
+            {/* Segmented Auth Tabs */}
+            <div className="auth-required-tabs">
+              <button 
+                type="button" 
+                className={`auth-req-tab ${authReqTab === 'login' ? 'active' : ''}`}
+                onClick={() => { setAuthReqTab('login'); setAuthReqError(''); setAuthReqSuccess(''); }}
+              >
+                {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+              </button>
+              <button 
+                type="button" 
+                className={`auth-req-tab ${authReqTab === 'register' ? 'active' : ''}`}
+                onClick={() => { setAuthReqTab('register'); setAuthReqError(''); setAuthReqSuccess(''); }}
+              >
+                {lang === 'ar' ? 'إنشاء حساب جديد' : 'Sign Up'}
+              </button>
+            </div>
+
+            {/* Status alerts */}
+            {authReqError && (
+              <div className="auth-req-alert error">
+                <span>⚠️ {authReqError}</span>
+              </div>
+            )}
+            {authReqSuccess && (
+              <div className="auth-req-alert success">
+                <span>✓ {authReqSuccess}</span>
+              </div>
+            )}
+
+            {/* TAB 1: LOGIN FORM */}
+            {authReqTab === 'login' && (
+              <form onSubmit={handleAuthReqLogin} className="auth-req-form">
+                <div className="auth-req-field">
+                  <label className="booking-label">
+                    {lang === 'ar' ? 'رقم الهاتف المسجل:' : 'Registered Phone Number:'}
+                  </label>
+                  <input 
+                    type="tel"
+                    required
+                    placeholder={lang === 'ar' ? '010XXXXXXXX' : '010XXXXXXXX'}
+                    className="booking-text-input"
+                    value={authReqPhone}
+                    onChange={(e) => setAuthReqPhone(e.target.value)}
+                    autoFocus
+                  />
+                </div>
+
+                <div className="auth-req-field">
+                  <label className="booking-label">
+                    {lang === 'ar' ? 'كلمة المرور:' : 'Password:'}
+                  </label>
+                  <input 
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    className="booking-text-input"
+                    value={authReqPassword}
+                    onChange={(e) => setAuthReqPassword(e.target.value)}
+                  />
+                </div>
+
+                <button type="submit" className="booking-submit-btn auth-req-submit" disabled={authReqLoading}>
+                  {authReqLoading 
+                    ? (lang === 'ar' ? 'جاري التحقق...' : 'Signing in...') 
+                    : (lang === 'ar' ? 'تسجيل الدخول والمتابعة' : 'Sign In & Continue')}
+                </button>
+
+                <div className="auth-req-switch-wrap">
+                  <span>{lang === 'ar' ? 'ليس لديك حساب؟' : "Don't have an account?"}</span>{' '}
+                  <button 
+                    type="button"
+                    className="auth-req-switch-btn"
+                    onClick={() => { setAuthReqTab('register'); setAuthReqError(''); }}
+                  >
+                    {lang === 'ar' ? 'إنشاء حساب سريع' : 'Create an Account'}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* TAB 2: REGISTER FORM */}
+            {authReqTab === 'register' && (
+              <form onSubmit={handleAuthReqRegister} className="auth-req-form">
+                <div className="auth-req-field">
+                  <label className="booking-label">
+                    {lang === 'ar' ? 'الاسم بالكامل:' : 'Full Name:'}
+                  </label>
+                  <input 
+                    type="text"
+                    required
+                    placeholder={lang === 'ar' ? 'مثال: أحمد محمد' : 'e.g. Ahmed Mohamed'}
+                    className="booking-text-input"
+                    value={authReqName}
+                    onChange={(e) => setAuthReqName(e.target.value)}
+                    autoFocus
+                  />
+                </div>
+
+                <div className="auth-req-field">
+                  <label className="booking-label">
+                    {lang === 'ar' ? 'رقم الهاتف (واتساب):' : 'Phone (WhatsApp):'}
+                  </label>
+                  <input 
+                    type="tel"
+                    required
+                    placeholder={lang === 'ar' ? '010XXXXXXXX' : '010XXXXXXXX'}
+                    className="booking-text-input"
+                    value={authReqPhone}
+                    onChange={(e) => setAuthReqPhone(e.target.value)}
+                  />
+                </div>
+
+                <div className="auth-req-field">
+                  <label className="booking-label">
+                    {lang === 'ar' ? 'كلمة المرور:' : 'Password:'}
+                  </label>
+                  <input 
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    className="booking-text-input"
+                    value={authReqPassword}
+                    onChange={(e) => setAuthReqPassword(e.target.value)}
+                  />
+                </div>
+
+                <button type="submit" className="booking-submit-btn auth-req-submit" disabled={authReqLoading}>
+                  {authReqLoading 
+                    ? (lang === 'ar' ? 'جاري إنشاء الحساب...' : 'Creating Account...') 
+                    : (lang === 'ar' ? 'إنشاء الحساب والمتابعة' : 'Sign Up & Continue')}
+                </button>
+
+                <div className="auth-req-switch-wrap">
+                  <span>{lang === 'ar' ? 'لديك حساب بالفعل؟' : 'Already have an account?'}</span>{' '}
+                  <button 
+                    type="button"
+                    className="auth-req-switch-btn"
+                    onClick={() => { setAuthReqTab('login'); setAuthReqError(''); }}
+                  >
+                    {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

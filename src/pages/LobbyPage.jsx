@@ -331,6 +331,7 @@ export default function LobbyPage({
   // Helper: check if client already has account / is logged in
   const checkIsAuthenticated = () => {
     try {
+      if (localStorage.getItem('american_dream_is_guest') === 'true') return false;
       const status = localStorage.getItem('american_dream_user_logged_in');
       if (status === 'true') return true;
       const activeUser = localStorage.getItem('american_dream_active_user');
@@ -400,6 +401,7 @@ export default function LobbyPage({
 
     // Persist login state
     localStorage.setItem('american_dream_user_logged_in', 'true');
+    localStorage.removeItem('american_dream_is_guest');
     localStorage.setItem('american_dream_user_profile', JSON.stringify({
       name: guestData.name,
       phone: guestData.phone,
@@ -528,6 +530,7 @@ export default function LobbyPage({
 
     // Persist active logged in state
     localStorage.setItem('american_dream_user_logged_in', 'true');
+    localStorage.removeItem('american_dream_is_guest');
     localStorage.setItem('american_dream_user_profile', JSON.stringify({
       id: newGuest._id,
       name: newGuest.name,
@@ -585,79 +588,13 @@ export default function LobbyPage({
     }, 500);
   };
 
-  // Quick Demo Login (Ahmed Mohamed Account)
-  const handleQuickDemoLogin = () => {
-    setLoginPhone('+20 101 234 5678');
-    setLoginPassword('123456');
-
-    const demoGuest = {
-      _id: 'guest_demo_ahmed',
-      name: 'Ahmed Mohamed',
-      phone: '+20 101 234 5678',
-      age: '34',
-      gender: 'male',
-      children: [
-        {
-          _id: 'child_demo_leila',
-          name: 'ليلى أحمد',
-          age: '7',
-          gender: 'female',
-          wristband: '#KW-01'
-        }
-      ]
-    };
-
-    localStorage.setItem('american_dream_user_logged_in', 'true');
-    localStorage.setItem('american_dream_user_profile', JSON.stringify({
-      id: demoGuest._id,
-      name: demoGuest.name,
-      phone: demoGuest.phone,
-      age: demoGuest.age,
-      gender: demoGuest.gender,
-      email: 'ahmed@americandream.com',
-      address: 'Canal Waterfront Road, Ferdan District, Ismailia',
-      passId: '#AD-84920',
-      memberSince: 'March 2027',
-      points: 1350,
-      storeCredit: 135.00
-    }));
-    localStorage.setItem('american_dream_user_children', JSON.stringify([
-      {
-        id: 'child-1',
-        name: 'Leila Ahmed',
-        gender: 'female',
-        age: 7,
-        wristband: '#KW-01'
-      }
-    ]));
-    localStorage.setItem('american_dream_active_user', JSON.stringify({
-      id: demoGuest._id,
-      name: demoGuest.name,
-      phone: demoGuest.phone,
-      age: demoGuest.age,
-      gender: demoGuest.gender,
-      children: demoGuest.children,
-      points: 1350
-    }));
-
-    playCoinSound();
-    try {
-      confetti({ particleCount: 80, spread: 75, origin: { y: 0.5 } });
-    } catch {}
-
-    const targetTitle = pendingSign ? (lang === 'ar' ? pendingSign.titleAr : pendingSign.titleEn) : (lang === 'ar' ? 'الحديقة' : 'the park');
-    setAuthSuccessMsg(lang === 'ar' ? `مرحباً بعودتك أحمد! جاري نقلك إلى ${targetTitle}...` : `Welcome back Ahmed! Redirecting to ${targetTitle}...`);
-
-    setTimeout(() => {
-      setShowAuthModal(false);
-      if (setActiveTab) {
-        setActiveTab(pendingSign ? pendingSign.tab : 'home');
-      }
-    }, 400);
-  };
-
   // Continue as Guest handler
   const handleContinueAsGuest = () => {
+    localStorage.setItem('american_dream_user_logged_in', 'false');
+    localStorage.setItem('american_dream_is_guest', 'true');
+    localStorage.removeItem('kids_area_auth_token');
+    localStorage.removeItem('american_dream_active_user');
+    localStorage.setItem('kids_area_auth_user', JSON.stringify({ id: 'guest', name: 'Guest' }));
     playCoinSound();
     setShowAuthModal(false);
     if (setActiveTab) {

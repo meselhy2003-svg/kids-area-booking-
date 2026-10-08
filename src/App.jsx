@@ -41,6 +41,7 @@ import LobbyPage from './pages/LobbyPage';
 // Styles
 import './components/MobilePlayZone.css';
 import './components/DesktopPlayZone.css';
+import { isUserAuthenticated } from './api/authService';
 
 export default function App() {
   // Always open the Lobby Gateway first when the site loads
@@ -131,6 +132,22 @@ export default function App() {
   }, []);
 
   const openModal = (type, data = null) => {
+    // If opening booking or offer and user is NOT authenticated, require sign in / sign up
+    if (type === 'booking' || type === 'partyBooking') {
+      const isAuth = isUserAuthenticated();
+      if (!isAuth) {
+        setModal({
+          isOpen: true,
+          type: 'auth-required',
+          data: {
+            action: 'offer',
+            offerData: data,
+            returnType: type
+          }
+        });
+        return;
+      }
+    }
     setModal({ isOpen: true, type, data });
   };
 

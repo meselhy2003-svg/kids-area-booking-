@@ -2966,5 +2966,207 @@
   line-height: 1.32;
 }
 
+/* ==========================================================================
+   AUTH REQUIRED MODAL (GUEST INTERCEPTION FOR OFFERS, CHECKOUT, BOOKING)
+   ========================================================================== */
+.auth-required-sheet {
+  max-width: 480px;
+  background: #ffffff;
+  border-radius: 28px 28px 0 0;
+  padding: 24px 22px 30px;
+  position: relative;
+  box-shadow: 0 -12px 36px rgba(0, 43, 50, 0.28);
+}
+
+@media (min-width: 768px) {
+  .mobile-modal-backdrop:has(.auth-required-sheet) {
+    align-items: center;
+    background: rgba(1, 43, 50, 0.72);
+  }
+  .auth-required-sheet {
+    border-radius: 28px;
+    margin: 20px auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    animation: zoomInModal 0.22s ease-out;
+  }
+}
+
+@keyframes zoomInModal {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.auth-required-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-required-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 4px;
+}
+
+.auth-required-badge-circle {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.25);
+}
+
+.auth-required-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #007287;
+  background: rgba(0, 169, 195, 0.12);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 169, 195, 0.25);
+  letter-spacing: 0.3px;
+}
+
+.auth-required-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #012b32;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.auth-required-desc {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+  max-width: 380px;
+}
+
+/* Segmented Tabs */
+.auth-required-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #f1f5f9;
+  border-radius: 14px;
+  padding: 4px;
+  gap: 6px;
+}
+
+.auth-req-tab {
+  border: none;
+  background: transparent;
+  padding: 10px 14px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #64748b;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-req-tab.active {
+  background: #ffffff;
+  color: #012b32;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Form Fields */
+.auth-req-form {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.auth-req-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: right;
+}
+
+[dir="ltr"] .auth-req-field {
+  text-align: left;
+}
+
+.auth-req-submit {
+  width: 100%;
+  margin-top: 6px;
+  background: linear-gradient(135deg, #00a9c3 0%, #012b32 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-size: 0.98rem;
+  font-weight: 800;
+  padding: 13px 20px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 169, 195, 0.35);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.auth-req-submit:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.auth-req-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.auth-req-switch-wrap {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.auth-req-switch-btn {
+  background: none;
+  border: none;
+  color: #00a9c3;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.auth-req-alert {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-req-alert.error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.auth-req-alert.success {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
 
 
