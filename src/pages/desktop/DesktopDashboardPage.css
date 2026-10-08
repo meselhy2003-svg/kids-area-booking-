@@ -105,6 +105,19 @@
   transform: translateX(2px);
 }
 
+.ados-sidebar-nav-link.active-nav {
+  background: rgba(0, 168, 204, 0.25);
+  border-color: #00a8cc;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 168, 204, 0.2);
+}
+
+.ados-orders-btn.active-view {
+  background-color: #00a8cc !important;
+  box-shadow: 0 0 0 2px #38bdf8, 0 6px 18px rgba(0, 168, 204, 0.5);
+}
+
 .ados-sidebar-nav-link span {
   display: flex;
   align-items: center;

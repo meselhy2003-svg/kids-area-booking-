@@ -28,6 +28,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 import './DesktopDashboardPage.css';
+import PlayZoneOrdersView from './PlayZoneOrdersView';
+import TripsOrdersView from './TripsOrdersView';
 
 // Curated Local Assets for quick selection & fallback
 const LOCAL_ASSET_GALLERY = [
@@ -429,6 +431,39 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
   // Current active zone tab: 'challenge' | 'kids-area' | 'fun-park' | 'adventure' | 'home' | 'packages'
   const [activeZone, setActiveZone] = useState('challenge');
 
+  // Dashboard View State: 'playzone-orders' | 'trips-orders' | 'editor'
+  const [dashboardView, setDashboardView] = useState(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.hash.includes('trips-orders')) return 'trips-orders';
+      if (window.location.hash.includes('editor')) return 'editor';
+    }
+    return 'playzone-orders';
+  });
+
+  useEffect(() => {
+    const handleHash = () => {
+      if (typeof window !== 'undefined') {
+        if (window.location.hash.includes('trips-orders')) {
+          setDashboardView('trips-orders');
+        } else if (window.location.hash.includes('playzone-orders')) {
+          setDashboardView('playzone-orders');
+        } else if (window.location.hash.includes('editor')) {
+          setDashboardView('editor');
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  const handleSwitchDashboardView = (view) => {
+    setDashboardView(view);
+    if (typeof window !== 'undefined') {
+      window.location.hash = `dashboard/${view}`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   // Orders State
   const [orders, setOrders] = useState(() => {
     try {
@@ -779,18 +814,44 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
             />
           </button>
 
-          {/* Web Admin Dashboard Nav Link */}
-          <button 
-            className="ados-sidebar-nav-link"
-            onClick={() => setActiveTab('home')}
-            title="Click to view the public website"
-          >
-            <span>
-              <Globe size={15} color="#38bdf8" />
-              Web Admin Dashboard
-            </span>
-            <ChevronRight size={14} color="#94a3b8" />
-          </button>
+          {/* Web Admin Dashboard & Order Links */}
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+            <button 
+              className={`ados-sidebar-nav-link ${dashboardView === 'editor' ? 'active-nav' : ''}`}
+              onClick={() => handleSwitchDashboardView('editor')}
+              title="Click to view Zone Content Editor"
+            >
+              <span>
+                <Globe size={15} color="#38bdf8" />
+                Web Admin Dashboard
+              </span>
+              <ChevronRight size={14} color="#94a3b8" />
+            </button>
+
+            <button 
+              className={`ados-sidebar-nav-link ${dashboardView === 'playzone-orders' ? 'active-nav' : ''}`}
+              onClick={() => handleSwitchDashboardView('playzone-orders')}
+              title="View Play Zone Orders & Bookings"
+            >
+              <span>
+                <Ticket size={15} color="#38bdf8" />
+                Play Zone Orders
+              </span>
+              <ChevronRight size={14} color="#94a3b8" />
+            </button>
+
+            <button 
+              className={`ados-sidebar-nav-link ${dashboardView === 'trips-orders' ? 'active-nav' : ''}`}
+              onClick={() => handleSwitchDashboardView('trips-orders')}
+              title="View Institutional Trips Orders"
+            >
+              <span>
+                <Calendar size={15} color="#38bdf8" />
+                Trips Orders
+              </span>
+              <ChevronRight size={14} color="#94a3b8" />
+            </button>
+          </div>
         </div>
 
         {/* Sidebar Footer */}
@@ -817,24 +878,53 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
       <div className="ados-main-area">
         {/* Topbar */}
         <header className="ados-topbar">
-          <div style={{ width: 140 }}></div>
+          <div style={{ width: 140, display: 'flex', gap: 8 }}>
+            {dashboardView !== 'editor' && (
+              <button 
+                type="button" 
+                className="ados-sidebar-nav-link"
+                style={{ padding: '6px 12px', fontSize: 12, width: 'auto', background: 'rgba(255,255,255,0.08)' }}
+                onClick={() => handleSwitchDashboardView('editor')}
+              >
+                ← Web Editor
+              </button>
+            )}
+          </div>
           <div className="ados-topbar-title-group">
             <h1 className="ados-topbar-title">ADOS Management Dashboard</h1>
             <div className="ados-topbar-subtitle">More Fun. More Value. More Memories.</div>
           </div>
-          <button 
-            className="ados-orders-btn"
-            onClick={() => setIsOrdersModalOpen(true)}
-          >
-            PLAY ZONE ORDERS
-            <span className="ados-orders-count-badge">{orders.length}</span>
-          </button>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <button 
+              className={`ados-orders-btn ${dashboardView === 'playzone-orders' ? 'active-view' : ''}`}
+              onClick={() => handleSwitchDashboardView('playzone-orders')}
+            >
+              PLAY ZONE ORDERS
+              <span className="ados-orders-count-badge">86</span>
+            </button>
+            <button 
+              className={`ados-orders-btn ${dashboardView === 'trips-orders' ? 'active-view' : ''}`}
+              style={{
+                background: dashboardView === 'trips-orders' ? '#00a8cc' : 'rgba(0, 168, 204, 0.2)',
+                border: '1px solid rgba(0, 168, 204, 0.4)'
+              }}
+              onClick={() => handleSwitchDashboardView('trips-orders')}
+            >
+              TRIPS ORDERS
+            </button>
+          </div>
         </header>
 
         {/* Dashboard Content Container */}
         <div className="ados-content">
-          {/* Zone Navigation Pills */}
-          <nav className="ados-zone-nav">
+          {dashboardView === 'playzone-orders' ? (
+            <PlayZoneOrdersView onSwitchToTrips={() => handleSwitchDashboardView('trips-orders')} />
+          ) : dashboardView === 'trips-orders' ? (
+            <TripsOrdersView />
+          ) : (
+            <>
+              {/* Zone Navigation Pills */}
+              <nav className="ados-zone-nav">
             <button 
               className={`ados-zone-pill ${activeZone === 'home' ? 'active' : ''}`}
               onClick={() => setActiveZone('home')}
@@ -1290,6 +1380,8 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
               Save Changes
             </button>
           </div>
+            </>
+          )}
         </div>
       </div>
 
