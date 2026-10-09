@@ -59,6 +59,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 24px;
 }
 
 .desktop-nav-brand {
@@ -119,7 +120,7 @@
 .desktop-nav-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 22px;
 }
 
 /* Parachute button */
@@ -131,6 +132,7 @@
   align-items: center;
   justify-content: center;
   padding: 4px;
+  margin: 0 2px;
   border-radius: 50%;
   transition: transform 0.2s ease;
 }
@@ -146,19 +148,22 @@
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-/* User Profile Pill ("Ahmed" + Avatar - Image 1 and 2 match) */
+/* User Profile Button (Icon Only - Computer View) */
 .desktop-nav-user-pill {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
   background: #003744;
   border: 1.5px solid #00a9c3;
-  border-radius: 30px;
-  padding: 5px 14px;
+  border-radius: 50%;
+  padding: 0;
   color: #ffffff;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
 
 .desktop-nav-user-pill:hover {
@@ -174,20 +179,9 @@
   box-shadow: 0 4px 14px rgba(245, 158, 11, 0.45);
 }
 
-.desktop-nav-user-pill.active .desktop-nav-user-name {
-  color: #012b32;
-  font-weight: 850;
-}
-
-.desktop-nav-user-name {
-  font-size: 0.95rem;
-  font-weight: 750;
-  color: #ffffff;
-}
-
 .desktop-nav-user-icon-wrap {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -195,8 +189,8 @@
 }
 
 .desktop-nav-user-svg {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   stroke: #00c5de;
   transition: stroke 0.2s ease;
 }
@@ -207,6 +201,38 @@
 
 .desktop-nav-user-pill.active .desktop-nav-user-svg {
   stroke: #012b32;
+}
+
+.desktop-nav-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1.5px solid rgba(239, 68, 68, 0.4);
+  border-radius: 30px;
+  padding: 5px 12px;
+  color: #fca5a5;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.desktop-nav-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+}
+
+.desktop-nav-logout-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.desktop-nav-logout-btn:hover svg {
+  transform: translateX(-2px);
 }
 
 /* Floating 2250 pts Badge right beneath navbar */

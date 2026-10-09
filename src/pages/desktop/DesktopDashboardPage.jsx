@@ -25,11 +25,13 @@ import {
   Sparkles,
   Upload,
   ArrowRight,
-  ChevronRight
+  ChevronRight,
+  ChevronLeft,
+  LogOut
 } from 'lucide-react';
 import './DesktopDashboardPage.css';
-import PlayZoneOrdersView from './PlayZoneOrdersView';
-import TripsOrdersView from './TripsOrdersView';
+import PlayZoneOrdersManager from './PlayZoneOrdersManager';
+import { authService } from '../../api/authService';
 
 // Curated Local Assets for quick selection & fallback
 const LOCAL_ASSET_GALLERY = [
@@ -60,11 +62,12 @@ const LOCAL_ASSET_GALLERY = [
   { name: 'Resort Architecture', path: '/photo/kid area pic/American Dream Ismailia luxury event hall architecture setup.png' }
 ];
 
-// Initial Master Data for All Zones matching the 4 Screenshots precisely
+// Initial Master Data for All Zones
 const INITIAL_ZONES_DATA = {
-  // Screenshot 1 & 3: CHALLENGE ZONE
+  // CHALLENGE ZONE
   'challenge': {
     name: 'CHALLENGE ZONE',
+    nameAr: 'منطقة التحدي',
     icon: 'gamepad',
     hero: {
       titleEn: 'CHALLENGE ZONE',
@@ -78,7 +81,7 @@ const INITIAL_ZONES_DATA = {
       ],
       activeSlideIndex: 0
     },
-    subTab: 'packages', // 'packages' | 'tickets'
+    subTab: 'packages',
     packages: [
       {
         id: 'ch-pkg-1',
@@ -86,6 +89,7 @@ const INITIAL_ZONES_DATA = {
         titleAr: 'تذكرة التحدي الشاملة',
         subtitle: 'Pick any 4 games',
         badge: 'Save 60 EGP',
+        badgeAr: 'وفر 60 ج.م',
         price: 100,
         originalPrice: 160,
         image: '/photo/kid area pic/Photo 3_ VR Arena Friends.png',
@@ -114,9 +118,10 @@ const INITIAL_ZONES_DATA = {
     }
   },
 
-  // Screenshot 2: Kids Area
+  // Kids Area
   'kids-area': {
     name: 'Kids Area',
+    nameAr: 'منطقة الأطفال',
     icon: 'baby',
     hero: {
       titleEn: 'Kids Area',
@@ -137,6 +142,7 @@ const INITIAL_ZONES_DATA = {
         title: 'Single Midweek',
         titleAr: 'تذكرة فردية منتصف الأسبوع',
         badge: 'SAVE 85 EGP',
+        badgeAr: 'وفر 85 ج.م',
         ages: 'Ages 1 - 3',
         features: ['All-day entry + 1 Package جبس وألوان'],
         price: 100,
@@ -148,6 +154,7 @@ const INITIAL_ZONES_DATA = {
         title: 'Sisters Midweek',
         titleAr: 'تذكرة الأختين منتصف الأسبوع',
         badge: 'SAVE 150 EGP',
+        badgeAr: 'وفر 150 ج.م',
         ages: 'Ages 1 - 3',
         features: ['All-day entry for 2 kids'],
         price: 150,
@@ -159,6 +166,7 @@ const INITIAL_ZONES_DATA = {
         title: 'Single Weekend',
         titleAr: 'تذكرة فردية نهاية الأسبوع',
         badge: 'SAVE 35 EGP',
+        badgeAr: 'وفر 35 ج.م',
         ages: 'Ages 1 - 3',
         features: ['All-day entry + 1 Package جبس وألوان', '+ Free coloring workshop + Party included'],
         price: 150,
@@ -170,6 +178,7 @@ const INITIAL_ZONES_DATA = {
         title: 'Sisters Weekend',
         titleAr: 'تذكرة الأختين نهاية الأسبوع',
         badge: 'SAVE 120 EGP',
+        badgeAr: 'وفر 120 ج.م',
         ages: 'Ages 1 - 3',
         features: ['Entry for 2 kids + 2 Package جبس وألوان', '+ Free coloring workshop + Party included'],
         price: 250,
@@ -188,9 +197,10 @@ const INITIAL_ZONES_DATA = {
     }
   },
 
-  // Screenshot 4: Fun Park
+  // Fun Park
   'fun-park': {
     name: 'Fun Park',
+    nameAr: 'منطقة المرح',
     icon: 'ferris',
     hero: {
       titleEn: 'Fun Park',
@@ -211,6 +221,7 @@ const INITIAL_ZONES_DATA = {
         title: 'Single Midweek',
         titleAr: 'تذكرة فردية منتصف الأسبوع',
         badge: 'SAVE 85 EGP',
+        badgeAr: 'وفر 85 ج.م',
         ages: 'Ages 4 - 12',
         features: ['All-day entry + 1 Game(1 VR)'],
         price: 100,
@@ -222,6 +233,7 @@ const INITIAL_ZONES_DATA = {
         title: 'Sisters Midweek',
         titleAr: 'تذكرة الأختين منتصف الأسبوع',
         badge: 'SAVE 150 EGP',
+        badgeAr: 'وفر 150 ج.م',
         ages: 'Ages 4 - 12',
         features: ['All-day entry for 2 kids'],
         price: 150,
@@ -233,6 +245,7 @@ const INITIAL_ZONES_DATA = {
         title: 'Friends Midweek',
         titleAr: 'تذكرة الأصدقاء منتصف الأسبوع',
         badge: 'SAVE 95 EGP',
+        badgeAr: 'وفر 95 ج.م',
         ages: 'Ages 4 - 12',
         features: ['All-day entry for 3 kids'],
         price: 225,
@@ -244,6 +257,7 @@ const INITIAL_ZONES_DATA = {
         title: 'Single Weekend',
         titleAr: 'تذكرة فردية نهاية الأسبوع',
         badge: 'SAVE 35 EGP',
+        badgeAr: 'وفر 35 ج.م',
         ages: 'Ages 4 - 12',
         features: ['All-day entry + 2 Game(1 VR, 1 Basketball) + Party'],
         price: 150,
@@ -255,6 +269,7 @@ const INITIAL_ZONES_DATA = {
         title: 'Sisters Weekend',
         titleAr: 'تذكرة الأختين نهاية الأسبوع',
         badge: 'SAVE 50 EGP',
+        badgeAr: 'وفر 50 ج.م',
         ages: 'Ages 4 - 12',
         features: ['All-day entry for 2 kids + 2 Game(1 VR, 1 Basketball) + Party'],
         price: 250,
@@ -266,6 +281,7 @@ const INITIAL_ZONES_DATA = {
         title: 'Friends Weekend',
         titleAr: 'تذكرة الأصدقاء نهاية الأسبوع',
         badge: 'SAVE 25 EGP',
+        badgeAr: 'وفر 25 ج.م',
         ages: 'Ages 4 - 12',
         features: ['All-day entry for 3 kids + 3 Game(1 VR, 1 Basketball) + Party'],
         price: 375,
@@ -287,6 +303,7 @@ const INITIAL_ZONES_DATA = {
   // Adventure Zone
   'adventure': {
     name: 'ADVENTURE ZONE',
+    nameAr: 'منطقة المغامرات',
     icon: 'zap',
     hero: {
       titleEn: 'ADVENTURE ZONE',
@@ -306,6 +323,7 @@ const INITIAL_ZONES_DATA = {
         title: 'Ropes & Climbing Pass',
         titleAr: 'تذكرة تسلق الحبال والمغامرة',
         badge: 'SAVE 50 EGP',
+        badgeAr: 'وفر 50 ج.م',
         ages: 'Ages 8+',
         features: ['High ropes obstacle course', 'Zip-line ride', 'Climbing wall access'],
         price: 150,
@@ -329,6 +347,7 @@ const INITIAL_ZONES_DATA = {
   // Home Page
   'home': {
     name: 'Home',
+    nameAr: 'الرئيسية',
     icon: 'home',
     hero: {
       titleEn: 'AMERICAN DREAM RESORT',
@@ -348,6 +367,7 @@ const INITIAL_ZONES_DATA = {
         title: 'All-Day Resort Pass',
         titleAr: 'تذكرة اليوم الكامل لجميع المناطق',
         badge: 'BEST VALUE',
+        badgeAr: 'أفضل قيمة',
         ages: 'All Ages',
         features: ['Access to Kids Area & Fun Park', 'Challenge Zone VR Access', 'Free parking & Welcome Drink'],
         price: 350,
@@ -369,6 +389,7 @@ const INITIAL_ZONES_DATA = {
   // Packages Zone
   'packages': {
     name: 'PACKAGES',
+    nameAr: 'الباقات والعروض',
     icon: 'boxes',
     hero: {
       titleEn: 'EXCLUSIVE PACKAGES',
@@ -388,6 +409,7 @@ const INITIAL_ZONES_DATA = {
         title: 'Family Mega Bundle',
         titleAr: 'باقة العائلة الذهبية',
         badge: 'SAVE 300 EGP',
+        badgeAr: 'وفر 300 ج.م',
         ages: 'Family (4 Persons)',
         features: ['Entry for 2 Adults + 2 Kids', '200 EGP Arcade credits', 'Meal voucher included'],
         price: 650,
@@ -407,16 +429,14 @@ const INITIAL_ZONES_DATA = {
   }
 };
 
-// Initial Orders Data
-const INITIAL_ORDERS = [
-  { id: 'ORD-1092', customer: 'Ahmed El-Sayed', phone: '01012345678', zone: 'Kids Area', item: 'Single Midweek Pass', qty: 2, total: '200 EGP', date: 'Today, 14:30', status: 'Confirmed' },
-  { id: 'ORD-1091', customer: 'Sara Mahmoud', phone: '01287654321', zone: 'Fun Park', item: 'Sisters Midweek Package', qty: 1, total: '150 EGP', date: 'Today, 13:15', status: 'Completed' },
-  { id: 'ORD-1090', customer: 'Mohamed Karim', phone: '01198765432', zone: 'Challenge Zone', item: 'Challenge Pass (4 Games)', qty: 3, total: '300 EGP', date: 'Yesterday, 19:40', status: 'Confirmed' },
-  { id: 'ORD-1089', customer: 'Nouran Adel', phone: '01555543210', zone: 'Challenge Zone', item: 'Air Hockey (30 min)', qty: 2, total: '100 EGP', date: 'Yesterday, 18:20', status: 'Completed' },
-  { id: 'ORD-1088', customer: 'Tamer Hosny', phone: '01066778899', zone: 'Kids Area', item: 'Sisters Weekend', qty: 1, total: '250 EGP', date: '2 days ago', status: 'Pending' }
-];
+export default function DesktopDashboardPage({ 
+  setActiveTab, 
+  openModal, 
+  lang = 'ar',
+  setLang 
+}) {
+  const isAr = lang === 'ar';
 
-export default function DesktopDashboardPage({ setActiveTab, openModal, lang = 'ar' }) {
   // Master state
   const [zonesData, setZonesData] = useState(() => {
     try {
@@ -431,57 +451,29 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
   // Current active zone tab: 'challenge' | 'kids-area' | 'fun-park' | 'adventure' | 'home' | 'packages'
   const [activeZone, setActiveZone] = useState('challenge');
 
-  // Dashboard View State: 'playzone-orders' | 'trips-orders' | 'editor'
-  const [dashboardView, setDashboardView] = useState(() => {
+  // Modals state
+  const [isOrdersViewOpen, setIsOrdersViewOpen] = useState(() => {
     if (typeof window !== 'undefined') {
-      if (window.location.hash.includes('trips-orders')) return 'trips-orders';
-      if (window.location.hash.includes('editor')) return 'editor';
+      return window.location.hash === '#playzone-orders' || window.location.hash === '#orders';
     }
-    return 'playzone-orders';
+    return false;
   });
 
   useEffect(() => {
     const handleHash = () => {
-      if (typeof window !== 'undefined') {
-        if (window.location.hash.includes('trips-orders')) {
-          setDashboardView('trips-orders');
-        } else if (window.location.hash.includes('playzone-orders')) {
-          setDashboardView('playzone-orders');
-        } else if (window.location.hash.includes('editor')) {
-          setDashboardView('editor');
-        }
+      if (window.location.hash === '#playzone-orders' || window.location.hash === '#orders') {
+        setIsOrdersViewOpen(true);
       }
     };
     window.addEventListener('hashchange', handleHash);
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
-  const handleSwitchDashboardView = (view) => {
-    setDashboardView(view);
-    if (typeof window !== 'undefined') {
-      window.location.hash = `dashboard/${view}`;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
-  // Orders State
-  const [orders, setOrders] = useState(() => {
-    try {
-      const saved = localStorage.getItem('ados_playzone_orders');
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      // ignore
-    }
-    return INITIAL_ORDERS;
-  });
-
-  // Modals state
-  const [isOrdersModalOpen, setIsOrdersModalOpen] = useState(false);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [cardModalMode, setCardModalMode] = useState('edit'); // 'edit' | 'add'
   const [editingCard, setEditingCard] = useState(null);
   const [isImagePickerOpen, setIsImagePickerOpen] = useState(false);
-  const [imagePickerTarget, setImagePickerTarget] = useState(null); // { type: 'hero' | 'explore' | 'card', slotIndex?: number }
+  const [imagePickerTarget, setImagePickerTarget] = useState(null);
   const [is360ModalOpen, setIs360ModalOpen] = useState(false);
 
   // Toast feedback state
@@ -491,12 +483,22 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
     setTimeout(() => setToastMessage(''), 3500);
   };
 
+  // Admin Logout Handler
+  const handleAdminLogout = async () => {
+    const confirmMsg = isAr 
+      ? 'هل أنت متأكد من رغبتك في تسجيل الخروج من لوحة الإدارة والعودة للبوابة الرئيسية؟' 
+      : 'Are you sure you want to log out from the Admin Dashboard and return to the lobby?';
+    if (window.confirm(confirmMsg)) {
+      await authService.logout();
+      if (setActiveTab) setActiveTab('lobby');
+      if (typeof window !== 'undefined') {
+        window.location.hash = '#lobby';
+      }
+    }
+  };
+
   // File input ref for upload
   const fileInputRef = useRef(null);
-
-  // Orders filter & search
-  const [orderSearch, setOrderSearch] = useState('');
-  const [orderZoneFilter, setOrderZoneFilter] = useState('All');
 
   // Get current zone data
   const currentZoneData = zonesData[activeZone] || zonesData['challenge'];
@@ -510,24 +512,26 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
   const handleSaveChanges = () => {
     try {
       localStorage.setItem('ados_dashboard_master_data_v2', JSON.stringify(zonesData));
-      // Trigger canvas confetti celebration
       confetti({
         particleCount: 80,
         spread: 70,
         origin: { y: 0.6 }
       });
-      showToast('✓ All changes saved successfully to ADOS Management Dashboard!');
+      showToast(isAr ? '✓ تم حفظ جميع التعديلات بنجاح في لوحة التحكم!' : '✓ All changes saved successfully to ADOS Management Dashboard!');
     } catch (err) {
-      showToast('Error saving changes to local storage.');
+      showToast(isAr ? 'حدث خطأ أثناء حفظ التعديلات.' : 'Error saving changes to local storage.');
     }
   };
 
   // Revert changes
   const handleCancelChanges = () => {
-    if (window.confirm('Reset all changes back to saved defaults?')) {
+    const confirmPrompt = isAr 
+      ? 'هل أنت متأكد من استعادة البيانات الافتراضية وإلغاء جميع التعديلات؟' 
+      : 'Reset all changes back to saved defaults?';
+    if (window.confirm(confirmPrompt)) {
       localStorage.removeItem('ados_dashboard_master_data_v2');
       setZonesData(INITIAL_ZONES_DATA);
-      showToast('Changes reset to defaults.');
+      showToast(isAr ? 'تمت استعادة البيانات الافتراضية.' : 'Changes reset to defaults.');
     }
   };
 
@@ -559,7 +563,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
   // Delete current Hero Banner image
   const handleDeleteHeroBanner = () => {
     if (currentHeroImages.length <= 1) {
-      alert('You must have at least one hero banner image.');
+      alert(isAr ? 'يجب الإبقاء على صورة واحدة على الأقل لشريحة الغلاف.' : 'You must have at least one hero banner image.');
       return;
     }
     const updatedImages = currentHeroImages.filter((_, idx) => idx !== activeSlideIndex);
@@ -574,7 +578,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
         }
       }
     }));
-    showToast('Hero image removed.');
+    showToast(isAr ? 'تمت إزالة صورة الغلاف.' : 'Hero image removed.');
   };
 
   // Open Image Picker
@@ -588,7 +592,6 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
     if (!imagePickerTarget) return;
 
     if (imagePickerTarget.type === 'hero') {
-      // Update hero image
       const newImages = [...currentHeroImages];
       newImages[activeSlideIndex] = imagePath;
       setZonesData(prev => ({
@@ -601,7 +604,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
           }
         }
       }));
-      showToast('Hero banner updated.');
+      showToast(isAr ? 'تم تحديث صورة الغلاف.' : 'Hero banner updated.');
     } else if (imagePickerTarget.type === 'explore') {
       const exploreList = [...(currentZoneData.explore || [])];
       if (imagePickerTarget.slotIndex !== undefined && exploreList[imagePickerTarget.slotIndex]) {
@@ -620,7 +623,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
           explore: exploreList
         }
       }));
-      showToast('Explore photo updated.');
+      showToast(isAr ? 'تم تحديث صورة الاستكشاف.' : 'Explore photo updated.');
     } else if (imagePickerTarget.type === 'card' && editingCard) {
       setEditingCard(prev => ({ ...prev, image: imagePath }));
     }
@@ -653,7 +656,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
         explore: exploreList
       }
     }));
-    showToast('Photo removed from Explore section.');
+    showToast(isAr ? 'تم حذف الصورة من قسم الاستكشاف.' : 'Photo removed from Explore section.');
   };
 
   // Open Edit Card Modal
@@ -676,6 +679,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
       titleAr: isTicket ? 'تذكرة نشاط جديدة' : 'عرض باقة جديدة',
       subtitle: isTicket ? '' : 'All-day access pass',
       badge: isTicket ? '' : 'SAVE 50 EGP',
+      badgeAr: isTicket ? '' : 'وفر 50 ج.م',
       ages: isTicket ? '' : 'Ages 4 - 12',
       price: 50,
       originalPrice: 80,
@@ -714,13 +718,15 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
 
     setIsCardModalOpen(false);
     setEditingCard(null);
-    showToast(`✓ ${editingCard.title} saved successfully.`);
+    showToast(isAr ? `✓ تم حفظ ${editingCard.titleAr || editingCard.title} بنجاح.` : `✓ ${editingCard.title} saved successfully.`);
   };
 
   // Delete Card
   const handleDeleteCard = () => {
     if (!editingCard) return;
-    if (window.confirm(`Are you sure you want to delete "${editingCard.title}"?`)) {
+    const itemTitle = editingCard.titleAr || editingCard.title;
+    const confirmPrompt = isAr ? `هل أنت متأكد من حذف "${itemTitle}"؟` : `Are you sure you want to delete "${itemTitle}"?`;
+    if (window.confirm(confirmPrompt)) {
       const isTicket = editingCard.isTicket || activeSubTab === 'tickets';
       const listKey = isTicket ? 'tickets' : 'packages';
       const list = (currentZoneData[listKey] || []).filter(c => c.id !== editingCard.id);
@@ -735,76 +741,36 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
 
       setIsCardModalOpen(false);
       setEditingCard(null);
-      showToast('Item deleted.');
+      showToast(isAr ? 'تم حذف العنصر.' : 'Item deleted.');
     }
   };
 
-  // Add Mock Order in Orders Modal
-  const handleAddMockOrder = () => {
-    const newOrder = {
-      id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
-      customer: 'VIP Guest',
-      phone: '010' + Math.floor(10000000 + Math.random() * 90000000),
-      zone: currentZoneData.name,
-      item: 'All-Day Pass & VR Tokens',
-      qty: 1,
-      total: '250 EGP',
-      date: 'Just now',
-      status: 'Confirmed'
-    };
-    const updated = [newOrder, ...orders];
-    setOrders(updated);
-    try {
-      localStorage.setItem('ados_playzone_orders', JSON.stringify(updated));
-    } catch (e) {}
-    showToast(`Order #${newOrder.id} generated.`);
-  };
-
-  // Toggle Order Status
-  const handleToggleOrderStatus = (orderId) => {
-    const updated = orders.map(ord => {
-      if (ord.id === orderId) {
-        const nextStatus = ord.status === 'Confirmed' ? 'Completed' : ord.status === 'Completed' ? 'Pending' : 'Confirmed';
-        return { ...ord, status: nextStatus };
-      }
-      return ord;
-    });
-    setOrders(updated);
-    try {
-      localStorage.setItem('ados_playzone_orders', JSON.stringify(updated));
-    } catch (e) {}
-  };
-
-  // Delete Order
-  const handleDeleteOrder = (orderId) => {
-    const updated = orders.filter(ord => ord.id !== orderId);
-    setOrders(updated);
-    try {
-      localStorage.setItem('ados_playzone_orders', JSON.stringify(updated));
-    } catch (e) {}
-    showToast('Order removed.');
-  };
-
-  // Filtered orders list
-  const filteredOrders = orders.filter(ord => {
-    const matchesSearch = ord.customer.toLowerCase().includes(orderSearch.toLowerCase()) || 
-                          ord.id.toLowerCase().includes(orderSearch.toLowerCase()) ||
-                          ord.phone.includes(orderSearch);
-    const matchesZone = orderZoneFilter === 'All' || ord.zone.toLowerCase().includes(orderZoneFilter.toLowerCase());
-    return matchesSearch && matchesZone;
-  });
+  // Render Full Play Zone & Trips Orders Management Suite
+  if (isOrdersViewOpen) {
+    return (
+      <PlayZoneOrdersManager 
+        onBackToDashboard={() => setIsOrdersViewOpen(false)} 
+        onGoHome={() => setActiveTab && setActiveTab('home')}
+        lang={lang} 
+        setLang={setLang}
+      />
+    );
+  }
 
   return (
-    <div className="ados-dashboard-container">
+    <div 
+      className={`ados-dashboard-container ${isAr ? 'lang-ar' : ''}`}
+      dir={isAr ? 'rtl' : 'ltr'}
+    >
       {/* ------------------------------------------------------------------ */}
-      {/* 1. LEFT SIDEBAR                                                   */}
+      {/* 1. SIDEBAR                                                         */}
       {/* ------------------------------------------------------------------ */}
       <aside className="ados-sidebar">
         <div className="ados-sidebar-top">
           {/* Logo */}
           <button 
             className="ados-sidebar-logo-btn" 
-            title="Return to American Dream Website"
+            title={isAr ? 'العودة لموقع أمريكان دريم' : 'Return to American Dream Website'}
             onClick={() => setActiveTab('home')}
           >
             <img 
@@ -814,50 +780,51 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
             />
           </button>
 
-          {/* Web Admin Dashboard & Order Links */}
-          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
-            <button 
-              className={`ados-sidebar-nav-link ${dashboardView === 'editor' ? 'active-nav' : ''}`}
-              onClick={() => handleSwitchDashboardView('editor')}
-              title="Click to view Zone Content Editor"
-            >
-              <span>
-                <Globe size={15} color="#38bdf8" />
-                Web Admin Dashboard
-              </span>
-              <ChevronRight size={14} color="#94a3b8" />
-            </button>
+          {/* Web Admin Dashboard Nav Link */}
+          <button 
+            className="ados-sidebar-nav-link"
+            onClick={() => setActiveTab('home')}
+            title={isAr ? 'الانتقال إلى الموقع العام' : 'Click to view the public website'}
+          >
+            <span>
+              <Globe size={15} color="#38bdf8" />
+              {isAr ? 'الموقع العام' : 'Visit Public Website'}
+            </span>
+            {isAr ? <ChevronLeft size={14} color="#94a3b8" /> : <ChevronRight size={14} color="#94a3b8" />}
+          </button>
 
-            <button 
-              className={`ados-sidebar-nav-link ${dashboardView === 'playzone-orders' ? 'active-nav' : ''}`}
-              onClick={() => handleSwitchDashboardView('playzone-orders')}
-              title="View Play Zone Orders & Bookings"
-            >
-              <span>
-                <Ticket size={15} color="#38bdf8" />
-                Play Zone Orders
-              </span>
-              <ChevronRight size={14} color="#94a3b8" />
-            </button>
-
-            <button 
-              className={`ados-sidebar-nav-link ${dashboardView === 'trips-orders' ? 'active-nav' : ''}`}
-              onClick={() => handleSwitchDashboardView('trips-orders')}
-              title="View Institutional Trips Orders"
-            >
-              <span>
-                <Calendar size={15} color="#38bdf8" />
-                Trips Orders
-              </span>
-              <ChevronRight size={14} color="#94a3b8" />
-            </button>
-          </div>
+          {/* Play Zone Orders Nav Link */}
+          <button 
+            className="ados-sidebar-nav-link"
+            onClick={() => setIsOrdersViewOpen(true)}
+            title={isAr ? 'إدارة طلبات البلاي زون والرحلات' : 'Manage Play Zone & Trips Orders'}
+          >
+            <span>
+              <Ticket size={15} color="#00d2ff" />
+              {isAr ? 'طلبات البلاي زون' : 'Play Zone Orders'}
+            </span>
+            <span style={{ 
+              marginInlineStart: 'auto', 
+              background: '#00d2ff', 
+              color: '#002830', 
+              padding: '2px 8px', 
+              borderRadius: '10px', 
+              fontSize: '11px', 
+              fontWeight: 800 
+            }}>
+              86
+            </span>
+          </button>
         </div>
 
         {/* Sidebar Footer */}
         <div className="ados-sidebar-footer">
-          <div className="ados-sidebar-brand-script">Play, Explore, Together!</div>
-          <div className="ados-sidebar-brand-subtitle">ISMAILIA FUN RESORT</div>
+          <div className="ados-sidebar-brand-script">
+            {isAr ? 'العب، استكشف، معاً!' : 'Play, Explore, Together!'}
+          </div>
+          <div className="ados-sidebar-brand-subtitle">
+            {isAr ? 'منتجع الإسماعيلية للمرح' : 'ISMAILIA FUN RESORT'}
+          </div>
           <div className="ados-sidebar-socials">
             <button className="ados-sidebar-social-icon" onClick={() => window.open('https://facebook.com', '_blank')}>
               <Facebook size={14} />
@@ -878,94 +845,116 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
       <div className="ados-main-area">
         {/* Topbar */}
         <header className="ados-topbar">
-          <div style={{ width: 140, display: 'flex', gap: 8 }}>
-            {dashboardView !== 'editor' && (
+          <div style={{ width: 140 }}></div>
+          <div className="ados-topbar-title-group">
+            <h1 className="ados-topbar-title">
+              {isAr ? 'لوحة تحكم إدارة أمريكان دريم' : 'ADOS Management Dashboard'}
+            </h1>
+            <div className="ados-topbar-subtitle">
+              {isAr ? 'مرح أكثر • قيمة أعلى • ذكريات تدوم' : 'More Fun. More Value. More Memories.'}
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {/* Language Toggle */}
+            <div className="ados-topbar-lang-toggle">
               <button 
                 type="button" 
-                className="ados-sidebar-nav-link"
-                style={{ padding: '6px 12px', fontSize: 12, width: 'auto', background: 'rgba(255,255,255,0.08)' }}
-                onClick={() => handleSwitchDashboardView('editor')}
+                className={`ados-lang-btn ${isAr ? 'active' : ''}`}
+                onClick={() => setLang && setLang('ar')}
+                title="عربي"
               >
-                ← Web Editor
+                عربي
               </button>
-            )}
-          </div>
-          <div className="ados-topbar-title-group">
-            <h1 className="ados-topbar-title">ADOS Management Dashboard</h1>
-            <div className="ados-topbar-subtitle">More Fun. More Value. More Memories.</div>
-          </div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              <button 
+                type="button" 
+                className={`ados-lang-btn ${!isAr ? 'active' : ''}`}
+                onClick={() => setLang && setLang('en')}
+                title="English"
+              >
+                EN
+              </button>
+            </div>
+
             <button 
-              className={`ados-orders-btn ${dashboardView === 'playzone-orders' ? 'active-view' : ''}`}
-              onClick={() => handleSwitchDashboardView('playzone-orders')}
+              className="ados-orders-btn"
+              onClick={() => setIsOrdersViewOpen(true)}
+              title={isAr ? 'فتح إدارة طلبات البلاي زون' : 'Open Play Zone & Trips Orders Management'}
             >
-              PLAY ZONE ORDERS
+              <span>{isAr ? 'طلبات البلاي زون' : 'PLAY ZONE ORDERS'}</span>
               <span className="ados-orders-count-badge">86</span>
             </button>
+
             <button 
-              className={`ados-orders-btn ${dashboardView === 'trips-orders' ? 'active-view' : ''}`}
+              type="button"
+              className="ados-logout-topbar-btn"
+              onClick={handleAdminLogout}
+              title={isAr ? 'تسجيل الخروج' : 'Log Out'}
               style={{
-                background: dashboardView === 'trips-orders' ? '#00a8cc' : 'rgba(0, 168, 204, 0.2)',
-                border: '1px solid rgba(0, 168, 204, 0.4)'
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'rgba(239, 68, 68, 0.15)',
+                border: '1.5px solid rgba(239, 68, 68, 0.4)',
+                borderRadius: '8px',
+                padding: '8px 14px',
+                color: '#fca5a5',
+                cursor: 'pointer',
+                fontWeight: 700,
+                fontSize: '12px',
+                transition: 'all 0.2s ease'
               }}
-              onClick={() => handleSwitchDashboardView('trips-orders')}
             >
-              TRIPS ORDERS
+              <LogOut size={15} />
+              <span>{isAr ? 'خروج' : 'Logout'}</span>
             </button>
           </div>
         </header>
 
         {/* Dashboard Content Container */}
         <div className="ados-content">
-          {dashboardView === 'playzone-orders' ? (
-            <PlayZoneOrdersView onSwitchToTrips={() => handleSwitchDashboardView('trips-orders')} />
-          ) : dashboardView === 'trips-orders' ? (
-            <TripsOrdersView />
-          ) : (
-            <>
-              {/* Zone Navigation Pills */}
-              <nav className="ados-zone-nav">
+          {/* Zone Navigation Pills */}
+          <nav className="ados-zone-nav">
             <button 
               className={`ados-zone-pill ${activeZone === 'home' ? 'active' : ''}`}
               onClick={() => setActiveZone('home')}
             >
               <Home size={15} className="ados-zone-pill-icon" />
-              Home
+              <span>{isAr ? 'الرئيسية' : 'Home'}</span>
             </button>
             <button 
               className={`ados-zone-pill ${activeZone === 'kids-area' ? 'active' : ''}`}
               onClick={() => setActiveZone('kids-area')}
             >
               <Baby size={15} className="ados-zone-pill-icon" />
-              Kids Area
+              <span>{isAr ? 'منطقة الأطفال' : 'Kids Area'}</span>
             </button>
             <button 
               className={`ados-zone-pill ${activeZone === 'fun-park' ? 'active' : ''}`}
               onClick={() => setActiveZone('fun-park')}
             >
               <FerrisWheel size={15} className="ados-zone-pill-icon" />
-              Fun Park
+              <span>{isAr ? 'فن بارك' : 'Fun Park'}</span>
             </button>
             <button 
               className={`ados-zone-pill ${activeZone === 'challenge' ? 'active' : ''}`}
               onClick={() => setActiveZone('challenge')}
             >
               <Gamepad2 size={15} className="ados-zone-pill-icon" />
-              CHALLENGE ZONE
+              <span>{isAr ? 'منطقة التحدي' : 'CHALLENGE ZONE'}</span>
             </button>
             <button 
               className={`ados-zone-pill ${activeZone === 'adventure' ? 'active' : ''}`}
               onClick={() => setActiveZone('adventure')}
             >
               <Zap size={15} className="ados-zone-pill-icon" />
-              ADVENTURE ZONE
+              <span>{isAr ? 'منطقة المغامرات' : 'ADVENTURE ZONE'}</span>
             </button>
             <button 
               className={`ados-zone-pill ${activeZone === 'packages' ? 'active' : ''}`}
               onClick={() => setActiveZone('packages')}
             >
               <Boxes size={15} className="ados-zone-pill-icon" />
-              PACKAGES
+              <span>{isAr ? 'الباقات والعروض' : 'PACKAGES'}</span>
             </button>
           </nav>
 
@@ -978,18 +967,37 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
             <div className="ados-hero-inner">
               <div className="ados-hero-text-and-badge">
                 <div className="ados-hero-text-block">
-                  <h2 className="ados-hero-title-en">{currentHero?.titleEn}</h2>
-                  <div className="ados-hero-subtitle-en">{currentHero?.subtitleEn}</div>
-                  <h3 className="ados-hero-title-ar">{currentHero?.titleAr}</h3>
-                  <div className="ados-hero-subtitle-ar">{currentHero?.subtitleAr}</div>
+                  <h2 className="ados-hero-title-en">
+                    {isAr ? (currentHero?.titleAr || currentHero?.titleEn) : currentHero?.titleEn}
+                  </h2>
+                  <div className="ados-hero-subtitle-en">
+                    {isAr ? (currentHero?.subtitleAr || currentHero?.subtitleEn) : currentHero?.subtitleEn}
+                  </div>
+                  {!isAr && (
+                    <>
+                      <h3 className="ados-hero-title-ar">{currentHero?.titleAr}</h3>
+                      <div className="ados-hero-subtitle-ar">{currentHero?.subtitleAr}</div>
+                    </>
+                  )}
                 </div>
 
-                {/* Orange Stamp Badge */}
+                {/* Stamp Badge */}
                 <div className="ados-hero-stamp-badge">
-                  <span>PLAY</span>
-                  <span>EXPLORE</span>
-                  <span>LEARN</span>
-                  <span>TOGETHER!</span>
+                  {isAr ? (
+                    <>
+                      <span>العب</span>
+                      <span>استكشف</span>
+                      <span>تعلم</span>
+                      <span>معاً!</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>PLAY</span>
+                      <span>EXPLORE</span>
+                      <span>LEARN</span>
+                      <span>TOGETHER!</span>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -1012,13 +1020,13 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                     onClick={() => openImagePicker({ type: 'hero' })}
                   >
                     <RotateCcw size={13} />
-                    Change or Add Image
+                    <span>{isAr ? 'تغيير أو إضافة صورة' : 'Change or Add Image'}</span>
                   </button>
                   {currentHeroImages.length > 1 && (
                     <button 
                       className="ados-hero-delete-btn"
                       onClick={handleDeleteHeroBanner}
-                      title="Delete Current Slide"
+                      title={isAr ? 'حذف الشريحة الحالية' : 'Delete Current Slide'}
                     >
                       <Trash2 size={14} />
                     </button>
@@ -1033,17 +1041,19 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
             <div className="ados-section-header">
               <div className="ados-section-title-wrap">
                 <h2 className="ados-section-title">
-                  {activeZone === 'challenge' && activeSubTab === 'tickets' ? 'Challenge Zone Area Tickets' : `${currentZoneData.name} Offers`}
+                  {isAr 
+                    ? (activeZone === 'challenge' && activeSubTab === 'tickets' ? 'تذاكر ألعاب منطقة التحدي' : `عروض ${currentHero?.titleAr || currentZoneData.nameAr || currentZoneData.name}`)
+                    : (activeZone === 'challenge' && activeSubTab === 'tickets' ? 'Challenge Zone Area Tickets' : `${currentZoneData.name} Offers`)}
                 </h2>
                 <span className="ados-section-title-pipe">|</span>
                 <span className="ados-section-title-ar">
-                  {activeZone === 'challenge' && activeSubTab === 'tickets' ? 'عروض منطقة تذاكر' : `عروض ${currentHero?.titleAr || 'المنطقة'}`}
+                  {activeZone === 'challenge' && activeSubTab === 'tickets' ? 'عروض التذاكر والأنشطة' : `عروض ${currentHero?.titleAr || 'المنطقة'}`}
                 </span>
               </div>
 
               <button className="ados-add-btn" onClick={openAddCardModal}>
                 <Plus size={14} />
-                Add
+                <span>{isAr ? 'إضافة' : 'Add'}</span>
               </button>
             </div>
 
@@ -1056,75 +1066,85 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                     onClick={() => handleSubTabChange('packages')}
                   >
                     <Boxes size={14} />
-                    Packages ({currentZoneData.packages?.length || 0})
+                    <span>{isAr ? `الباقات (${currentZoneData.packages?.length || 0})` : `Packages (${currentZoneData.packages?.length || 0})`}</span>
                   </button>
                   <button 
                     className={`ados-subtab-btn ${activeSubTab === 'tickets' ? 'active' : ''}`}
                     onClick={() => handleSubTabChange('tickets')}
                   >
                     <Ticket size={14} />
-                    Tickets ({currentZoneData.tickets?.length || 0})
+                    <span>{isAr ? `التذاكر (${currentZoneData.tickets?.length || 0})` : `Tickets (${currentZoneData.tickets?.length || 0})`}</span>
                   </button>
                 </div>
               </div>
             )}
 
-            {/* CARDS DISPLAY LOGIC: */}
-            {/* 1. Wide Challenge Pass Card (Screenshot 1) */}
+            {/* CARDS DISPLAY LOGIC */}
+            {/* 1. Wide Challenge Pass Card */}
             {activeZone === 'challenge' && activeSubTab === 'packages' && currentZoneData.packages?.map(pkg => (
               <div key={pkg.id} className="ados-wide-package-card">
                 {/* Media Collage */}
                 <div className="ados-wide-media-collage">
                   <img src={pkg.image} alt={pkg.title} className="ados-wide-media-img" />
-                  <div className="ados-collage-pill-badge">★ CHOOSE ANY 4 GAMES ★</div>
+                  <div className="ados-collage-pill-badge">
+                    {isAr ? '★ اختر أي 4 ألعاب تفاعلية ★' : '★ CHOOSE ANY 4 GAMES ★'}
+                  </div>
                 </div>
 
                 {/* Info Center */}
                 <div className="ados-wide-info-body">
-                  <h3 className="ados-wide-title">{pkg.title}</h3>
-                  <div className="ados-wide-subtitle">{pkg.subtitle || 'Pick any 4 games'}</div>
+                  <h3 className="ados-wide-title">{isAr ? (pkg.titleAr || pkg.title) : pkg.title}</h3>
+                  <div className="ados-wide-subtitle">
+                    {isAr ? 'اختر أي 4 ألعاب مميزة' : (pkg.subtitle || 'Pick any 4 games')}
+                  </div>
                   
                   <div className="ados-wide-features-grid">
                     <div className="ados-wide-feature-item">
                       <Gamepad2 size={16} color="#0284c7" />
-                      VR
+                      <span>{isAr ? 'واقع افتراضي VR' : 'VR'}</span>
                     </div>
                     <div className="ados-wide-feature-item">
                       <Zap size={16} color="#0284c7" />
-                      Basketball
+                      <span>{isAr ? 'كرة السلة' : 'Basketball'}</span>
                     </div>
                     <div className="ados-wide-feature-item">
                       <Sparkles size={16} color="#0284c7" />
-                      Shooting
+                      <span>{isAr ? 'الرماية بالليزر' : 'Shooting'}</span>
                     </div>
                     <div className="ados-wide-feature-item">
                       <Ticket size={16} color="#0284c7" />
-                      Car Racing
+                      <span>{isAr ? 'سباق سيارات' : 'Car Racing'}</span>
                     </div>
                   </div>
 
                   <div className="ados-wide-price-row">
-                    <span className="ados-wide-price-main">EGP {pkg.price}</span>
+                    <span className="ados-wide-price-main">
+                      {pkg.price} {isAr ? 'ج.م' : 'EGP'}
+                    </span>
                     {pkg.originalPrice && (
-                      <span className="ados-wide-price-original">EGP {pkg.originalPrice}</span>
+                      <span className="ados-wide-price-original">
+                        {pkg.originalPrice} {isAr ? 'ج.م' : 'EGP'}
+                      </span>
                     )}
                   </div>
                 </div>
 
                 {/* Right Actions & Badge */}
                 <div className="ados-wide-right-actions">
-                  <div className="ados-save-badge-pill">{pkg.badge || 'Save 60 EGP'}</div>
+                  <div className="ados-save-badge-pill">
+                    {isAr ? (pkg.badgeAr || 'وفر 60 ج.م') : (pkg.badge || 'Save 60 EGP')}
+                  </div>
                   <button 
                     className="ados-card-edit-btn"
                     onClick={() => openEditCardModal(pkg, false)}
                   >
-                    EDIT
+                    {isAr ? 'تعديل' : 'EDIT'}
                   </button>
                 </div>
               </div>
             ))}
 
-            {/* 2. Challenge Zone Tickets (10 Cards Grid - Screenshot 3) */}
+            {/* 2. Challenge Zone Tickets */}
             {activeZone === 'challenge' && activeSubTab === 'tickets' && (
               <div className="ados-cards-grid-3">
                 {currentZoneData.tickets?.map(tkt => (
@@ -1134,20 +1154,28 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                     </div>
                     <div className="ados-card-content">
                       <div className="ados-card-titles-wrap">
-                        <h4 className="ados-card-title-en">{tkt.title}</h4>
-                        {tkt.titleAr && <span className="ados-card-title-ar">{tkt.titleAr}</span>}
+                        <h4 className="ados-card-title-en">
+                          {isAr ? (tkt.titleAr || tkt.title) : tkt.title}
+                        </h4>
+                        {!isAr && tkt.titleAr && <span className="ados-card-title-ar">{tkt.titleAr}</span>}
                       </div>
 
                       <div className="ados-card-footer">
                         <div className="ados-card-price-row">
-                          <span className="ados-card-price-main">EGP {tkt.price}</span>
-                          <span className="ados-card-price-unit">{tkt.unit || '/ ticket'}</span>
+                          <span className="ados-card-price-main">
+                            {tkt.price} {isAr ? 'ج.م' : 'EGP'}
+                          </span>
+                          <span className="ados-card-price-unit">
+                            {isAr 
+                              ? (tkt.unit === '/ ticket' ? '/ تذكرة' : (tkt.unit === '/ 30 min' ? '/ 30 دقيقة' : tkt.unit))
+                              : (tkt.unit || '/ ticket')}
+                          </span>
                         </div>
                         <button 
                           className="ados-card-full-edit-btn"
                           onClick={() => openEditCardModal(tkt, true)}
                         >
-                          EDIT
+                          {isAr ? 'تعديل' : 'EDIT'}
                         </button>
                       </div>
                     </div>
@@ -1156,7 +1184,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
               </div>
             )}
 
-            {/* 3. Kids Area (4 Cards Grid - Screenshot 2) */}
+            {/* 3. Kids Area Packages */}
             {activeZone === 'kids-area' && (
               <div className="ados-cards-grid-4">
                 {currentZoneData.packages?.map(card => (
@@ -1164,20 +1192,24 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                     <div className="ados-card-thumb-wrap">
                       <img src={card.image} alt={card.title} className="ados-card-thumb-img" />
                       {card.badge && (
-                        <div className="ados-card-thumb-badge">{card.badge}</div>
+                        <div className="ados-card-thumb-badge">
+                          {isAr ? (card.badgeAr || card.badge) : card.badge}
+                        </div>
                       )}
                     </div>
                     <div className="ados-card-content">
                       <div className="ados-card-titles-wrap">
-                        <h4 className="ados-card-title-en">{card.title}</h4>
-                        <span className="ados-card-title-ar">{card.titleAr}</span>
+                        <h4 className="ados-card-title-en">
+                          {isAr ? (card.titleAr || card.title) : card.title}
+                        </h4>
+                        {!isAr && card.titleAr && <span className="ados-card-title-ar">{card.titleAr}</span>}
                       </div>
 
                       <div className="ados-card-details-list">
                         {card.ages && (
                           <div className="ados-card-detail-item">
                             <User size={13} />
-                            <span>{card.ages}</span>
+                            <span>{isAr ? `الأعمار ${card.ages.replace('Ages ', '')}` : card.ages}</span>
                           </div>
                         )}
                         {card.features?.map((feat, fIdx) => (
@@ -1190,16 +1222,20 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
 
                       <div className="ados-card-footer">
                         <div className="ados-card-price-row">
-                          <span className="ados-card-price-main">EGP {card.price}</span>
+                          <span className="ados-card-price-main">
+                            {card.price} {isAr ? 'ج.م' : 'EGP'}
+                          </span>
                           {card.originalPrice && (
-                            <span className="ados-card-price-original">EGP {card.originalPrice}</span>
+                            <span className="ados-card-price-original">
+                              {card.originalPrice} {isAr ? 'ج.م' : 'EGP'}
+                            </span>
                           )}
                         </div>
                         <button 
                           className="ados-card-full-edit-btn"
                           onClick={() => openEditCardModal(card, false)}
                         >
-                          EDIT
+                          {isAr ? 'تعديل' : 'EDIT'}
                         </button>
                       </div>
                     </div>
@@ -1208,7 +1244,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
               </div>
             )}
 
-            {/* 4. Fun Park (6 Cards Grid - Screenshot 4) */}
+            {/* 4. Fun Park Packages */}
             {activeZone === 'fun-park' && (
               <div className="ados-cards-grid-3">
                 {currentZoneData.packages?.map(card => (
@@ -1216,20 +1252,24 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                     <div className="ados-card-thumb-wrap">
                       <img src={card.image} alt={card.title} className="ados-card-thumb-img" />
                       {card.badge && (
-                        <div className="ados-card-thumb-badge">{card.badge}</div>
+                        <div className="ados-card-thumb-badge">
+                          {isAr ? (card.badgeAr || card.badge) : card.badge}
+                        </div>
                       )}
                     </div>
                     <div className="ados-card-content">
                       <div className="ados-card-titles-wrap">
-                        <h4 className="ados-card-title-en">{card.title}</h4>
-                        <span className="ados-card-title-ar">{card.titleAr}</span>
+                        <h4 className="ados-card-title-en">
+                          {isAr ? (card.titleAr || card.title) : card.title}
+                        </h4>
+                        {!isAr && card.titleAr && <span className="ados-card-title-ar">{card.titleAr}</span>}
                       </div>
 
                       <div className="ados-card-details-list">
                         {card.ages && (
                           <div className="ados-card-detail-item">
                             <User size={13} />
-                            <span>{card.ages}</span>
+                            <span>{isAr ? `الأعمار ${card.ages.replace('Ages ', '')}` : card.ages}</span>
                           </div>
                         )}
                         {card.features?.map((feat, fIdx) => (
@@ -1242,16 +1282,20 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
 
                       <div className="ados-card-footer">
                         <div className="ados-card-price-row">
-                          <span className="ados-card-price-main">EGP {card.price}</span>
+                          <span className="ados-card-price-main">
+                            {card.price} {isAr ? 'ج.م' : 'EGP'}
+                          </span>
                           {card.originalPrice && (
-                            <span className="ados-card-price-original">EGP {card.originalPrice}</span>
+                            <span className="ados-card-price-original">
+                              {card.originalPrice} {isAr ? 'ج.م' : 'EGP'}
+                            </span>
                           )}
                         </div>
                         <button 
                           className="ados-card-full-edit-btn"
                           onClick={() => openEditCardModal(card, false)}
                         >
-                          EDIT
+                          {isAr ? 'تعديل' : 'EDIT'}
                         </button>
                       </div>
                     </div>
@@ -1268,20 +1312,24 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                     <div className="ados-card-thumb-wrap">
                       <img src={card.image} alt={card.title} className="ados-card-thumb-img" />
                       {card.badge && (
-                        <div className="ados-card-thumb-badge">{card.badge}</div>
+                        <div className="ados-card-thumb-badge">
+                          {isAr ? (card.badgeAr || card.badge) : card.badge}
+                        </div>
                       )}
                     </div>
                     <div className="ados-card-content">
                       <div className="ados-card-titles-wrap">
-                        <h4 className="ados-card-title-en">{card.title}</h4>
-                        {card.titleAr && <span className="ados-card-title-ar">{card.titleAr}</span>}
+                        <h4 className="ados-card-title-en">
+                          {isAr ? (card.titleAr || card.title) : card.title}
+                        </h4>
+                        {!isAr && card.titleAr && <span className="ados-card-title-ar">{card.titleAr}</span>}
                       </div>
 
                       <div className="ados-card-details-list">
                         {card.ages && (
                           <div className="ados-card-detail-item">
                             <User size={13} />
-                            <span>{card.ages}</span>
+                            <span>{isAr ? `الأعمار ${card.ages.replace('Ages ', '')}` : card.ages}</span>
                           </div>
                         )}
                         {card.features?.map((feat, fIdx) => (
@@ -1294,16 +1342,20 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
 
                       <div className="ados-card-footer">
                         <div className="ados-card-price-row">
-                          <span className="ados-card-price-main">EGP {card.price}</span>
+                          <span className="ados-card-price-main">
+                            {card.price} {isAr ? 'ج.م' : 'EGP'}
+                          </span>
                           {card.originalPrice && (
-                            <span className="ados-card-price-original">EGP {card.originalPrice}</span>
+                            <span className="ados-card-price-original">
+                              {card.originalPrice} {isAr ? 'ج.م' : 'EGP'}
+                            </span>
                           )}
                         </div>
                         <button 
                           className="ados-card-full-edit-btn"
                           onClick={() => openEditCardModal(card, false)}
                         >
-                          EDIT
+                          {isAr ? 'تعديل' : 'EDIT'}
                         </button>
                       </div>
                     </div>
@@ -1315,7 +1367,11 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
 
           {/* Explore Zone Section */}
           <section className="ados-explore-section">
-            <h3 className="ados-explore-title">Explore {currentZoneData.name}</h3>
+            <h3 className="ados-explore-title">
+              {isAr 
+                ? `استكشف ${currentHero?.titleAr || currentZoneData.nameAr || currentZoneData.name}` 
+                : `Explore ${currentZoneData.name}`}
+            </h3>
             <div className="ados-explore-grid">
               {currentZoneData.explore?.map((expItem, idx) => (
                 <div key={expItem.id} className="ados-explore-photo-card">
@@ -1326,12 +1382,12 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                       onClick={() => openImagePicker({ type: 'explore', slotIndex: idx })}
                     >
                       <RotateCcw size={12} />
-                      Change Image
+                      <span>{isAr ? 'تغيير الصورة' : 'Change Image'}</span>
                     </button>
                     <button 
                       className="ados-explore-trash-btn"
                       onClick={() => handleDeleteExplore(idx)}
-                      title="Remove Photo"
+                      title={isAr ? 'حذف الصورة' : 'Remove Photo'}
                     >
                       <Trash2 size={14} />
                     </button>
@@ -1339,7 +1395,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                 </div>
               ))}
 
-              {/* Add Photo Slot #2 */}
+              {/* Add Photo Slot */}
               <div 
                 className="ados-explore-add-slot"
                 onClick={() => openImagePicker({ type: 'explore' })}
@@ -1347,8 +1403,10 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                 <div className="ados-explore-add-icon-circle">
                   <Plus size={18} />
                 </div>
-                <div className="ados-explore-add-text">+ Add Photo</div>
-                <div className="ados-explore-add-subtext">Slot #{(currentZoneData.explore?.length || 0) + 1}</div>
+                <div className="ados-explore-add-text">{isAr ? '+ إضافة صورة' : '+ Add Photo'}</div>
+                <div className="ados-explore-add-subtext">
+                  {isAr ? `المكان #${(currentZoneData.explore?.length || 0) + 1}` : `Slot #${(currentZoneData.explore?.length || 0) + 1}`}
+                </div>
               </div>
             </div>
           </section>
@@ -1358,14 +1416,14 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
             <div className="ados-360-card">
               <div className="ados-360-title">
                 <Eye size={18} className="ados-360-title-icon" />
-                EXPLORE 360°
+                <span>{isAr ? 'جولة تفاعلية 360°' : 'EXPLORE 360°'}</span>
               </div>
               <button 
                 className="ados-360-action-btn"
                 onClick={() => setIs360ModalOpen(true)}
               >
                 <RotateCcw size={13} />
-                Change or Add 360 EXPLORER
+                <span>{isAr ? 'تغيير أو ربط جولة 360°' : 'Change or Add 360 EXPLORER'}</span>
               </button>
             </div>
           </section>
@@ -1373,15 +1431,13 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
           {/* Bottom Save & Cancel Bar */}
           <div className="ados-bottom-bar">
             <button className="ados-cancel-btn" onClick={handleCancelChanges}>
-              Cancel
+              {isAr ? 'إلغاء' : 'Cancel'}
             </button>
             <button className="ados-save-btn" onClick={handleSaveChanges}>
               <Check size={16} />
-              Save Changes
+              <span>{isAr ? 'حفظ التعديلات' : 'Save Changes'}</span>
             </button>
           </div>
-            </>
-          )}
         </div>
       </div>
 
@@ -1390,9 +1446,13 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
       {/* ------------------------------------------------------------------ */}
       {isCardModalOpen && editingCard && (
         <div className="ados-modal-backdrop" onClick={() => setIsCardModalOpen(false)}>
-          <div className="ados-modal-window" onClick={e => e.stopPropagation()}>
+          <div className="ados-modal-window" onClick={e => e.stopPropagation()} dir={isAr ? 'rtl' : 'ltr'}>
             <div className="ados-modal-header">
-              <h3>{cardModalMode === 'edit' ? `Edit Item: ${editingCard.title}` : 'Add New Offer / Ticket'}</h3>
+              <h3>
+                {cardModalMode === 'edit' 
+                  ? (isAr ? `تعديل: ${editingCard.titleAr || editingCard.title}` : `Edit Item: ${editingCard.title}`) 
+                  : (isAr ? 'إضافة عرض / تذكرة جديدة' : 'Add New Offer / Ticket')}
+              </h3>
               <button className="ados-modal-close-btn" onClick={() => setIsCardModalOpen(false)}>
                 <X size={18} />
               </button>
@@ -1401,7 +1461,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
             <div className="ados-modal-body">
               <div className="ados-form-row">
                 <div className="ados-form-group">
-                  <label>Title (English)</label>
+                  <label>{isAr ? 'الاسم بالإنجليزية' : 'Title (English)'}</label>
                   <input 
                     type="text" 
                     className="ados-form-input"
@@ -1410,7 +1470,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                   />
                 </div>
                 <div className="ados-form-group">
-                  <label>Title (Arabic)</label>
+                  <label>{isAr ? 'الاسم بالعربية' : 'Title (Arabic)'}</label>
                   <input 
                     type="text" 
                     className="ados-form-input"
@@ -1422,7 +1482,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
 
               <div className="ados-form-row">
                 <div className="ados-form-group">
-                  <label>Price (EGP)</label>
+                  <label>{isAr ? 'السعر (ج.م)' : 'Price (EGP)'}</label>
                   <input 
                     type="number" 
                     className="ados-form-input"
@@ -1434,13 +1494,14 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                       setEditingCard({
                         ...editingCard,
                         price: newPrice,
-                        badge: diff > 0 ? `SAVE ${diff} EGP` : ''
+                        badge: diff > 0 ? `SAVE ${diff} EGP` : '',
+                        badgeAr: diff > 0 ? `وفر ${diff} ج.م` : ''
                       });
                     }}
                   />
                 </div>
                 <div className="ados-form-group">
-                  <label>Original Price (EGP - for discount)</label>
+                  <label>{isAr ? 'السعر الأصلي (ج.م - لحساب الخصم)' : 'Original Price (EGP - for discount)'}</label>
                   <input 
                     type="number" 
                     className="ados-form-input"
@@ -1452,7 +1513,8 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                       setEditingCard({
                         ...editingCard,
                         originalPrice: orig,
-                        badge: diff > 0 ? `SAVE ${diff} EGP` : ''
+                        badge: diff > 0 ? `SAVE ${diff} EGP` : '',
+                        badgeAr: diff > 0 ? `وفر ${diff} ج.م` : ''
                       });
                     }}
                   />
@@ -1461,20 +1523,20 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
 
               <div className="ados-form-row">
                 <div className="ados-form-group">
-                  <label>Discount Badge Text</label>
+                  <label>{isAr ? 'نص شارة الخصم' : 'Discount Badge Text'}</label>
                   <input 
                     type="text" 
                     className="ados-form-input"
-                    value={editingCard.badge || ''} 
-                    onChange={e => setEditingCard({ ...editingCard, badge: e.target.value })}
+                    value={isAr ? (editingCard.badgeAr || editingCard.badge || '') : (editingCard.badge || '')} 
+                    onChange={e => setEditingCard({ ...editingCard, badge: e.target.value, badgeAr: e.target.value })}
                   />
                 </div>
                 <div className="ados-form-group">
-                  <label>Age Range / Duration</label>
+                  <label>{isAr ? 'الفئة العمرية / المدة' : 'Age Range / Duration'}</label>
                   <input 
                     type="text" 
                     className="ados-form-input"
-                    placeholder="e.g. Ages 1 - 3 or / 30 min"
+                    placeholder={isAr ? 'مثال: الأعمار 1 - 3 أو / 30 دقيقة' : 'e.g. Ages 1 - 3 or / 30 min'}
                     value={editingCard.ages || editingCard.unit || ''} 
                     onChange={e => setEditingCard({ ...editingCard, ages: e.target.value, unit: e.target.value })}
                   />
@@ -1482,7 +1544,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
               </div>
 
               <div className="ados-form-group">
-                <label>Card Image</label>
+                <label>{isAr ? 'صورة العنصر' : 'Card Image'}</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                   <img 
                     src={editingCard.image} 
@@ -1494,13 +1556,13 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                     className="ados-btn-secondary"
                     onClick={() => openImagePicker({ type: 'card' })}
                   >
-                    Select Photo from Gallery...
+                    {isAr ? 'اختر صورة من المعرض...' : 'Select Photo from Gallery...'}
                   </button>
                 </div>
               </div>
 
               <div className="ados-form-group">
-                <label>Features / Inclusions (Comma separated)</label>
+                <label>{isAr ? 'المميزات المضمنة (مفصولة بفاصلة)' : 'Features / Inclusions (Comma separated)'}</label>
                 <textarea 
                   className="ados-form-textarea"
                   rows={3}
@@ -1516,18 +1578,18 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
             <div className="ados-modal-footer">
               {cardModalMode === 'edit' ? (
                 <button className="ados-btn-danger" onClick={handleDeleteCard}>
-                  <Trash2 size={13} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-                  Delete Item
+                  <Trash2 size={13} style={{ marginInlineEnd: 6, verticalAlign: 'middle' }} />
+                  <span>{isAr ? 'حذف العنصر' : 'Delete Item'}</span>
                 </button>
               ) : <div></div>}
 
               <div style={{ display: 'flex', gap: 10 }}>
                 <button className="ados-btn-secondary" onClick={() => setIsCardModalOpen(false)}>
-                  Cancel
+                  {isAr ? 'إلغاء' : 'Cancel'}
                 </button>
                 <button className="ados-btn-primary" onClick={handleSaveCard}>
-                  <Check size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-                  Save Item
+                  <Check size={14} style={{ marginInlineEnd: 6, verticalAlign: 'middle' }} />
+                  <span>{isAr ? 'حفظ العنصر' : 'Save Item'}</span>
                 </button>
               </div>
             </div>
@@ -1540,9 +1602,9 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
       {/* ------------------------------------------------------------------ */}
       {isImagePickerOpen && (
         <div className="ados-modal-backdrop" onClick={() => setIsImagePickerOpen(false)}>
-          <div className="ados-modal-window ados-modal-window-wide" onClick={e => e.stopPropagation()}>
+          <div className="ados-modal-window ados-modal-window-wide" onClick={e => e.stopPropagation()} dir={isAr ? 'rtl' : 'ltr'}>
             <div className="ados-modal-header">
-              <h3>Choose Photo Asset or Upload</h3>
+              <h3>{isAr ? 'اختيار صورة أو رفع ملف جديد' : 'Choose Photo Asset or Upload'}</h3>
               <button className="ados-modal-close-btn" onClick={() => setIsImagePickerOpen(false)}>
                 <X size={18} />
               </button>
@@ -1560,8 +1622,12 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                 justifyContent: 'space-between'
               }}>
                 <div>
-                  <div style={{ fontWeight: 700, color: '#002830', fontSize: 14 }}>Upload a new photo from your PC</div>
-                  <div style={{ color: '#64748b', fontSize: 12 }}>PNG, JPG or WEBP formats supported</div>
+                  <div style={{ fontWeight: 700, color: '#002830', fontSize: 14 }}>
+                    {isAr ? 'رفع صورة جديدة من جهاز الكمبيوتر' : 'Upload a new photo from your PC'}
+                  </div>
+                  <div style={{ color: '#64748b', fontSize: 12 }}>
+                    {isAr ? 'يدعم ملفات PNG أو JPG أو WEBP' : 'PNG, JPG or WEBP formats supported'}
+                  </div>
                 </div>
                 <label style={{
                   backgroundColor: '#00a8cc',
@@ -1576,7 +1642,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                   gap: 6
                 }}>
                   <Upload size={14} />
-                  Browse File
+                  <span>{isAr ? 'استعراض الملفات' : 'Browse File'}</span>
                   <input 
                     type="file" 
                     accept="image/*" 
@@ -1589,7 +1655,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
 
               <div>
                 <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 10, color: '#334155' }}>
-                  Or select from project media library:
+                  {isAr ? 'أو اختر من مكتبة صور المشروع:' : 'Or select from project media library:'}
                 </div>
                 <div className="ados-image-picker-grid">
                   {LOCAL_ASSET_GALLERY.map((asset, idx) => (
@@ -1623,7 +1689,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
             <div className="ados-modal-footer">
               <div></div>
               <button className="ados-btn-secondary" onClick={() => setIsImagePickerOpen(false)}>
-                Close
+                {isAr ? 'إغلاق' : 'Close'}
               </button>
             </div>
           </div>
@@ -1631,147 +1697,13 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
       )}
 
       {/* ------------------------------------------------------------------ */}
-      {/* 5. MODAL: PLAY ZONE ORDERS                                         */}
-      {/* ------------------------------------------------------------------ */}
-      {isOrdersModalOpen && (
-        <div className="ados-modal-backdrop" onClick={() => setIsOrdersModalOpen(false)}>
-          <div className="ados-modal-window ados-modal-window-wide" onClick={e => e.stopPropagation()}>
-            <div className="ados-modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Ticket size={20} color="#00a8cc" />
-                <h3>Play Zone Live Bookings & Orders</h3>
-              </div>
-              <button className="ados-modal-close-btn" onClick={() => setIsOrdersModalOpen(false)}>
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="ados-modal-body">
-              {/* Filter & Search Bar */}
-              <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-                <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
-                  <Search size={15} style={{ position: 'absolute', left: 10, top: 12, color: '#94a3b8' }} />
-                  <input 
-                    type="text" 
-                    placeholder="Search by customer, phone, or order #..."
-                    className="ados-form-input"
-                    style={{ paddingLeft: 32 }}
-                    value={orderSearch}
-                    onChange={e => setOrderSearch(e.target.value)}
-                  />
-                </div>
-
-                <select 
-                  className="ados-form-select" 
-                  style={{ width: 170 }}
-                  value={orderZoneFilter}
-                  onChange={e => setOrderZoneFilter(e.target.value)}
-                >
-                  <option value="All">All Zones</option>
-                  <option value="Kids Area">Kids Area</option>
-                  <option value="Fun Park">Fun Park</option>
-                  <option value="Challenge Zone">Challenge Zone</option>
-                  <option value="Adventure Zone">Adventure Zone</option>
-                </select>
-
-                <button 
-                  className="ados-btn-primary" 
-                  style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6 }}
-                  onClick={handleAddMockOrder}
-                >
-                  <Plus size={14} />
-                  Add Mock Order
-                </button>
-              </div>
-
-              {/* Orders Table */}
-              <div className="ados-orders-table-wrap">
-                <table className="ados-orders-table">
-                  <thead>
-                    <tr>
-                      <th>Order ID</th>
-                      <th>Customer</th>
-                      <th>Zone</th>
-                      <th>Package / Item</th>
-                      <th>Total</th>
-                      <th>Date</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredOrders.length === 0 ? (
-                      <tr>
-                        <td colSpan={8} style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
-                          No orders found matching the filter criteria.
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredOrders.map(ord => (
-                        <tr key={ord.id}>
-                          <td style={{ fontWeight: 700, color: '#002830' }}>{ord.id}</td>
-                          <td>
-                            <div style={{ fontWeight: 600 }}>{ord.customer}</div>
-                            <div style={{ color: '#64748b', fontSize: 11 }}>{ord.phone}</div>
-                          </td>
-                          <td>{ord.zone}</td>
-                          <td>
-                            {ord.item}
-                            <span style={{ color: '#64748b', fontSize: 11, marginLeft: 4 }}>x{ord.qty}</span>
-                          </td>
-                          <td style={{ fontWeight: 700, color: '#002830' }}>{ord.total}</td>
-                          <td style={{ color: '#64748b' }}>{ord.date}</td>
-                          <td>
-                            <span 
-                              className={`ados-status-pill ${
-                                ord.status === 'Confirmed' ? 'ados-status-confirmed' :
-                                ord.status === 'Completed' ? 'ados-status-completed' :
-                                'ados-status-pending'
-                              }`}
-                              style={{ cursor: 'pointer' }}
-                              onClick={() => handleToggleOrderStatus(ord.id)}
-                              title="Click to toggle status"
-                            >
-                              {ord.status}
-                            </span>
-                          </td>
-                          <td>
-                            <button 
-                              onClick={() => handleDeleteOrder(ord.id)}
-                              title="Delete Order"
-                              style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
-                            >
-                              <Trash2 size={15} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div className="ados-modal-footer">
-              <div style={{ color: '#64748b', fontSize: 12 }}>
-                Showing {filteredOrders.length} orders
-              </div>
-              <button className="ados-btn-secondary" onClick={() => setIsOrdersModalOpen(false)}>
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ------------------------------------------------------------------ */}
-      {/* 6. MODAL: 360 EXPLORER CONFIGURATION                               */}
+      {/* 5. MODAL: 360 EXPLORER CONFIGURATION                               */}
       {/* ------------------------------------------------------------------ */}
       {is360ModalOpen && (
         <div className="ados-modal-backdrop" onClick={() => setIs360ModalOpen(false)}>
-          <div className="ados-modal-window" onClick={e => e.stopPropagation()}>
+          <div className="ados-modal-window" onClick={e => e.stopPropagation()} dir={isAr ? 'rtl' : 'ltr'}>
             <div className="ados-modal-header">
-              <h3>Configure 360° Virtual Experience</h3>
+              <h3>{isAr ? 'إعداد الجولة الافتراضية 360°' : 'Configure 360° Virtual Experience'}</h3>
               <button className="ados-modal-close-btn" onClick={() => setIs360ModalOpen(false)}>
                 <X size={18} />
               </button>
@@ -1779,7 +1711,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
 
             <div className="ados-modal-body">
               <div className="ados-form-group">
-                <label>360 Experience Title</label>
+                <label>{isAr ? 'عنوان التجربة الافتراضية 360°' : '360 Experience Title'}</label>
                 <input 
                   type="text" 
                   className="ados-form-input"
@@ -1801,7 +1733,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
               </div>
 
               <div className="ados-form-group">
-                <label>Virtual Tour / Matterport Embed URL</label>
+                <label>{isAr ? 'رابط الجولة الافتراضية (Matterport)' : 'Virtual Tour / Matterport Embed URL'}</label>
                 <input 
                   type="url" 
                   className="ados-form-input"
@@ -1835,10 +1767,12 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
               }}>
                 <Eye size={32} color="#00a8cc" />
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#002830' }}>
-                  Interactive 360° Panorama Active
+                  {isAr ? 'الجولة البانورامية التفاعلية 360° نشطة' : 'Interactive 360° Panorama Active'}
                 </div>
                 <div style={{ fontSize: 12, color: '#64748b', textAlign: 'center' }}>
-                  Visitors on the public site will be able to navigate full 360-degree interactive views of this zone.
+                  {isAr 
+                    ? 'سيتمكن زوار الموقع العام من التنقل في جولة تفاعلية شاملة 360 درجة لهذه المنطقة.'
+                    : 'Visitors on the public site will be able to navigate full 360-degree interactive views of this zone.'}
                 </div>
               </div>
             </div>
@@ -1849,10 +1783,10 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
                 className="ados-btn-primary" 
                 onClick={() => {
                   setIs360ModalOpen(false);
-                  showToast('360° Explorer settings saved.');
+                  showToast(isAr ? 'تم حفظ إعدادات جولة 360°.' : '360° Explorer settings saved.');
                 }}
               >
-                Apply 360° Settings
+                {isAr ? 'تطبيق إعدادات 360°' : 'Apply 360° Settings'}
               </button>
             </div>
           </div>
@@ -1860,7 +1794,7 @@ export default function DesktopDashboardPage({ setActiveTab, openModal, lang = '
       )}
 
       {/* ------------------------------------------------------------------ */}
-      {/* 7. TOAST NOTIFICATION                                             */}
+      {/* 6. TOAST NOTIFICATION                                             */}
       {/* ------------------------------------------------------------------ */}
       {toastMessage && (
         <div className="ados-toast">

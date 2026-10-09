@@ -200,8 +200,7 @@ export const PollingImageGallery = ({
       const response = await fetch(endpoint, {
         method: 'GET',
         headers: {
-          'Accept': 'application/json',
-          'ngrok-skip-browser-warning': 'true'
+          'Accept': 'application/json'
         },
         signal
       });
@@ -210,7 +209,7 @@ export const PollingImageGallery = ({
         // Fallback for demo/dev if /media/page/ returned 404
         if (response.status === 404 && isLocalhost) {
           const altRes = await fetch(`/api/media/section/${sanitizedPage}`, {
-            headers: { 'Accept': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+            headers: { 'Accept': 'application/json' },
             signal
           });
           if (altRes.ok) {

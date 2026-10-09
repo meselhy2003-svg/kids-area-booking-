@@ -5,7 +5,7 @@
  * background revalidation, browser preloading, and server replacement sync.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { mediaService } from '../api/mediaService';
 
 export function useHomeMedia() {
@@ -26,14 +26,65 @@ export function useHomeMedia() {
   const [isLoading, setIsLoading] = useState(false);
   const [isServerSynced, setIsServerSynced] = useState(false);
 
+  // References to previous state for comparison
+  const prevDestRef = useRef(destinationImages);
+  const prevVibesRef = useRef(vibesImages);
+
+  useEffect(() => {
+    prevDestRef.current = destinationImages;
+  }, [destinationImages]);
+
+  useEffect(() => {
+    prevVibesRef.current = vibesImages;
+  }, [vibesImages]);
+
   // 2. Background synchronization with server
   const syncMedia = useCallback(async (forceRefresh = false) => {
     setIsLoading(true);
+    console.log('🔄 [POLLING TRIGGERED] Initiating sync for Home / Resort media...');
+
     try {
       const [freshDest, freshVibes] = await Promise.all([
         mediaService.getUltimateDestinationImages(forceRefresh),
         mediaService.getPlayzoneVibes(forceRefresh)
       ]);
+
+      // 2. Console log response.data every time polling triggers
+      console.log('📦 [Polling response.data] Destination Highlights:', freshDest);
+      console.log('📦 [Polling response.data] Playzone Vibes:', freshVibes);
+
+      // 3. Compare old state with new fetched data and warn if unchanged
+      const oldDest = prevDestRef.current || [];
+      const isDestLengthSame = oldDest.length === (freshDest?.length || 0);
+      const isDestItemsSame = JSON.stringify(oldDest.map(i => i?.src || i?.image || i?.url || i)) === 
+                              JSON.stringify((freshDest || []).map(i => i?.src || i?.image || i?.url || i));
+
+      if (isDestLengthSame && isDestItemsSame) {
+        console.warn(
+          `⚠️ [POLLING WARNING - Home Destination]: Fetched data is IDENTICAL to previous state!\n` +
+          `• Array length: ${freshDest?.length || 0}\n` +
+          `• Items:`, freshDest,
+          `\n• Diagnostic Note: If an image was recently uploaded to Home (Destination), the server or mock API is returning static data.`
+        );
+      } else {
+        console.log(`✨ [POLLING UPDATE - Home Destination]: New images detected! Prev count: ${oldDest.length} -> New count: ${freshDest?.length}`);
+      }
+
+      const oldVibes = prevVibesRef.current || [];
+      const isVibesLengthSame = oldVibes.length === (freshVibes?.length || 0);
+      const isVibesItemsSame = JSON.stringify(oldVibes.map(i => i?.src || i?.image || i?.url || i)) === 
+                               JSON.stringify((freshVibes || []).map(i => i?.src || i?.image || i?.url || i));
+
+      if (isVibesLengthSame && isVibesItemsSame) {
+        console.warn(
+          `⚠️ [POLLING WARNING - Home Vibes/Gallery]: Fetched data is IDENTICAL to previous state!\n` +
+          `• Array length: ${freshVibes?.length || 0}\n` +
+          `• Items:`, freshVibes,
+          `\n• Diagnostic Note: If an image was recently uploaded to Home (Vibes), the server or mock API is returning static data.`
+        );
+      } else {
+        console.log(`✨ [POLLING UPDATE - Home Vibes]: New images detected! Prev count: ${oldVibes.length} -> New count: ${freshVibes?.length}`);
+      }
 
       if (Array.isArray(freshDest) && freshDest.length > 0) {
         setDestinationImages(freshDest);
@@ -43,11 +94,6 @@ export function useHomeMedia() {
         setVibesImages(freshVibes);
         setVibesColumns(mediaService.distributeVibesIntoColumns(freshVibes));
       }
-
-      console.log('[useHomeMedia] Loaded Home media data:', {
-        destinationImages: freshDest,
-        vibesImages: freshVibes
-      });
 
       setIsServerSynced(true);
     } catch (err) {
@@ -102,10 +148,10 @@ export function useHomeMedia() {
     };
     window.addEventListener('focus', handleWindowFocus);
 
-    // Background polling every 15 seconds to catch remote uploads from Apidog
+    // Background polling every 5 seconds to catch remote uploads
     const interval = setInterval(() => {
       syncMedia(false);
-    }, 15000);
+    }, 5000);
 
     return () => {
       isMounted = false;

@@ -2979,9 +2979,14 @@
 }
 
 @media (min-width: 768px) {
-  .mobile-modal-backdrop:has(.auth-required-sheet) {
+  .mobile-modal-backdrop:has(.auth-required-sheet),
+  .mobile-modal-backdrop:has(.auth-required-gateway-card) {
     align-items: center;
-    background: rgba(1, 43, 50, 0.72);
+    justify-content: center;
+    background: rgba(0, 18, 25, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 16px;
   }
   .auth-required-sheet {
     border-radius: 28px;
@@ -2989,6 +2994,21 @@
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
     animation: zoomInModal 0.22s ease-out;
   }
+}
+
+.auth-required-gateway-card {
+  max-width: 520px;
+  width: 100%;
+  margin: auto;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-required-gateway-card .lobby-auth-body {
+  max-height: calc(90vh - 180px);
+  overflow-y: auto;
 }
 
 @keyframes zoomInModal {

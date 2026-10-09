@@ -86,10 +86,15 @@ export function useEventsMedia() {
 
     initialSync();
 
+    const interval = setInterval(() => {
+      syncEventsMedia(false);
+    }, 5000);
+
     return () => {
       isMounted = false;
+      clearInterval(interval);
     };
-  }, []);
+  }, [syncEventsMedia]);
 
   // 5. Auto-advance hero carousel every 6 seconds
   useEffect(() => {

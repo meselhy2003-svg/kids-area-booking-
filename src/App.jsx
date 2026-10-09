@@ -37,6 +37,7 @@ import DesktopFooter from './components/DesktopFooter';
 import MobileModals from './components/MobileModals';
 import LoadingScreen from './components/common/LoadingScreen';
 import LobbyPage from './pages/LobbyPage';
+import FloatingGirlChatBot from './components/common/FloatingGirlChatBot';
 
 // Styles
 import './components/MobilePlayZone.css';
@@ -56,7 +57,7 @@ export default function App() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (activeTab === 'restaurant' && window.location.hash.includes('delivery')) {
+      if (activeTab === 'restaurant' && (window.location.hash.includes('delivery') || window.location.hash.includes('book-table'))) {
         // keep subroute intact
       } else {
         window.location.hash = activeTab;
@@ -67,9 +68,11 @@ export default function App() {
   useEffect(() => {
     const handleHashSync = () => {
       const h = window.location.hash.replace('#', '');
-      if (h.startsWith('restaurant')) {
+      if (h.startsWith('restaurant') || h === 'book-table') {
         setActiveTab('restaurant');
-      } else if (['lobby', 'home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'events', 'trips', 'cart', 'about', 'dashboard'].includes(h)) {
+      } else if (h === 'playzone-orders' || h === 'orders') {
+        setActiveTab('dashboard');
+      } else if (['lobby', 'home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'events', 'birthday', 'trips', 'cart', 'about', 'dashboard', 'profile'].includes(h)) {
         setActiveTab(h);
       }
     };
@@ -245,11 +248,12 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'events' && (
+              {(activeTab === 'events' || activeTab === 'birthday') && (
                 <DesktopEventsPage 
                   setActiveTab={setActiveTab}
                   openModal={openModal}
                   lang={lang}
+                  initialBirthdayView={activeTab === 'birthday'}
                 />
               )}
 
@@ -302,6 +306,7 @@ export default function App() {
                   setActiveTab={setActiveTab}
                   openModal={openModal}
                   lang={lang}
+                  setLang={setLang}
                 />
               )}
 
@@ -398,11 +403,12 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'events' && (
+              {(activeTab === 'events' || activeTab === 'birthday') && (
                 <MobileEventsPage 
                   setActiveTab={setActiveTab}
                   openModal={openModal}
                   lang={lang}
+                  initialBirthdayView={activeTab === 'birthday'}
                 />
               )}
 
@@ -443,6 +449,7 @@ export default function App() {
                   setActiveTab={setActiveTab}
                   openModal={openModal}
                   lang={lang}
+                  setLang={setLang}
                 />
               )}
 
@@ -477,6 +484,15 @@ export default function App() {
             />
           )}
         </div>
+      )}
+
+      {/* Floating 3D Sally AI ChatBot Assistant (Hidden on Admin Dashboard) */}
+      {activeTab !== 'dashboard' && (
+        <FloatingGirlChatBot 
+          setActiveTab={setActiveTab}
+          openModal={openModal}
+          lang={lang}
+        />
       )}
     </>
   );

@@ -6,7 +6,7 @@
  * browser preloading, and server replacement sync.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { mediaService } from '../api/mediaService';
 
 export function useKidsAreaMedia() {
@@ -23,14 +23,65 @@ export function useKidsAreaMedia() {
   const [isLoading, setIsLoading] = useState(false);
   const [isServerSynced, setIsServerSynced] = useState(false);
 
+  // References to previous state for comparison
+  const prevHeroRef = useRef(heroBanners);
+  const prevExploreRef = useRef(exploreItems);
+
+  useEffect(() => {
+    prevHeroRef.current = heroBanners;
+  }, [heroBanners]);
+
+  useEffect(() => {
+    prevExploreRef.current = exploreItems;
+  }, [exploreItems]);
+
   // 2. Background synchronization with server
   const syncKidsMedia = useCallback(async (forceRefresh = false) => {
     setIsLoading(true);
+    console.log('🔄 [POLLING TRIGGERED] Initiating sync for Kids Area media...');
+
     try {
       const [freshHero, freshExplore] = await Promise.all([
         mediaService.getKidsHeroBanners(forceRefresh),
         mediaService.getExploreKidsArea(forceRefresh)
       ]);
+
+      // 2. Console log response.data every time polling triggers
+      console.log('📦 [Polling response.data] Kids Area Hero Banners:', freshHero);
+      console.log('📦 [Polling response.data] Kids Area Explore Items:', freshExplore);
+
+      // 3. Compare old state with new fetched data and warn if unchanged
+      const oldHero = prevHeroRef.current || [];
+      const isHeroLengthSame = oldHero.length === (freshHero?.length || 0);
+      const isHeroItemsSame = JSON.stringify(oldHero.map(i => i?.image || i?.src || i?.url || i)) === 
+                              JSON.stringify((freshHero || []).map(i => i?.image || i?.src || i?.url || i));
+
+      if (isHeroLengthSame && isHeroItemsSame) {
+        console.warn(
+          `⚠️ [POLLING WARNING - Kids Area Hero]: Fetched data is IDENTICAL to previous state!\n` +
+          `• Array length: ${freshHero?.length || 0}\n` +
+          `• Items:`, freshHero,
+          `\n• Diagnostic Note: If you just uploaded an image in the admin dashboard, the backend or mock API is returning static data, or the section/page name in the upload doesn't match this endpoint.`
+        );
+      } else {
+        console.log(`✨ [POLLING UPDATE - Kids Area Hero]: New images detected! Previous count: ${oldHero.length} -> New count: ${freshHero?.length}`);
+      }
+
+      const oldExplore = prevExploreRef.current || [];
+      const isExploreLengthSame = oldExplore.length === (freshExplore?.length || 0);
+      const isExploreItemsSame = JSON.stringify(oldExplore.map(i => i?.image || i?.src || i?.url || i)) === 
+                                 JSON.stringify((freshExplore || []).map(i => i?.image || i?.src || i?.url || i));
+
+      if (isExploreLengthSame && isExploreItemsSame) {
+        console.warn(
+          `⚠️ [POLLING WARNING - Kids Area Explore]: Fetched data is IDENTICAL to previous state!\n` +
+          `• Array length: ${freshExplore?.length || 0}\n` +
+          `• Items:`, freshExplore,
+          `\n• Diagnostic Note: If you just uploaded an image to the Explore section, the backend is returning unchanged static data.`
+        );
+      } else {
+        console.log(`✨ [POLLING UPDATE - Kids Area Explore]: New images detected! Previous count: ${oldExplore.length} -> New count: ${freshExplore?.length}`);
+      }
 
       if (Array.isArray(freshHero) && freshHero.length > 0) {
         setHeroBanners(freshHero);
@@ -39,11 +90,6 @@ export function useKidsAreaMedia() {
       if (Array.isArray(freshExplore) && freshExplore.length >= 3) {
         setExploreItems(freshExplore);
       }
-
-      console.log('[useKidsAreaMedia] Loaded Kids Area media data:', {
-        heroBanners: freshHero,
-        exploreItems: freshExplore
-      });
 
       setIsServerSynced(true);
     } catch (err) {
@@ -97,10 +143,10 @@ export function useKidsAreaMedia() {
     };
     window.addEventListener('focus', handleWindowFocus);
 
-    // Background polling every 15 seconds to catch remote uploads from Apidog
+    // Background polling every 5 seconds to catch remote uploads
     const interval = setInterval(() => {
       syncKidsMedia(false);
-    }, 15000);
+    }, 5000);
 
     return () => {
       isMounted = false;

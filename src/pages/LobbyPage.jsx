@@ -12,7 +12,6 @@ import {
   ArrowLeft, 
   Check, 
   Sparkles, 
-  Zap,
   Calendar,
   Plus,
   Trash2,
@@ -124,16 +123,22 @@ export default function LobbyPage({
     const unlockAudio = () => {
       const ctx = getAudioContext();
       if (ctx && ctx.state === 'suspended') {
-        ctx.resume();
+        ctx.resume().catch(() => {});
       }
     };
     window.addEventListener('pointerdown', unlockAudio, { once: true });
     window.addEventListener('touchstart', unlockAudio, { once: true });
     window.addEventListener('click', unlockAudio, { once: true });
+    window.addEventListener('pointermove', unlockAudio, { once: true });
+    window.addEventListener('mousemove', unlockAudio, { once: true });
+    window.addEventListener('mouseenter', unlockAudio, { once: true });
     return () => {
       window.removeEventListener('pointerdown', unlockAudio);
       window.removeEventListener('touchstart', unlockAudio);
       window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('pointermove', unlockAudio);
+      window.removeEventListener('mousemove', unlockAudio);
+      window.removeEventListener('mouseenter', unlockAudio);
     };
   }, [getAudioContext]);
 
@@ -142,21 +147,25 @@ export default function LobbyPage({
     try {
       const ctx = getAudioContext();
       if (!ctx) return;
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+      const now = ctx.currentTime;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(160, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(580, ctx.currentTime + 0.32);
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.exponentialRampToValueAtTime(640, now + 0.32);
 
-      gain.gain.setValueAtTime(0.18, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.32);
+      gain.gain.setValueAtTime(0.32, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
 
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.32);
+      osc.start(now);
+      osc.stop(now + 0.32);
     } catch {
       // Audio autoplay policy fallback
     }
@@ -167,6 +176,9 @@ export default function LobbyPage({
     try {
       const ctx = getAudioContext();
       if (!ctx) return;
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
 
       const now = ctx.currentTime;
       const osc1 = ctx.createOscillator();
@@ -182,7 +194,7 @@ export default function LobbyPage({
       osc2.frequency.setValueAtTime(987.77, now);
       osc2.frequency.setValueAtTime(1318.51, now + 0.08);
 
-      gain.gain.setValueAtTime(0.22, now);
+      gain.gain.setValueAtTime(0.28, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
 
       osc1.connect(gain);
@@ -202,10 +214,22 @@ export default function LobbyPage({
   const triggerMarioJump = useCallback((targetSignId = 'trips') => {
     if (isJumping) return;
 
+    if (animTimeoutRef.current) clearTimeout(animTimeoutRef.current);
+    if (hitTimeoutRef.current) clearTimeout(hitTimeoutRef.current);
+
     setIsJumping(true);
     setGirlPose('jumping');
     setJumpCount(c => c + 1);
     playJumpSound();
+
+    // Map sign positions to confetti burst horizontal origins
+    const signOrigins = {
+      trips: 0.35,
+      events: 0.45,
+      restaurant: 0.55,
+      games: 0.65
+    };
+    const originX = signOrigins[targetSignId] || 0.45;
 
     // Peak reached, trigger coin chime & confetti
     hitTimeoutRef.current = setTimeout(() => {
@@ -215,11 +239,11 @@ export default function LobbyPage({
 
       try {
         confetti({
-          particleCount: 22,
-          spread: 50,
+          particleCount: 26,
+          spread: 55,
           startVelocity: 16,
           ticks: 45,
-          origin: { x: 0.28, y: 0.38 },
+          origin: { x: originX, y: 0.34 },
           colors: ['#fde047', '#f59e0b', '#fbbf24', '#ffffff'],
           shapes: ['circle']
         });
@@ -231,13 +255,13 @@ export default function LobbyPage({
         setActiveSignHit(null);
         setShowCoinSign(null);
       }, 550);
-    }, 420);
+    }, 380);
 
     // Complete jump & land back down
     animTimeoutRef.current = setTimeout(() => {
       setIsJumping(false);
       setGirlPose('idle');
-    }, 950);
+    }, 880);
   }, [isJumping, playJumpSound, playCoinSound]);
 
   // Trigger Boy Jump sequence
@@ -361,7 +385,31 @@ export default function LobbyPage({
       return;
     }
 
-    // Check existing registered guests in localStorage
+    // =========================================================================
+    // 1. ADMIN INTERCEPT: Check for fixed admin credentials
+    // =========================================================================
+    const ADMIN_CREDENTIALS = {
+      email: 'admin@americandream.eg',
+      password: 'Admin@123'
+    };
+
+    if (
+      (cleanPhone.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() || cleanPhone === 'admin' || cleanPhone === '01000000000') &&
+      loginPassword.trim() === ADMIN_CREDENTIALS.password
+    ) {
+      console.log('👑 [Admin Intercept] Admin credentials detected. Redirecting to dashboard.');
+      localStorage.setItem('isAdmin', 'true');
+      localStorage.setItem('userRole', 'admin');
+      localStorage.setItem('american_dream_user_logged_in', 'true');
+      localStorage.removeItem('american_dream_is_guest');
+
+      if (typeof window !== 'undefined') {
+        window.location.hash = '#dashboard';
+        window.dispatchEvent(new CustomEvent('auth-changed', { detail: { isAdmin: true } }));
+      }
+      if (onEnterApp) onEnterApp();
+      return;
+    }
     let guestFound = null;
     try {
       const registered = JSON.parse(localStorage.getItem('american_dream_registered_guests') || '[]');
@@ -717,8 +765,8 @@ export default function LobbyPage({
               type="button"
               className={`hanging-sign-wrap ${sign.className} ${isHit ? 'sign-hit-animation' : ''}`}
               onMouseEnter={() => {
-                if (sign.id === 'trips' && !isJumping) {
-                  triggerMarioJump('trips');
+                if (!isJumping) {
+                  triggerMarioJump(sign.id);
                 }
               }}
               onClick={() => handleSignClick(sign)}
@@ -923,20 +971,6 @@ export default function LobbyPage({
                       </button>
                     </div>
                   </div>
-
-                  {/* Quick Demo Login Pill */}
-                  <button 
-                    type="button" 
-                    className="lobby-auth-demo-btn"
-                    onClick={handleQuickDemoLogin}
-                  >
-                    <Zap size={15} />
-                    <span>
-                      {lang === 'ar' 
-                        ? '⚡ تجربة فورية سريعة بحساب (أحمد محمد)' 
-                        : '⚡ Quick Demo Login (Ahmed Mohamed)'}
-                    </span>
-                  </button>
 
                   {/* Submit Button */}
                   <button type="submit" className="lobby-auth-submit-btn">

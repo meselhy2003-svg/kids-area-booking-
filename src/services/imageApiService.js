@@ -91,7 +91,7 @@ export const getImageUrl = (filename) => {
   // Safely encode filename URI (handles spaces and special characters)
   const encodedFilename = encodeURI(clean);
 
-  // In local browser development, leverage Vite /media proxy to prevent CORS and ngrok interstitial blocks
+  // In local browser development, leverage Vite /media proxy to prevent CORS issues
   const isLocalhost = typeof window !== 'undefined' && 
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
@@ -167,6 +167,16 @@ export const extractValidFilenames = (rawData) => {
 
 /**
  * Fetches images for a specific page from GET /media/page/{page_name}
+/**
+ * Standard Headers applied to GET, POST, and DELETE requests
+ */
+export const STANDARD_HEADERS = {
+  'Accept': 'application/json'
+};
+
+/**
+ * Fetches images for a specific page from GET /api/media/page/{page_name}
+ * Strictly uses /api/ prefix and NO cache-busting query parameter.
  * 
  * @param {string} pageName - Page identifier (e.g. 'kids-area', 'hero', 'fun-park', 'home')
  * @returns {Promise<{ success: boolean, filenames: string[], urls: string[], raw?: any, error?: string }>}
@@ -174,32 +184,27 @@ export const extractValidFilenames = (rawData) => {
 export const fetchPageImages = async (pageName = 'kids-area') => {
   const sanitizedPage = encodeURIComponent(String(pageName).trim());
 
-  // Determine endpoint URL:
-  // In localhost browser, use relative proxy /api/media/page/... or fallback to API_BASE_URL
   const isLocalhost = typeof window !== 'undefined' && 
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-  // Primary endpoint per Apidog specification: /media/page/{page_name}
+  // Explicitly starts with /api/
   const endpoint = isLocalhost 
-    ? `/api/media/page/${sanitizedPage}`
-    : `${API_BASE_URL || ''}/media/page/${sanitizedPage}`;
+    ? `/api/media/page/${sanitizedPage}` 
+    : `${API_BASE_URL || ''}/api/media/page/${sanitizedPage}`;
 
   try {
     const response = await fetch(endpoint, {
       method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'ngrok-skip-browser-warning': 'true'
-      }
+      headers: STANDARD_HEADERS
     });
 
     if (!response.ok) {
-      // If /api/media/page/... returned 404, also try alternative endpoint /api/media/section/...
+      // If /api/media/page/... returned 404, fallback to /api/media/section/...
       if (response.status === 404 && isLocalhost) {
         const altEndpoint = `/api/media/section/${sanitizedPage}`;
         const altRes = await fetch(altEndpoint, {
           method: 'GET',
-          headers: { 'Accept': 'application/json', 'ngrok-skip-browser-warning': 'true' }
+          headers: STANDARD_HEADERS
         });
         if (altRes.ok) {
           const altJson = await altRes.json();
@@ -241,6 +246,8 @@ export const fetchPageImages = async (pageName = 'kids-area') => {
 
 /**
  * Uploads an image using the POST /upload-image endpoint with FormData.
+ * Strictly applies anti-cache headers and avoids manual Content-Type definition
+ * so the browser generates the required multipart boundary without cached conditional requests.
  * 
  * @param {object} options
  * @param {File} options.file - The image file to upload
@@ -270,7 +277,6 @@ export const uploadImage = async ({ file, pageName = 'kids-area', section = 'her
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
   // Primary endpoint per requirement: POST /upload-image
-  // In development, Vite proxy directs /upload-image to remote server
   const primaryEndpoint = isLocalhost ? '/upload-image' : `${API_BASE_URL || ''}/upload-image`;
 
   try {
@@ -278,19 +284,24 @@ export const uploadImage = async ({ file, pageName = 'kids-area', section = 'her
       method: 'POST',
       body: formData,
       headers: {
-        'ngrok-skip-browser-warning': 'true'
-        // NOTE: Do NOT set 'Content-Type': multipart/form-data manually,
-        // the browser must set it with the correct multipart boundary!
-      }
+        // 2. Strict Headers: prevent cached conditional requests
+        ...ANTI_CACHE_HEADERS
+        // 3. NOTE: Do NOT set 'Content-Type': multipart/form-data manually!
+        // Browser must automatically add: multipart/form-data; boundary=----WebKitFormBoundary...
+      },
+      cache: 'no-store'
     });
 
-    // If primary endpoint returns 404, fallback to /api/media (which is also supported by the backend)
+    // If primary endpoint returns 404, fallback to /api/media
     if (!response.ok && (response.status === 404 || response.status === 405)) {
       const fallbackEndpoint = isLocalhost ? '/api/media' : `${API_BASE_URL || ''}/api/media`;
       response = await fetch(fallbackEndpoint, {
         method: 'POST',
         body: formData,
-        headers: { 'ngrok-skip-browser-warning': 'true' }
+        headers: { 
+          ...ANTI_CACHE_HEADERS
+        },
+        cache: 'no-store'
       });
     }
 
@@ -322,6 +333,87 @@ export const uploadImage = async ({ file, pageName = 'kids-area', section = 'her
     return {
       success: false,
       error: error.message || 'An error occurred while uploading the image.'
+    };
+  }
+};
+
+/**
+ * Deletes an image using the DELETE /delete-image endpoint per Apidog specification.
+ * Applies strict anti-cache headers and cache: 'no-store'.
+ * 
+ * @param {string} filename - The filename to delete (e.g. "media-123.jpeg")
+ * @returns {Promise<{ success: boolean, message?: string, error?: string }>}
+ */
+export const deleteImage = async (filename) => {
+  if (!filename || typeof filename !== 'string') {
+    return { success: false, error: 'A valid filename is required for deletion.' };
+  }
+
+  const cleanFilename = filename.trim();
+  const isLocalhost = typeof window !== 'undefined' && 
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+  const primaryEndpoint = isLocalhost ? '/delete-image' : `${API_BASE_URL || ''}/delete-image`;
+
+  try {
+    // 1. Send DELETE with JSON body and anti-cache headers
+    let response = await fetch(primaryEndpoint, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        ...ANTI_CACHE_HEADERS
+      },
+      cache: 'no-store',
+      body: JSON.stringify({ 
+        filename: cleanFilename,
+        image: cleanFilename,
+        id: cleanFilename 
+      })
+    });
+
+    // 2. Fallback to query param if 404 or 405
+    if (!response.ok && (response.status === 404 || response.status === 405)) {
+      const queryEndpoint = `${primaryEndpoint}?filename=${encodeURIComponent(cleanFilename)}`;
+      response = await fetch(queryEndpoint, {
+        method: 'DELETE',
+        headers: { 
+          ...ANTI_CACHE_HEADERS
+        },
+        cache: 'no-store'
+      });
+    }
+
+    // 3. Fallback to /api/media/{filename}
+    if (!response.ok && (response.status === 404 || response.status === 405)) {
+      const altEndpoint = isLocalhost 
+        ? `/api/media/${encodeURIComponent(cleanFilename)}` 
+        : `${API_BASE_URL || ''}/api/media/${encodeURIComponent(cleanFilename)}`;
+      response = await fetch(altEndpoint, {
+        method: 'DELETE',
+        headers: { 
+          ...ANTI_CACHE_HEADERS
+        },
+        cache: 'no-store'
+      });
+    }
+
+    if (!response.ok) {
+      const errText = await response.text().catch(() => '');
+      throw new Error(`Delete failed with HTTP ${response.status}: ${errText || response.statusText}`);
+    }
+
+    const data = await response.json().catch(() => ({}));
+    return {
+      success: true,
+      message: data.message || `Image "${cleanFilename}" deleted successfully.`,
+      data
+    };
+  } catch (error) {
+    console.error('[ImageApiService] Delete error:', error);
+    return {
+      success: false,
+      error: error.message || 'An error occurred while deleting the image.'
     };
   }
 };

@@ -385,12 +385,12 @@
 
 /* Super Mario Jump Keyframe Animation (Smooth & Contained) */
 .girl-character-anchor.jumping {
-  animation: marioJumpAnimation 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: marioJumpAnimation 0.88s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   z-index: 40;
 }
 
 .girl-character-anchor.jumping .character-ground-shadow {
-  animation: shadowShrinkAnimation 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: shadowShrinkAnimation 0.88s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes marioJumpAnimation {
@@ -601,12 +601,12 @@
   /* In mobile: jump strictly in-place (purely vertical translateY, no horizontal sideways shift) */
   .girl-character-anchor.jumping,
   .boy-character-anchor.jumping {
-    animation: mobileVerticalJump 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+    animation: mobileVerticalJump 0.88s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
   }
 
   .girl-character-anchor.jumping .character-ground-shadow,
   .boy-character-anchor.jumping .character-ground-shadow {
-    animation: mobileShadowJump 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+    animation: mobileShadowJump 0.88s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
   }
 
   .character-speech-bubble {

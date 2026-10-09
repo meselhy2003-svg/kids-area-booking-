@@ -9,28 +9,24 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'https://unfraternised-luella-unexpeditiously.ngrok-free.dev',
+        target: 'https://backend-ados.vercel.app',
         changeOrigin: true,
-        secure: false,
-        headers: {
-          'ngrok-skip-browser-warning': 'true'
-        }
+        secure: false
       },
       '/media': {
-        target: 'https://unfraternised-luella-unexpeditiously.ngrok-free.dev',
+        target: 'https://backend-ados.vercel.app',
         changeOrigin: true,
-        secure: false,
-        headers: {
-          'ngrok-skip-browser-warning': 'true'
-        }
+        secure: false
       },
       '/upload-image': {
-        target: 'https://unfraternised-luella-unexpeditiously.ngrok-free.dev',
+        target: 'https://backend-ados.vercel.app',
         changeOrigin: true,
-        secure: false,
-        headers: {
-          'ngrok-skip-browser-warning': 'true'
-        }
+        secure: false
+      },
+      '/delete-image': {
+        target: 'https://backend-ados.vercel.app',
+        changeOrigin: true,
+        secure: false
       }
     }
   }

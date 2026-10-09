@@ -25,9 +25,11 @@ import {
   Gift,
   ArrowRight,
   ShieldCheck,
-  Users
+  Users,
+  LogOut
 } from 'lucide-react';
 import './DesktopProfilePage.css';
+import { authService } from '../../api/authService';
 
 export default function DesktopProfilePage({ 
   setActiveTab, 
@@ -105,6 +107,20 @@ export default function DesktopProfilePage({
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 3500);
+  };
+
+  // Handle user logout
+  const handleLogout = async () => {
+    const confirmMsg = isAr 
+      ? 'هل أنت متأكد من رغبتك في تسجيل الخروج؟' 
+      : 'Are you sure you want to log out?';
+    if (window.confirm(confirmMsg)) {
+      await authService.logout();
+      if (setActiveTab) setActiveTab('lobby');
+      if (typeof window !== 'undefined') {
+        window.location.hash = '#lobby';
+      }
+    }
   };
 
   // Avatar Upload Handler
@@ -286,20 +302,32 @@ export default function DesktopProfilePage({
                   <p className="profile-welcome-text">
                     {isAr ? 'مرحباً بعودتك! Welcome back!' : 'Welcome back! مرحباً بعودتك!'}
                   </p>
-                  <button 
-                    className="profile-edit-btn"
-                    onClick={() => {
-                      setFormData({
-                        name: profile.name,
-                        phone: profile.phone,
-                        address: profile.address,
-                        gender: profile.gender
-                      });
-                      setCurrentView('edit');
-                    }}
-                  >
-                    <span>{isAr ? 'تعديل بياناتك' : 'Edit your information'}</span>
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px', flexWrap: 'wrap' }}>
+                    <button 
+                      className="profile-edit-btn"
+                      onClick={() => {
+                        setFormData({
+                          name: profile.name,
+                          phone: profile.phone,
+                          address: profile.address,
+                          gender: profile.gender
+                        });
+                        setCurrentView('edit');
+                      }}
+                    >
+                      <span>{isAr ? 'تعديل بياناتك' : 'Edit your information'}</span>
+                    </button>
+
+                    <button 
+                      type="button"
+                      className="profile-logout-btn"
+                      onClick={handleLogout}
+                      title={isAr ? 'تسجيل الخروج من الحساب' : 'Log out from account'}
+                    >
+                      <LogOut size={14} />
+                      <span>{isAr ? 'تسجيل الخروج' : 'Log Out'}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 

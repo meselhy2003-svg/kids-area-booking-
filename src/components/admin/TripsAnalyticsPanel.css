@@ -1,0 +1,736 @@
+/* ==========================================================================
+   TRIPS ANALYTICS, FLOWCHART & LIVE GRAPHS PANEL
+   Admin Dashboard - School & Institutional Trips
+   ========================================================================== */
+
+.tap-panel-root {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 24px;
+  font-family: inherit;
+  color: #ffffff;
+}
+
+/* HEADER & VIEW MODE SWITCHER */
+.tap-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tap-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tap-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 169, 195, 0.15);
+  border: 1px solid rgba(0, 169, 195, 0.35);
+  color: #38bdf8;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  width: fit-content;
+}
+
+.tap-live-icon {
+  animation: tapPulse 2s infinite ease-in-out;
+}
+
+@keyframes tapPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.tap-heading {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.tap-subheading {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.tap-mode-switch {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #082d36;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 4px 12px rgba(8, 45, 54, 0.25);
+}
+
+.tap-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tap-mode-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tap-mode-btn.active {
+  background: #00a9c3;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 169, 195, 0.35);
+}
+
+/* 4 KPI CARDS */
+.tap-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.tap-kpi-card {
+  background: linear-gradient(145deg, #0c2b36 0%, #08222a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 16px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.tap-kpi-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0, 169, 195, 0.5);
+  box-shadow: 0 10px 24px rgba(0, 169, 195, 0.2);
+}
+
+.tap-kpi-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.tap-kpi-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tap-kpi-icon.teal { background: rgba(0, 169, 195, 0.2); color: #00a9c3; }
+.tap-kpi-icon.blue { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+.tap-kpi-icon.purple { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+.tap-kpi-icon.emerald { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+
+.tap-kpi-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+
+.tap-kpi-badge.teal { background: rgba(0, 169, 195, 0.18); color: #38bdf8; }
+.tap-kpi-badge.blue { background: rgba(56, 189, 248, 0.18); color: #7dd3fc; }
+.tap-kpi-badge.purple { background: rgba(139, 92, 246, 0.18); color: #c4b5fd; }
+.tap-kpi-badge.emerald { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; }
+
+.tap-kpi-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.tap-kpi-val-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.tap-kpi-num {
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.tap-kpi-unit {
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 600;
+}
+
+.tap-sparkline-wrap {
+  width: 100%;
+  height: 36px;
+  margin: 4px 0 8px;
+}
+
+.tap-sparkline-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tap-kpi-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.65);
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tap-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tap-pulse-dot.green { background: #10b981; box-shadow: 0 0 6px #10b981; }
+.tap-pulse-dot.blue { background: #38bdf8; box-shadow: 0 0 6px #38bdf8; }
+.tap-pulse-dot.purple { background: #a78bfa; box-shadow: 0 0 6px #a78bfa; }
+.tap-pulse-dot.emerald { background: #34d399; box-shadow: 0 0 6px #34d399; }
+
+/* OPERATIONAL FLOWCHART CARD */
+.tap-flowchart-card {
+  background: #082d36;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px 22px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.tap-card-top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tap-card-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tap-accent-icon {
+  color: #00a9c3;
+  flex-shrink: 0;
+}
+
+.tap-card-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.tap-card-sub {
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.tap-legend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+
+.tap-legend-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.tap-legend-dot.green {
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+/* FLOW PIPELINE LAYOUT */
+.tap-flow-pipeline {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.tap-flow-node {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.tap-flow-node:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #00a9c3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 169, 195, 0.2);
+}
+
+.tap-flow-node.active-filter {
+  background: rgba(0, 169, 195, 0.15);
+  border-color: #00a9c3;
+  box-shadow: 0 0 0 2px rgba(0, 169, 195, 0.4), 0 6px 18px rgba(0, 169, 195, 0.25);
+}
+
+.tap-node-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tap-node-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tap-node-icon.amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+.tap-node-icon.teal { background: rgba(0, 169, 195, 0.2); color: #38bdf8; }
+.tap-node-icon.purple { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+.tap-node-icon.emerald { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.tap-node-icon.red { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+.tap-node-step {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.5px;
+}
+
+.tap-node-step.red {
+  color: #f87171;
+}
+
+.tap-node-name {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 2px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tap-node-desc {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 28px;
+}
+
+.tap-node-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-top: 4px;
+}
+
+.tap-node-stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.stat-value {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* FLOW CONNECTORS */
+.tap-flow-connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 28px;
+}
+
+.tap-connector-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-50%);
+  overflow: hidden;
+}
+
+.tap-pulse-particle {
+  position: absolute;
+  top: 0;
+  left: -10px;
+  width: 10px;
+  height: 2px;
+  background: #00a9c3;
+  box-shadow: 0 0 6px #00a9c3;
+  animation: tapFlowAnim 1.8s infinite linear;
+}
+
+.tap-pulse-particle.delay-1 { animation-delay: 0.6s; }
+.tap-pulse-particle.delay-2 { animation-delay: 1.2s; }
+
+@keyframes tapFlowAnim {
+  0% { left: -10px; opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+
+.tap-connector-arrow {
+  color: #00a9c3;
+  z-index: 2;
+  background: #082d36;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* GRAPHS GRID */
+.tap-graphs-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 16px;
+}
+
+.tap-graph-card,
+.tap-zone-card {
+  background: #082d36;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px 22px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.tap-graph-header,
+.tap-zone-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tap-graph-toggle-pills {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 3px;
+  border-radius: 18px;
+}
+
+.tap-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tap-pill-btn.active {
+  background: #00a9c3;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 169, 195, 0.35);
+}
+
+.tap-svg-graph-container {
+  width: 100%;
+  height: 160px;
+  position: relative;
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.tap-main-svg-chart {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.tap-smooth-curve-line {
+  filter: drop-shadow(0 2px 6px rgba(0, 169, 195, 0.6));
+}
+
+.tap-chart-point-group {
+  cursor: pointer;
+}
+
+.tap-chart-point-group:hover .tap-point-circle {
+  r: 8;
+  fill: #38bdf8;
+}
+
+.tap-chart-tooltip {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  background: #0c212b;
+  border: 1px solid #00a9c3;
+  border-radius: 8px;
+  padding: 4px 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  z-index: 10;
+  white-space: nowrap;
+  animation: tapFadeIn 0.15s ease-out;
+}
+
+@keyframes tapFadeIn {
+  from { opacity: 0; transform: translate(-50%, -90%); }
+  to { opacity: 1; transform: translate(-50%, -100%); }
+}
+
+.tooltip-date {
+  font-size: 0.64rem;
+  color: #94a3b8;
+  display: block;
+}
+
+.tooltip-val {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #38bdf8;
+}
+
+.tap-axis-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 12px 0;
+}
+
+.axis-lbl {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+}
+
+.tap-graph-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summary-item .lbl {
+  font-size: 0.66rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.summary-item .val {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.summary-item .val.highlight {
+  color: #38bdf8;
+}
+
+.summary-item .val.green {
+  color: #34d399;
+}
+
+/* ZONE BARS LIST */
+.tap-zone-bars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 6px 0 16px;
+  flex: 1;
+}
+
+.tap-zone-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tap-zone-row-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.76rem;
+}
+
+.zone-name {
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.zone-count-badge {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.zone-count-badge strong {
+  color: #ffffff;
+}
+
+.tap-progress-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.tap-progress-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tap-zone-card-footer {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.zone-total-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.zt-lbl {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.zt-val {
+  font-size: 0.86rem;
+  font-weight: 900;
+  color: #a78bfa;
+}
+
+.zt-note {
+  font-size: 0.66rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* RTL OVERRIDES */
+[dir="rtl"] .tap-panel-root,
+.lang-ar .tap-panel-root {
+  direction: rtl;
+}
+
+[dir="rtl"] .tap-flow-pipeline,
+.lang-ar .tap-flow-pipeline {
+  direction: ltr;
+}
+
+@media (max-width: 1200px) {
+  .tap-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tap-graphs-grid {
+    grid-template-columns: 1fr;
+  }
+  .tap-flow-pipeline {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tap-flow-connector {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .tap-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
