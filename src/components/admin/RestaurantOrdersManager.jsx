@@ -921,13 +921,14 @@ export default function RestaurantOrdersManager({
       </div>
 
       {/* ========================================================================= */}
-      {/* RESTAURANT ORDER DETAILS & UPDATE SLIDE-OVER DRAWER (SLIDER PANEL)        */}
+      {/* RESTAURANT ORDER DETAILS & UPDATE MODAL (CENTERED WHITE CARD)             */}
       {/* ========================================================================= */}
       {selectedOrder && (
-        <div className="pz-modal-backdrop slide-over-backdrop" onClick={() => setSelectedOrder(null)}>
+        <div className="pz-modal-backdrop" onClick={() => setSelectedOrder(null)}>
           <div 
-            className="pz-order-details-modal-wrapper slide-over-panel" 
+            className="pz-order-details-modal-wrapper" 
             onClick={e => e.stopPropagation()} 
+            style={{ maxWidth: '840px', width: '95%', maxHeight: '90vh', overflowY: 'auto', borderRadius: '20px' }}
           >
             <div className="order-details-card">
               {/* Header */}
@@ -988,19 +989,19 @@ export default function RestaurantOrdersManager({
                   </div>
 
                   {/* Items list */}
-                  <div style={{ marginTop: '16px' }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#38bdf8', display: 'block', marginBottom: '8px' }}>
+                  <div className="order-items-list-wrapper">
+                    <span className="order-items-list-label">
                       {isAr ? 'قائمة الأصناف المحجوزة:' : 'Ordered Items / Reservation:'}
                     </span>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '10px' }}>
+                    <div className="order-items-box">
                       {(selectedOrder.items || []).map((it, i) => (
-                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < (selectedOrder.items.length - 1) ? '1px solid rgba(255,255,255,0.08)' : 'none', fontSize: '0.8rem', color: '#e2e8f0' }}>
-                          <span>{it.qty}x {isAr ? (it.nameAr || it.name) : it.name}</span>
-                          <strong style={{ color: '#00d2ff' }}>{it.price * it.qty} {isAr ? 'ج.م' : 'EGP'}</strong>
+                        <div key={i} className="order-item-row">
+                          <span className="item-name-qty">{it.qty}x {isAr ? (it.nameAr || it.name) : it.name}</span>
+                          <strong className="item-price-val">{it.price * it.qty} {isAr ? 'ج.م' : 'EGP'}</strong>
                         </div>
                       ))}
                       {selectedOrder.deliveryFee > 0 && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderTop: '1px dashed rgba(255,255,255,0.15)', fontSize: '0.8rem', color: '#94a3b8' }}>
+                        <div className="order-item-row delivery-fee-row">
                           <span>{isAr ? 'خدمة التوصيل السريع (Delivery Fee)' : 'Delivery Service Fee'}</span>
                           <span>{selectedOrder.deliveryFee} {isAr ? 'ج.م' : 'EGP'}</span>
                         </div>

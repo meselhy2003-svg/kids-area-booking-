@@ -1,128 +1,100 @@
 /* ==========================================================================
    RESTAURANT & CAFE ORDERS MANAGER STYLES
-   Slide-Over Drawer (Slider Panel) with Smooth Transitions & Solid Background
+   Centered White Card Modal (Clean Modern Light Theme)
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   SLIDE-OVER DRAWER BACKDROP
+   MODAL BACKDROP (CENTERED OVERLAY)
    -------------------------------------------------------------------------- */
-.pz-modal-backdrop.slide-over-backdrop {
+.pz-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(3, 14, 18, 0.65) !important;
-  backdrop-filter: blur(6px) !important;
-  -webkit-backdrop-filter: blur(6px) !important;
+  background: rgba(15, 23, 42, 0.65) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
   z-index: 10000;
   display: flex !important;
-  justify-content: flex-end !important; /* Slide in from right */
-  align-items: stretch !important;
-  padding: 0 !important;
-  animation: pzDrawerBackdropFade 0.25s ease-out;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  animation: pzModalBackdropFade 0.2s ease-out;
 }
 
-.pz-orders-manager-root.lang-ar .pz-modal-backdrop.slide-over-backdrop {
-  justify-content: flex-start !important; /* Slide in from left in RTL */
-}
-
-@keyframes pzDrawerBackdropFade {
+@keyframes pzModalBackdropFade {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 /* --------------------------------------------------------------------------
-   SLIDE-OVER DRAWER PANEL (SLIDER)
+   SOLID WHITE MODAL CARD
    -------------------------------------------------------------------------- */
-.pz-order-details-modal-wrapper.slide-over-panel {
-  width: 100% !important;
-  max-width: 620px !important;
-  height: 100vh !important;
-  max-height: 100vh !important;
-  border-radius: 0 !important;
-  border-top: none !important;
-  border-bottom: none !important;
-  border-right: none !important;
-  border-left: 1.5px solid rgba(0, 169, 195, 0.45) !important;
-  box-shadow: -15px 0 50px rgba(0, 0, 0, 0.75) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  background: #08252d !important;
-  background-color: #08252d !important;
+.pz-order-details-modal-wrapper {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
   overflow: hidden !important;
-  color: #ffffff !important;
-  animation: pzSlideInRight 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform;
+  color: #0f172a !important;
+  animation: pzModalZoomIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  max-width: 840px !important;
+  width: 95% !important;
+  max-height: 90vh !important;
 }
 
-.pz-orders-manager-root.lang-ar .pz-order-details-modal-wrapper.slide-over-panel {
-  border-left: none !important;
-  border-right: 1.5px solid rgba(0, 169, 195, 0.45) !important;
-  box-shadow: 15px 0 50px rgba(0, 0, 0, 0.75) !important;
-  animation: pzSlideInLeft 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes pzSlideInRight {
+@keyframes pzModalZoomIn {
   from {
-    transform: translateX(100%);
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
   }
   to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes pzSlideInLeft {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }
 
 .order-details-card {
-  height: 100% !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
   display: flex !important;
   flex-direction: column !important;
-  overflow: hidden !important;
-  background: #08252d !important;
-  background-color: #08252d !important;
-  color: #ffffff !important;
   width: 100%;
 }
 
 /* --------------------------------------------------------------------------
-   DRAWER HEADER (FIXED AT TOP)
+   MODAL HEADER (DARK NAVY / TEAL GRADIENT FOR ELEGANT CONTRAST)
    -------------------------------------------------------------------------- */
 .order-details-header {
-  background: linear-gradient(135deg, #051a20 0%, #0c333e 100%) !important;
-  padding: 18px 24px !important;
+  background: linear-gradient(135deg, #052026 0%, #003744 100%) !important;
+  padding: 20px 26px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
   gap: 16px;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .order-details-header h3 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #ffffff !important;
   letter-spacing: -0.02em;
 }
 
 .order-details-header p {
   margin: 4px 0 0 0;
-  font-size: 0.8rem;
-  color: #94a3b8;
+  font-size: 0.82rem;
+  color: #94a3b8 !important;
   font-weight: 500;
 }
 
 .order-details-header .close-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
   width: 36px;
   height: 36px;
   border-radius: 10px;
@@ -142,63 +114,44 @@
 }
 
 /* --------------------------------------------------------------------------
-   DRAWER BODY (SCROLLABLE CONTENT AREA)
+   MODAL BODY (WHITE BACKGROUND & CLEAN SLATE TEXT)
    -------------------------------------------------------------------------- */
 .order-details-body {
-  flex: 1 !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  padding: 24px !important;
+  padding: 26px !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 20px !important;
-  background: #08252d !important;
-}
-
-/* Custom Clean Scrollbar for the Drawer */
-.order-details-body::-webkit-scrollbar {
-  width: 6px;
-}
-
-.order-details-body::-webkit-scrollbar-track {
-  background: #051c22;
-}
-
-.order-details-body::-webkit-scrollbar-thumb {
-  background: #144955;
-  border-radius: 4px;
-}
-
-.order-details-body::-webkit-scrollbar-thumb:hover {
-  background: #00a9c3;
+  gap: 22px !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
 }
 
 /* --------------------------------------------------------------------------
-   SUMMARY SECTION
+   SUMMARY SECTION (LIGHT CARD)
    -------------------------------------------------------------------------- */
 .summary-section {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 18px 20px;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  padding: 20px 22px !important;
 }
 
 .section-title {
   margin: 0 0 16px 0;
-  font-size: 0.96rem;
+  font-size: 0.98rem;
   font-weight: 800;
-  color: #38bdf8;
+  color: #0284c7 !important;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0 !important;
 }
 
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 14px 18px;
+  gap: 16px 22px;
 }
 
 .summary-item {
@@ -208,45 +161,99 @@
 }
 
 .summary-item .label {
-  font-size: 0.74rem;
-  color: #94a3b8;
-  font-weight: 600;
+  font-size: 0.75rem;
+  color: #64748b !important;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
 }
 
 .summary-item .value {
-  font-size: 0.9rem;
-  color: #f1f5f9;
+  font-size: 0.94rem;
+  color: #1e293b !important;
   font-weight: 600;
 }
 
 .summary-item .value.bold {
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a !important;
 }
 
 .summary-item .value.price-highlight {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 900;
-  color: #00d2ff;
+  color: #0284c7 !important;
+}
+
+/* Items List Inside Summary */
+.order-items-list-wrapper {
+  margin-top: 18px;
+}
+
+.order-items-list-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #0369a1 !important;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.order-items-box {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.order-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.85rem;
+  color: #1e293b !important;
+}
+
+.order-item-row:last-child {
+  border-bottom: none;
+}
+
+.order-item-row .item-name-qty {
+  color: #0f172a !important;
+  font-weight: 600;
+}
+
+.order-item-row .item-price-val {
+  color: #0284c7 !important;
+  font-weight: 800;
+}
+
+.order-item-row.delivery-fee-row {
+  border-top: 1px dashed #cbd5e1 !important;
+  color: #64748b !important;
+  font-weight: 600;
+  margin-top: 4px;
+  padding-top: 8px;
 }
 
 /* --------------------------------------------------------------------------
-   UPDATE FORM SECTION
+   UPDATE FORM SECTION (LIGHT CARD)
    -------------------------------------------------------------------------- */
 .update-form-section {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 18px 20px;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  padding: 20px 22px !important;
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .form-group {
@@ -260,16 +267,17 @@
 }
 
 .form-group label {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  color: #cbd5e1;
+  color: #334155 !important;
 }
 
 .form-select,
 .form-textarea {
-  background: #04171d !important;
-  border: 1.5px solid #144955 !important;
-  color: #ffffff !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #0f172a !important;
   border-radius: 10px;
   padding: 10px 14px;
   font-size: 0.88rem;
@@ -282,14 +290,14 @@
 
 .form-select:focus,
 .form-textarea:focus {
-  border-color: #00d2ff !important;
-  background: #05212a !important;
-  box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.2) !important;
+  border-color: #0284c7 !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
 }
 
 .form-select option {
-  background: #08252d;
-  color: #ffffff;
+  background: #ffffff;
+  color: #0f172a;
   padding: 8px;
 }
 
@@ -299,39 +307,39 @@
 }
 
 /* --------------------------------------------------------------------------
-   DRAWER FOOTER ACTIONS
+   FOOTER ACTIONS
    -------------------------------------------------------------------------- */
 .form-actions-row {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 18px;
+  border-top: 1px solid #e2e8f0 !important;
 }
 
 .btn-cancel {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #e2e8f0;
-  padding: 10px 20px;
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #475569 !important;
+  padding: 10px 22px;
   border-radius: 10px;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .btn-cancel:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
 }
 
 .btn-save {
-  background: linear-gradient(135deg, #00a9c3 0%, #007f94 100%);
+  background: linear-gradient(135deg, #00a9c3 0%, #008096 100%) !important;
   border: none;
-  color: #ffffff;
-  padding: 10px 24px;
+  color: #ffffff !important;
+  padding: 10px 26px;
   border-radius: 10px;
   font-size: 0.88rem;
   font-weight: 800;
@@ -339,14 +347,14 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 14px rgba(0, 169, 195, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 169, 195, 0.35);
   transition: all 0.2s ease;
 }
 
 .btn-save:hover:not(:disabled) {
-  background: linear-gradient(135deg, #02b6d1 0%, #0093ab 100%);
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(0, 169, 195, 0.55);
+  box-shadow: 0 6px 18px rgba(2, 132, 199, 0.45);
 }
 
 .btn-save:disabled {
@@ -355,25 +363,21 @@
 }
 
 /* --------------------------------------------------------------------------
-   RESPONSIVE DRAWER
+   RESPONSIVE MODAL
    -------------------------------------------------------------------------- */
 @media (max-width: 640px) {
-  .pz-order-details-modal-wrapper.slide-over-panel {
-    max-width: 100% !important;
-  }
-
   .summary-grid,
   .form-grid {
     grid-template-columns: 1fr;
   }
   
   .order-details-header {
-    padding: 14px 18px !important;
+    padding: 16px 20px !important;
   }
   
   .order-details-body {
-    padding: 16px !important;
-    gap: 14px !important;
+    padding: 18px !important;
+    gap: 16px !important;
   }
   
   .form-actions-row {
