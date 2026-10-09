@@ -126,12 +126,13 @@ export const isUserAuthenticated = () => {
  */
 export async function signup(payload) {
   try {
+    const rawPhone = (payload.phone || '').trim();
     const requestData = {
       name: payload.name,
-      email: payload.email,
-      phone: payload.phone,
+      email: payload.email ? payload.email.trim() : undefined,
+      phone: rawPhone,
       password: payload.password,
-      passwordConfirm: payload.passwordConfirm,
+      passwordConfirm: payload.passwordConfirm || payload.password,
       age: payload.age !== undefined ? String(payload.age) : '25',
       gender: payload.gender || 'male'
     };
@@ -139,7 +140,7 @@ export async function signup(payload) {
     const res = await apiClient.post('/api/auth/signup', requestData);
 
     if (!res.success) {
-      throw new Error(extractErrorMessage(res, 'Sign up failed. Please check your data.'));
+      throw new Error(extractErrorMessage(res, 'فشل إنشاء الحساب، يرجى مراجعة البيانات المدخلة'));
     }
 
     const token = res.data?.token;
@@ -147,7 +148,7 @@ export async function signup(payload) {
     const user = res.data?.data || res.data?.user || {
       name: payload.name,
       email: payload.email,
-      phone: payload.phone
+      phone: rawPhone
     };
 
     // Save tokens on success
@@ -156,6 +157,26 @@ export async function signup(payload) {
     if (user && typeof window !== 'undefined') {
       localStorage.setItem(AUTH_KEYS.USER, JSON.stringify(user));
       localStorage.setItem('american_dream_user_logged_in', 'true');
+      const signupPts = Number(user.points) || 0;
+      const cleanSignupPhone = user.phone || rawPhone;
+      localStorage.setItem('american_dream_user_profile', JSON.stringify({
+        name: user.name || payload.name,
+        phone: cleanSignupPhone,
+        email: user.email || '',
+        age: user.age || payload.age || '25',
+        gender: user.gender || payload.gender || 'male',
+        points: signupPts,
+        storeCredit: Number((signupPts * 0.1).toFixed(2)),
+        passId: `#AD-${cleanSignupPhone ? cleanSignupPhone.replace(/[^0-9]/g, '').slice(-5) : '84920'}`,
+        memberSince: 'October 2026',
+        address: 'Canal Waterfront Road, Ferdan District, Ismailia',
+        avatar: '/photo/profile/ahmed-avatar-overview.png',
+        avatarEdit: '/photo/profile/ahmed-avatar-edit.png',
+        role: user.role || 'guest'
+      }));
+      window.dispatchEvent(new CustomEvent('auth-changed', {
+        detail: { isAuthenticated: true, user, isAdmin: user.role === 'admin' }
+      }));
     }
 
     return {
@@ -166,7 +187,7 @@ export async function signup(payload) {
     };
   } catch (error) {
     console.error('[authService.signup] Error:', error.message);
-    throw new Error(extractErrorMessage(error, 'Sign up failed. Please try again.'));
+    throw new Error(extractErrorMessage(error, 'فشل إنشاء الحساب، يرجى المحاولة مرة أخرى'));
   }
 }
 
@@ -174,24 +195,29 @@ export async function signup(payload) {
 // 2. LOGIN: POST /api/auth/login
 // ============================================================================
 /**
- * Authenticate existing user with email and password
+ * Authenticate existing user with phone (primary) and password
  * 
  * @param {object} credentials
- * @param {string} credentials.email - User email (or identifier)
+ * @param {string} [credentials.phone] - User phone number (primary)
+ * @param {string} [credentials.identifier] - Phone or identifier
+ * @param {string} [credentials.email] - User email (optional fallback)
  * @param {string} credentials.password - User password
  * @returns {Promise<{ success: boolean, token: string, refreshToken: string, user: object }>}
  */
-export async function login({ email, identifier, password }) {
+export async function login({ phone, identifier, email, password }) {
   try {
+    const rawIdentifier = (phone || identifier || email || '').trim();
     const requestData = {
-      email: (email || identifier || '').trim(),
+      phone: rawIdentifier,
+      identifier: rawIdentifier,
+      email: rawIdentifier,
       password
     };
 
     const res = await apiClient.post('/api/auth/login', requestData);
 
     if (!res.success) {
-      const errorMsg = extractErrorMessage(res, 'Invalid email or password.');
+      const errorMsg = extractErrorMessage(res, 'بيانات تسجيل الدخول غير صحيحة، يرجى التأكد من رقم الهاتف أو كلمة المرور');
       const err = new Error(errorMsg);
       err.response = { status: res.status, data: res.data };
       err.status = res.status;
@@ -200,7 +226,7 @@ export async function login({ email, identifier, password }) {
 
     const token = res.data?.token;
     const refreshToken = res.data?.refreshToken;
-    const user = res.data?.data || res.data?.user || { email: requestData.email };
+    const user = res.data?.data || res.data?.user || { phone: rawIdentifier };
 
     // Save tokens on success
     saveTokens(token, refreshToken);
@@ -208,6 +234,26 @@ export async function login({ email, identifier, password }) {
     if (user && typeof window !== 'undefined') {
       localStorage.setItem(AUTH_KEYS.USER, JSON.stringify(user));
       localStorage.setItem('american_dream_user_logged_in', 'true');
+      const loginPts = Number(user.points) || 0;
+      const cleanLoginPhone = user.phone || rawIdentifier;
+      localStorage.setItem('american_dream_user_profile', JSON.stringify({
+        name: user.name || 'عضو أمريكان دريم',
+        phone: cleanLoginPhone,
+        email: user.email || '',
+        age: user.age || '25',
+        gender: user.gender || 'male',
+        points: loginPts,
+        storeCredit: Number((loginPts * 0.1).toFixed(2)),
+        passId: `#AD-${cleanLoginPhone ? cleanLoginPhone.replace(/[^0-9]/g, '').slice(-5) : '84920'}`,
+        memberSince: 'October 2026',
+        address: 'Canal Waterfront Road, Ferdan District, Ismailia',
+        avatar: '/photo/profile/ahmed-avatar-overview.png',
+        avatarEdit: '/photo/profile/ahmed-avatar-edit.png',
+        role: user.role || 'guest'
+      }));
+      window.dispatchEvent(new CustomEvent('auth-changed', {
+        detail: { isAuthenticated: true, user, isAdmin: user.role === 'admin' }
+      }));
     }
 
     return {
@@ -218,7 +264,7 @@ export async function login({ email, identifier, password }) {
     };
   } catch (error) {
     console.error('[authService.login] Error:', error.message);
-    const err = new Error(extractErrorMessage(error, 'Login failed. Please check your credentials.'));
+    const err = new Error(extractErrorMessage(error, 'بيانات تسجيل الدخول غير صحيحة، يرجى التأكد من رقم الهاتف أو كلمة المرور'));
     err.response = error.response || { status: error.status || 401, data: error.data || { message: error.message } };
     err.status = error.status || error.response?.status || 401;
     throw err;

@@ -11,7 +11,7 @@
  * 5. Direct, clean REST calls to /api/... endpoints
  */
 
-export const API_BASE_URL = 'https://backend-ados.vercel.app';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9500';
 
 export const STORAGE_KEYS = {
   USERS: 'kids_area_users',

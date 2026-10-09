@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Copy, Check, FolderOpen, UploadCloud, X, Phone, MessageSquare, AlertCircle, ArrowRight } from 'lucide-react';
-import { isUserAuthenticated } from '../../api/authService';
+import {
+  Copy, Check, FolderOpen, UploadCloud, X, Phone, MessageSquare, AlertCircle, ArrowRight,
+  Banknote, CreditCard, Sparkles, CheckCircle2
+} from 'lucide-react';
+import { buyingService } from '../../api/buyingService';
+import { authService, isUserAuthenticated } from '../../api/authService';
 import './DesktopCartPage.css';
 
 export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }) {
+  const isAr = lang === 'ar';
+
   // 1. Initial 4 Passes matching screenshot: Total = 450 EGP / 1450 Points
   const [cartItems, setCartItems] = useState([
     {
@@ -57,18 +63,51 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
     }
   ]);
 
-  // User Points Balance (matches 2250 pts ribbon badge)
-  const [userPointsBalance, setUserPointsBalance] = useState(2250);
+  // User Points Balance (loaded dynamically from logged-in profile or fallback)
+  const [userPointsBalance, setUserPointsBalance] = useState(() => {
+    try {
+      const prof = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
+      return typeof prof.points === 'number' ? prof.points : 2250;
+    } catch {
+      return 2250;
+    }
+  });
 
-  // Payment Method Selection: 'points' | 'money'
+  // Payment Method Selection: 'points' | 'money' | 'cash'
   const [paymentMethod, setPaymentMethod] = useState('points');
   const [moneyMethod, setMoneyMethod] = useState('instapay'); // 'instapay' | 'vodafone'
+  const [lastPaymentMethod, setLastPaymentMethod] = useState('points');
+  const [lastOrderDetails, setLastOrderDetails] = useState(null);
+
+  // Official Payment Accounts State
+  const [paymentAccounts, setPaymentAccounts] = useState({
+    instapay: {
+      accountAddress: 'americandream@instapay',
+      recipientName: 'أمريكان دريم كيدز إيريا',
+      instructionsAr: 'افتح تطبيق إنستاباي، حول المبلغ المطلوب بدقة لعنوان الدفع اللحظي، ثم التقط صورة للإيصال وارفعها.',
+      instructionsEn: 'Open InstaPay app, transfer exact amount to the IPA address, and upload the screenshot.'
+    },
+    vodafoneCash: {
+      walletNumber: '01023456789',
+      recipientName: 'أمريكان دريم كيدز إيريا',
+      instructionsAr: 'حول المبلغ المطلوب إلى رقم المحفظة عبر تطبيق أنا فودافون أو كود *9#، ثم ارفع صورة الإيصال.',
+      instructionsEn: 'Transfer exact amount to our wallet via Ana Vodafone or *9#, then upload the receipt screenshot.'
+    },
+    cash: {
+      instructionsAr: 'ادفع كاش على الوصول عند الوصول للمنتزه لاستلام تذكرة وإسورة الدخول الورقية.',
+      instructionsEn: 'Pay cash at the ticket desk upon arrival to receive your physical wristband/ticket.'
+    }
+  });
 
   // Checkout Success Modal State
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [lastPaymentRef, setLastPaymentRef] = useState('');
   const [showAddPassesModal, setShowAddPassesModal] = useState(false);
   const [showVipModal, setShowVipModal] = useState(false);
+
+  // Checkout loading and error states
+  const [isSubmittingCheckout, setIsSubmittingCheckout] = useState(false);
+  const [checkoutError, setCheckoutError] = useState('');
 
   // Money Payment Proof Modal States
   const [showMoneyProofModal, setShowMoneyProofModal] = useState(false);
@@ -78,6 +117,58 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
   const [uploadError, setUploadError] = useState('');
   const [moneyOrderSubmitted, setMoneyOrderSubmitted] = useState(false);
   const [isSubmittingProof, setIsSubmittingProof] = useState(false);
+
+  // Fetch official accounts and sync points on mount
+  useEffect(() => {
+    let isMounted = true;
+    async function loadAccounts() {
+      try {
+        const res = await buyingService.getPaymentAccounts();
+        if (res.success && res.data && isMounted) {
+          const accs = res.data;
+          setPaymentAccounts((prev) => ({
+            instapay: {
+              accountAddress: accs.instapay?.accountAddress || accs.instapay?.address || prev.instapay.accountAddress,
+              recipientName: accs.instapay?.recipientName || accs.instapay?.accountName || prev.instapay.recipientName,
+              instructionsAr: accs.instapay?.instructionsAr || prev.instapay.instructionsAr,
+              instructionsEn: accs.instapay?.instructionsEn || prev.instapay.instructionsEn
+            },
+            vodafoneCash: {
+              walletNumber: accs.vodafone_cash?.walletNumber || accs.vodafoneCash?.walletNumber || prev.vodafoneCash.walletNumber,
+              recipientName: accs.vodafone_cash?.recipientName || accs.vodafoneCash?.recipientName || prev.vodafoneCash.recipientName,
+              instructionsAr: accs.vodafone_cash?.instructionsAr || accs.vodafoneCash?.instructionsAr || prev.vodafoneCash.instructionsAr,
+              instructionsEn: accs.vodafone_cash?.instructionsEn || accs.vodafoneCash?.instructionsEn || prev.vodafoneCash.instructionsEn
+            },
+            cash: {
+              instructionsAr: accs.cash?.instructionsAr || prev.cash.instructionsAr,
+              instructionsEn: accs.cash?.instructionsEn || prev.cash.instructionsEn
+            }
+          }));
+        }
+      } catch (e) {
+        console.warn('Could not load payment accounts:', e.message);
+      }
+    }
+
+    const syncPoints = () => {
+      try {
+        const prof = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
+        if (typeof prof.points === 'number' && isMounted) {
+          setUserPointsBalance(prof.points);
+        }
+      } catch (e) { }
+    };
+
+    loadAccounts();
+    window.addEventListener('auth-changed', syncPoints);
+    window.addEventListener('storage', syncPoints);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('auth-changed', syncPoints);
+      window.removeEventListener('storage', syncPoints);
+    };
+  }, []);
 
   // Dynamic Calculations
   const totalPasses = cartItems.reduce((acc, item) => acc + item.qty, 0);
@@ -184,8 +275,8 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
     }
     setUploadError('');
     const preview = URL.createObjectURL(file);
-    const sizeFormatted = file.size > 1024 * 1024 
-      ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` 
+    const sizeFormatted = file.size > 1024 * 1024
+      ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
       : `${Math.round(file.size / 1024)} KB`;
     setUploadedReceipt({ file, preview, name: file.name, size: sizeFormatted });
   };
@@ -199,24 +290,97 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
     setUploadError('');
   };
 
-  // Submit Money Payment Proof with Request
-  const handleSubmitMoneyProof = () => {
-    if (!uploadedReceipt) {
-      setUploadError('Please upload your payment screenshot/receipt to submit your request.');
+  // Helper to extract active user profile
+  const getActiveUser = () => {
+    try {
+      const cur = authService.getCurrentUser();
+      if (cur) return cur;
+      const prof = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
+      return prof;
+    } catch {
+      return {};
+    }
+  };
+
+  // Submit Money Payment Proof with Request (InstaPay or Vodafone Cash)
+  const handleSubmitMoneyProof = async () => {
+    if (!uploadedReceipt || !uploadedReceipt.file) {
+      setUploadError(isAr ? 'يرجى إرفاق صورة أو لقطة شاشة إيصال التحويل لإتمام الطلب.' : 'Please upload your payment screenshot/receipt to submit your request.');
       return;
     }
+
     setIsSubmittingProof(true);
-    setTimeout(() => {
-      setIsSubmittingProof(false);
-      const ref = `AD-WRIST-${Math.floor(100000 + Math.random() * 900000)}`;
-      setLastPaymentRef(ref);
-      setMoneyOrderSubmitted(true);
-      confetti({
-        particleCount: 120,
-        spread: 80,
-        origin: { y: 0.6 }
+    setUploadError('');
+
+    try {
+      const user = getActiveUser();
+      const guestPhone = user?.phone || '';
+      const guestName = user?.name || (isAr ? 'عميل أمريكان دريم' : 'American Dream Guest');
+      const guestId = user?._id || user?.id;
+
+      const ticketsPayload = cartItems.map((item) => ({
+        ticket: item.id,
+        title: isAr
+          ? (item.id === 'pass-kids-area' ? 'تذكرة المستكشف الصغير (منطقة الأطفال)'
+            : item.id === 'pass-fun-park' ? 'تذكرة المرح والإثارة (فن بارك)'
+              : item.id === 'pass-challenge' ? 'تذكرة ساحة التحدي والآركيد'
+                : item.id === 'pass-adventure' ? 'تذكرة مسار الحبال المعلقة (المغامرات)'
+                  : (item.titleAr || item.title))
+          : (item.titleEn || item.title),
+        quantity: item.qty,
+        priceEgp: item.priceEgp,
+        pricePts: item.pricePts,
+        zone: item.zone
+      }));
+
+      const chosenMethod = moneyMethod === 'vodafone' ? 'vodafone_cash' : 'instapay';
+      const notes = isAr
+        ? `طلب حجز تذاكر عبر ${moneyMethod === 'vodafone' ? 'فودافون كاش' : 'إنستاباي'} - حساب المحول: ${senderPhoneOrAccount || 'غير محدد'}`
+        : `Ticket purchase via ${moneyMethod === 'vodafone' ? 'Vodafone Cash' : 'InstaPay'} - Sender: ${senderPhoneOrAccount || 'Not specified'}`;
+
+      const res = await buyingService.createPurchase({
+        tickets: ticketsPayload,
+        paymentMethod: chosenMethod,
+        paymentStatus: 'pending_verification',
+        paymentProofFile: uploadedReceipt.file,
+        senderAccount: senderPhoneOrAccount,
+        guest: guestId,
+        guestName,
+        guestPhone,
+        notes
       });
-    }, 600);
+
+      const orderCode = res.data?.orderCode || `PZ-${Math.floor(100000 + Math.random() * 900000)}`;
+      setLastPaymentRef(orderCode);
+      setLastOrderDetails(res.data);
+      setLastPaymentMethod(chosenMethod);
+
+      // Save booked passes to user wallet
+      cartItems.forEach((item) => {
+        authService.addPassToWallet({
+          code: orderCode,
+          zone: item.zoneLabel || item.zone,
+          name: isAr ? (item.titleAr || item.title) : (item.titleEn || item.title),
+          quantity: item.qty,
+          price: `${item.priceEgp * item.qty} EGP`,
+          status: 'Pending Verification'
+        });
+      });
+
+      setMoneyOrderSubmitted(true);
+      try {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      } catch { }
+    } catch (err) {
+      console.error('[Cart] Money proof submission error:', err);
+      setUploadError(err.message || (isAr ? 'فشل إرسال إيصال الدفع. يرجى المحاولة ثانية.' : 'Failed to submit payment proof. Please try again.'));
+    } finally {
+      setIsSubmittingProof(false);
+    }
   };
 
   // Close Money Modal & reset if submitted
@@ -233,7 +397,7 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
 
   // Execute Payment
   const handlePayment = () => {
-    if (totalPasses === 0) return;
+    if (totalPasses === 0 || isSubmittingCheckout) return;
 
     if (!isUserAuthenticated()) {
       if (openModal) {
@@ -243,6 +407,8 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
             proceedPaymentExecution();
           }
         });
+      } else {
+        alert(isAr ? 'يرجى تسجيل الدخول برقم الهاتف وكلمة المرور للمتابعة.' : 'Please log in with your phone and password to proceed.');
       }
       return;
     }
@@ -250,29 +416,145 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
     proceedPaymentExecution();
   };
 
-  const proceedPaymentExecution = () => {
-    if (paymentMethod === 'points') {
-      if (userPointsBalance < subtotalPts) {
-        alert(lang === 'ar' ? 'رصيد النقاط غير كافٍ! يرجى اختيار الدفع بالمال.' : 'Insufficient points balance! Please select "Pay with Money" or top up your wristband.');
-        return;
-      }
-      setUserPointsBalance((prev) => prev - subtotalPts);
-      const ref = `AD-WRIST-${Math.floor(100000 + Math.random() * 900000)}`;
-      setLastPaymentRef(ref);
-      setPaymentSuccess(true);
+  const proceedPaymentExecution = async () => {
+    setCheckoutError('');
 
-      try {
-        confetti({
-          particleCount: 100,
-          spread: 80,
-          origin: { y: 0.6 }
-        });
-      } catch {}
-    } else {
+    if (paymentMethod === 'money') {
       // paymentMethod === 'money' -> Open Money Payment & Receipt Upload Pop Screen
       setShowMoneyProofModal(true);
       setMoneyOrderSubmitted(false);
       setUploadError('');
+      return;
+    }
+
+    const user = getActiveUser();
+    const guestPhone = user?.phone || '';
+    const guestName = user?.name || (isAr ? 'عميل أمريكان دريم' : 'American Dream Guest');
+    const guestId = user?._id || user?.id;
+
+    const ticketsPayload = cartItems.map((item) => ({
+      ticket: item.id,
+      title: isAr
+        ? (item.id === 'pass-kids-area' ? 'تذكرة المستكشف الصغير (منطقة الأطفال)'
+          : item.id === 'pass-fun-park' ? 'تذكرة المرح والإثارة (فن بارك)'
+            : item.id === 'pass-challenge' ? 'تذكرة ساحة التحدي والآركيد'
+              : item.id === 'pass-adventure' ? 'تذكرة مسار الحبال المعلقة (المغامرات)'
+                : (item.titleAr || item.title))
+        : (item.titleEn || item.title),
+      quantity: item.qty,
+      priceEgp: item.priceEgp,
+      pricePts: item.pricePts,
+      zone: item.zone
+    }));
+
+    if (paymentMethod === 'points') {
+      if (userPointsBalance < subtotalPts) {
+        setCheckoutError(isAr ? 'رصيد النقاط غير كافٍ! يرجى اختيار الدفع بالمال أو نقداً عند الوصول.' : 'Insufficient points balance! Please select Pay with Money or Cash on Arrival.');
+        return;
+      }
+
+      setIsSubmittingCheckout(true);
+      try {
+        const res = await buyingService.createPurchase({
+          tickets: ticketsPayload,
+          paymentMethod: 'points',
+          paymentStatus: 'paid',
+          guest: guestId,
+          guestName,
+          guestPhone,
+          notes: isAr ? 'شراء تذاكر برصيد النقاط' : 'Purchased with points'
+        });
+
+        const orderCode = res.data?.orderCode || `PZ-${Math.floor(100000 + Math.random() * 900000)}`;
+        setLastPaymentRef(orderCode);
+        setLastOrderDetails(res.data);
+        setLastPaymentMethod('points');
+
+        // Deduct points
+        const newBalance = Math.max(0, userPointsBalance - subtotalPts);
+        setUserPointsBalance(newBalance);
+        try {
+          authService.updateProfile({ points: newBalance, storeCredit: Number((newBalance * 0.1).toFixed(2)) });
+          const curProf = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
+          curProf.points = newBalance;
+          curProf.storeCredit = Number((newBalance * 0.1).toFixed(2));
+          localStorage.setItem('american_dream_user_profile', JSON.stringify(curProf));
+          window.dispatchEvent(new CustomEvent('auth-changed', { detail: { points: newBalance } }));
+        } catch (e) { }
+
+        // Add passes to wallet
+        cartItems.forEach((item) => {
+          authService.addPassToWallet({
+            code: orderCode,
+            zone: item.zoneLabel || item.zone,
+            name: isAr ? (item.titleAr || item.title) : (item.titleEn || item.title),
+            quantity: item.qty,
+            price: `${item.pricePts * item.qty} Pts`,
+            status: 'Active'
+          });
+        });
+
+        setCartItems([]);
+        setPaymentSuccess(true);
+        try {
+          confetti({
+            particleCount: 100,
+            spread: 80,
+            origin: { y: 0.6 }
+          });
+        } catch { }
+      } catch (err) {
+        console.error('[Cart] Points checkout error:', err);
+        setCheckoutError(err.message || (isAr ? 'فشلت عملية الدفع بالنقاط. يرجى المحاولة ثانية.' : 'Points checkout failed. Please try again.'));
+      } finally {
+        setIsSubmittingCheckout(false);
+      }
+    } else if (paymentMethod === 'cash') {
+      // Pay Cash on Arrival
+      setIsSubmittingCheckout(true);
+      try {
+        const res = await buyingService.createPurchase({
+          tickets: ticketsPayload,
+          paymentMethod: 'cash',
+          paymentStatus: 'pending',
+          guest: guestId,
+          guestName,
+          guestPhone,
+          notes: isAr ? 'حجز تذاكر نقداً عند الوصول (الدفع عند الوصول)' : 'Cash upon arrival reservation'
+        });
+
+        const orderCode = res.data?.orderCode || `PZ-${Math.floor(100000 + Math.random() * 900000)}`;
+        setLastPaymentRef(orderCode);
+        setLastOrderDetails(res.data);
+        setLastPaymentMethod('cash');
+
+        // Add passes to wallet
+        cartItems.forEach((item) => {
+          authService.addPassToWallet({
+            code: orderCode,
+            zone: item.zoneLabel || item.zone,
+            name: isAr ? (item.titleAr || item.title) : (item.titleEn || item.title),
+            quantity: item.qty,
+            price: `${item.priceEgp * item.qty} EGP`,
+            status: 'Pending Payment (Cash)'
+          });
+        });
+
+        setCartItems([]);
+        setPaymentSuccess(true);
+        try {
+          confetti({
+            particleCount: 100,
+            spread: 80,
+            origin: { y: 0.6 }
+          });
+        } catch { }
+      } catch (err) {
+        console.error('[Cart] Cash checkout error:', err);
+        setCheckoutError(err.message || (isAr ? 'فشل حجز التذاكر نقداً. يرجى المحاولة ثانية.' : 'Failed to reserve cash passes. Please try again.'));
+      } finally {
+        setIsSubmittingCheckout(false);
+      }
     }
   };
 
@@ -324,36 +606,36 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
             {cartItems.length > 0 ? (
               <div className="cart-items-list">
                 {cartItems.map((item) => {
-                  const itemTitle = lang === 'ar' 
+                  const itemTitle = lang === 'ar'
                     ? (item.id === 'pass-kids-area' ? 'تذكرة المستكشف الصغير'
                       : item.id === 'pass-fun-park' ? 'تذكرة المرح والإثارة'
-                      : item.id === 'pass-challenge' ? 'تذكرة ساحة التحدي والآركيد'
-                      : item.id === 'pass-adventure' ? 'تذكرة مسار الحبال المعلقة'
-                      : item.titleAr || item.title)
+                        : item.id === 'pass-challenge' ? 'تذكرة ساحة التحدي والآركيد'
+                          : item.id === 'pass-adventure' ? 'تذكرة مسار الحبال المعلقة'
+                            : item.titleAr || item.title)
                     : (item.titleEn || item.title);
 
                   const zoneLabel = lang === 'ar'
                     ? (item.zone === 'kids-area' ? 'منطقة الأطفال'
                       : item.zone === 'fun-park' ? 'فن بارك'
-                      : item.zone === 'challenge' ? 'منطقة التحدي'
-                      : item.zone === 'adventure' ? 'منطقة المغامرات'
-                      : item.zoneLabel)
+                        : item.zone === 'challenge' ? 'منطقة التحدي'
+                          : item.zone === 'adventure' ? 'منطقة المغامرات'
+                            : item.zoneLabel)
                     : item.zoneLabel;
 
                   const itemAge = lang === 'ar'
                     ? (item.age === 'Ages 1 - 6' ? 'الأعمار: ١ - ٦ سنوات'
                       : item.age === 'All Ages' ? 'لكل الأعمار'
-                      : item.age === 'Ages 8+' ? 'الأعمار: ٨+ سنوات'
-                      : item.age === 'Ages 6+' ? 'الأعمار: ٦+ سنوات'
-                      : item.age)
+                        : item.age === 'Ages 8+' ? 'الأعمار: ٨+ سنوات'
+                          : item.age === 'Ages 6+' ? 'الأعمار: ٦+ سنوات'
+                            : item.age)
                     : item.age;
 
                   const itemInclusions = lang === 'ar'
                     ? (item.id === 'pass-kids-area' ? 'سوفت بلاي طول اليوم + حوض الكرات + منطقة حسية'
                       : item.id === 'pass-fun-park' ? 'ركوب غير محدود للدوامة + سيارات التصادم'
-                      : item.id === 'pass-challenge' ? 'معارك الواقع الافتراضي + هوكي الهواء'
-                      : item.id === 'pass-adventure' ? 'مسار حبال معلق + حزام أمان ومشرف خاص'
-                      : item.inclusionsAr || item.inclusions)
+                        : item.id === 'pass-challenge' ? 'معارك الواقع الافتراضي + هوكي الهواء'
+                          : item.id === 'pass-adventure' ? 'مسار حبال معلق + حزام أمان ومشرف خاص'
+                            : item.inclusionsAr || item.inclusions)
                     : item.inclusions;
 
                   return (
@@ -361,10 +643,10 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                       {/* Left: Thumbnail & Title */}
                       <div className="cart-item-left">
                         <div className="cart-item-thumb-wrap">
-                          <img 
-                            src={item.thumb} 
-                            alt={itemTitle} 
-                            className="cart-item-thumb" 
+                          <img
+                            src={item.thumb}
+                            alt={itemTitle}
+                            className="cart-item-thumb"
                             onError={(e) => { e.target.src = '/photo/kid area pic/icon/cart.png'; }}
                           />
                         </div>
@@ -433,10 +715,10 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
             ) : (
               /* Empty Cart State */
               <div className="cart-empty-box">
-                <img 
-                  src="/photo/kid area pic/icon/cart.png" 
-                  alt="Empty Cart" 
-                  className="cart-empty-icon" 
+                <img
+                  src="/photo/kid area pic/icon/cart.png"
+                  alt="Empty Cart"
+                  className="cart-empty-icon"
                 />
                 <h3 className="cart-empty-title">
                   {lang === 'ar' ? 'سلة الحجز فارغة حالياً' : 'Your Cart is Currently Empty'}
@@ -446,9 +728,9 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                     ? 'أضف تذاكر الألعاب، أو أساور اليوم الكامل، أو باقات الرحلات للمتابعة.'
                     : 'Add thrill passes, all-day wristbands, or group packages to proceed.'}
                 </p>
-                <button 
-                  type="button" 
-                  className="card-btn selected" 
+                <button
+                  type="button"
+                  className="card-btn selected"
                   style={{ maxWidth: '240px', margin: '0 auto' }}
                   onClick={resetDemoCart}
                 >
@@ -463,10 +745,10 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
             <div className="cart-summary-card">
               {/* Header */}
               <div className="cart-sum-header">
-                <img 
-                  src="/photo/kid area pic/icon/Icon (14).png" 
-                  alt="Order Summary" 
-                  className="cart-sum-icon" 
+                <img
+                  src="/photo/kid area pic/icon/Icon (14).png"
+                  alt="Order Summary"
+                  className="cart-sum-icon"
                 />
                 <h3 className="cart-sum-title">
                   {lang === 'ar' ? 'ملخص الحجز والدفع' : 'ORDER SUMMARY'}
@@ -541,17 +823,17 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
 
                 <div className="payment-options-col" style={{ marginTop: '8px' }}>
                   {/* OPTION 1: PAY WITH POINTS */}
-                  <div 
+                  <div
                     className={`payment-card ${paymentMethod === 'points' ? 'active' : ''}`}
                     onClick={() => setPaymentMethod('points')}
                   >
                     <div className="payment-card-top">
                       <div className="payment-card-info-left">
                         <div className="payment-card-icon-circle">
-                          <img 
-                            src="/photo/kid area pic/icon/Icon (16).png" 
-                            alt="Points" 
-                            className="payment-card-icon-img" 
+                          <img
+                            src="/photo/kid area pic/icon/Icon (16).png"
+                            alt="Points"
+                            className="payment-card-icon-img"
                           />
                         </div>
                         <div className="payment-card-text">
@@ -595,17 +877,17 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                   </div>
 
                   {/* OPTION 2: PAY WITH MONEY */}
-                  <div 
+                  <div
                     className={`payment-card ${paymentMethod === 'money' ? 'active' : ''}`}
                     onClick={() => setPaymentMethod('money')}
                   >
                     <div className="payment-card-top">
                       <div className="payment-card-info-left">
                         <div className="payment-card-icon-circle" style={{ background: '#f59e0b' }}>
-                          <img 
-                            src="/photo/kid area pic/icon/Icon (15).png" 
-                            alt="Money" 
-                            className="payment-card-icon-img" 
+                          <img
+                            src="/photo/kid area pic/icon/Icon (15).png"
+                            alt="Money"
+                            className="payment-card-icon-img"
                           />
                         </div>
                         <div className="payment-card-text">
@@ -635,7 +917,7 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                           </span>
                         </div>
                         <div className="inset-payment-badges">
-                          <button 
+                          <button
                             type="button"
                             className={`inset-pay-badge instapay ${paymentMethod === 'money' && moneyMethod === 'instapay' ? 'selected' : ''}`}
                             onClick={(e) => {
@@ -644,17 +926,17 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                               setMoneyMethod('instapay');
                             }}
                           >
-                            <img 
-                              src="/photo/kid area pic/payment logo/instapay logo.png" 
-                              alt="InstaPay Logo" 
-                              className="inset-pay-logo-img" 
+                            <img
+                              src="/photo/kid area pic/payment logo/instapay logo.png"
+                              alt="InstaPay Logo"
+                              className="inset-pay-logo-img"
                             />
                             <span>{lang === 'ar' ? 'إنستاباي' : 'INSTAPAY'}</span>
                             {paymentMethod === 'money' && moneyMethod === 'instapay' && (
                               <span className="pay-badge-check">✓</span>
                             )}
                           </button>
-                          <button 
+                          <button
                             type="button"
                             className={`inset-pay-badge vodafone ${paymentMethod === 'money' && moneyMethod === 'vodafone' ? 'selected' : ''}`}
                             onClick={(e) => {
@@ -663,10 +945,10 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                               setMoneyMethod('vodafone');
                             }}
                           >
-                            <img 
-                              src="/photo/kid area pic/payment logo/vodafone_cash_clean.png" 
-                              alt="Vodafone Cash Logo" 
-                              className="inset-pay-logo-img" 
+                            <img
+                              src="/photo/kid area pic/payment logo/vodafone_cash_clean.png"
+                              alt="Vodafone Cash Logo"
+                              className="inset-pay-logo-img"
                               onError={(e) => { e.currentTarget.src = '/photo/kid area pic/payment logo/vodafone cash logo.png'; }}
                             />
                             <span>{lang === 'ar' ? 'فودافون كاش' : 'VODAFONE CASH'}</span>
@@ -678,27 +960,114 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                       </div>
                     </div>
                   </div>
+
+                  {/* OPTION 3: PAY CASH ON ARRIVAL */}
+                  <div
+                    className={`payment-card ${paymentMethod === 'cash' ? 'active' : ''}`}
+                    onClick={() => setPaymentMethod('cash')}
+                  >
+                    <div className="payment-card-top">
+                      <div className="payment-card-info-left">
+                        <div className="payment-card-icon-circle" style={{ background: '#10b981' }}>
+                          <Banknote size={19} color="#ffffff" strokeWidth={2.4} />
+                        </div>
+                        <div className="payment-card-text">
+                          <h5 className="payment-card-title">
+                            {lang === 'ar' ? 'الدفع نقداً عند الوصول' : 'Pay Cash on Arrival'}
+                          </h5>
+                          <span className="payment-card-subtitle" style={{ color: '#6ee7b7' }}>
+                            {lang === 'ar'
+                              ? 'ادفع كاش لالوصول واستلم إسورة الدخول فوراً'
+                              : 'Pay at ticket window upon arrival & collect wristband'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="payment-card-radio">
+                        {paymentMethod === 'cash' && <div className="payment-card-radio-inner" />}
+                      </div>
+                    </div>
+
+                    {/* Cash Inset Box */}
+                    <div className="payment-card-inset">
+                      <div className="inset-money-box">
+                        <div className="inset-money-row">
+                          <span>{lang === 'ar' ? 'المبلغ المطلوب سداده نقداً:' : 'Total Cash to Pay:'}</span>
+                          <span style={{ fontSize: '1rem', fontWeight: 900, color: '#0f172a' }}>
+                            {subtotalEgp} {lang === 'ar' ? 'ج.م' : 'EGP'}
+                          </span>
+                        </div>
+                        <div style={{
+                          fontSize: '0.74rem',
+                          color: '#047857',
+                          background: '#ecfdf5',
+                          padding: '7px 10px',
+                          borderRadius: '8px',
+                          lineHeight: 1.45,
+                          border: '1px solid #a7f3d0'
+                        }}>
+                          {lang === 'ar'
+                            ? '✓ حجز مباشر بدون رفع إيصالات. احصل على كود تذكرتك فوراً وسدد المبلغ للكاشير عند الوصول.'
+                            : '✓ Instant booking without payment proof. Get your reservation code now and pay at the counter.'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
+              {/* Checkout Error Alert */}
+              {checkoutError && (
+                <div style={{
+                  color: '#b91c1c',
+                  background: '#fef2f2',
+                  border: '1px solid #fecaca',
+                  borderRadius: '12px',
+                  padding: '10px 14px',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  marginTop: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <AlertCircle size={16} strokeWidth={2.4} style={{ flexShrink: 0 }} />
+                  <span>{checkoutError}</span>
+                </div>
+              )}
+
               {/* Big CTA Payment Button */}
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="cart-payment-btn"
                 onClick={handlePayment}
-                disabled={totalPasses === 0}
+                disabled={totalPasses === 0 || isSubmittingCheckout}
+                style={{
+                  marginTop: '12px',
+                  opacity: (totalPasses === 0 || isSubmittingCheckout) ? 0.65 : 1,
+                  cursor: (totalPasses === 0 || isSubmittingCheckout) ? 'not-allowed' : 'pointer',
+                  background: paymentMethod === 'cash' ? '#059669' : '#012b32'
+                }}
               >
-                <span>{lang === 'ar' ? 'متابعة الدفع وتأكيد الحجز' : 'Payment'}</span>
+                {isSubmittingCheckout ? (
+                  <span>{lang === 'ar' ? 'جاري تأكيد الحجز...' : 'Reserving Passes...'}</span>
+                ) : paymentMethod === 'cash' ? (
+                  <span>{lang === 'ar' ? `تأكيد الحجز والدفع نقداً (${subtotalEgp} ج.م)` : `Confirm & Pay Cash (${subtotalEgp} EGP)`}</span>
+                ) : paymentMethod === 'points' ? (
+                  <span>{lang === 'ar' ? `سداد الحجز برصيد النقاط (${subtotalPts} نقطة)` : `Pay with Points (${subtotalPts} Pts)`}</span>
+                ) : (
+                  <span>{lang === 'ar' ? `متابعة الدفع عبر ${moneyMethod === 'instapay' ? 'إنستاباي' : 'فودافون كاش'}` : `Proceed to Pay (${subtotalEgp} EGP)`}</span>
+                )}
               </button>
             </div>
 
             {/* Bottom VIP Desk Support Banner */}
             <div className="vip-desk-banner">
               <div className="vip-desk-left">
-                <img 
-                  src="/photo/kid area pic/icon/Icon (17).png" 
-                  alt="VIP Support" 
-                  className="vip-desk-icon" 
+                <img
+                  src="/photo/kid area pic/icon/Icon (17).png"
+                  alt="VIP Support"
+                  className="vip-desk-icon"
                 />
                 <div className="vip-desk-text">
                   <h5 className="vip-desk-title">
@@ -710,8 +1079,8 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                 </div>
               </div>
 
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="vip-desk-btn"
                 onClick={() => setShowVipModal(true)}
               >
@@ -728,13 +1097,13 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
       {paymentSuccess && (
         <div className="trips-modal-backdrop" onClick={() => setPaymentSuccess(false)}>
           <div className="trips-modal-card" style={{ maxWidth: '520px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="trips-modal-header" style={{ background: '#ecfdf5' }}>
+            <div className="trips-modal-header" style={{ background: lastPaymentMethod === 'cash' ? '#f0fdf4' : '#ecfdf5' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{
                   width: '36px',
                   height: '36px',
                   borderRadius: '50%',
-                  background: '#10b981',
+                  background: lastPaymentMethod === 'cash' ? '#059669' : '#10b981',
                   color: '#ffffff',
                   display: 'flex',
                   alignItems: 'center',
@@ -744,8 +1113,10 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                 }}>
                   ✓
                 </div>
-                <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#065f46', fontWeight: 850 }}>
-                  {lang === 'ar' ? 'تم حجز وتفعيل الإسورة بنجاح!' : 'Wristband Reserved Successfully!'}
+                <h3 style={{ margin: 0, fontSize: '1.15rem', color: lastPaymentMethod === 'cash' ? '#065f46' : '#065f46', fontWeight: 850 }}>
+                  {lastPaymentMethod === 'cash'
+                    ? (lang === 'ar' ? 'تم تأكيد حجز التذاكر بنجاح!' : 'Tickets Reserved Successfully!')
+                    : (lang === 'ar' ? 'تم حجز وتفعيل الإسورة بنجاح!' : 'Wristband Reserved Successfully!')}
                 </h3>
               </div>
               <button className="trips-modal-close" onClick={() => setPaymentSuccess(false)}>&times;</button>
@@ -754,24 +1125,32 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
             <div className="trips-modal-body" style={{ textAlign: 'center' }}>
               <div style={{
                 background: '#f8fafc',
-                border: '2px dashed #00a9c3',
+                border: `2px dashed ${lastPaymentMethod === 'cash' ? '#10b981' : '#00a9c3'}`,
                 borderRadius: '16px',
                 padding: '20px',
                 margin: '8px 0'
               }}>
-                <img 
-                  src="/photo/logo/logo nav bar and footer.png" 
-                  alt="Logo" 
-                  style={{ height: '38px', width: 'auto', marginBottom: '10px' }} 
+                <img
+                  src="/photo/logo/logo nav bar and footer.png"
+                  alt="Logo"
+                  style={{ height: '38px', width: 'auto', marginBottom: '10px' }}
                 />
                 <div style={{ fontSize: '0.78rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  {lang === 'ar' ? 'إسورة الدخول الرقمية' : 'DIGITAL ENTRY WRISTBAND PASS'}
+                  {lastPaymentMethod === 'cash'
+                    ? (lang === 'ar' ? 'كود حجز التذاكر المسبق' : 'PRE-BOOKED TICKET CODE')
+                    : (lang === 'ar' ? 'إسورة الدخول الرقمية' : 'DIGITAL ENTRY WRISTBAND PASS')}
                 </div>
-                <div style={{ fontSize: '1.35rem', fontWeight: 900, color: '#0a3342', margin: '4px 0' }}>
+                <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#0a3342', margin: '4px 0', letterSpacing: '0.05em' }}>
                   {lastPaymentRef}
                 </div>
-                <div style={{ fontSize: '0.85rem', color: '#10b981', fontWeight: 700 }}>
-                  {lang === 'ar' ? 'الحالة: نشطة • دخول سريع عبر البوابة' : 'Status: Active • Fast Gate Entry'}
+                <div style={{
+                  fontSize: '0.85rem',
+                  color: lastPaymentMethod === 'cash' ? '#d97706' : '#10b981',
+                  fontWeight: 700
+                }}>
+                  {lastPaymentMethod === 'cash'
+                    ? (lang === 'ar' ? 'الحالة: في انتظار الدفع نقداً عند الوصول' : 'Status: Pending Cash Payment at Desk')
+                    : (lang === 'ar' ? 'الحالة: نشطة • دخول سريع عبر البوابة' : 'Status: Active • Fast Gate Entry')}
                 </div>
 
                 <div style={{
@@ -791,21 +1170,31 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                     <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 13h6v6H3v-6zm2 2v2h2v-2H5zm13-2h3v3h-3v-3zm-5 0h2v2h-2v-2zm2 2h2v2h-2v-2zm-2 2h2v2h-2v-2zm4 0h3v3h-3v-3z" />
                   </svg>
                   <span style={{ fontSize: '0.66rem', color: '#64748b', fontWeight: 700, letterSpacing: '1px' }}>
-                    {lang === 'ar' ? 'المسح عند البوابة' : 'SCAN AT GATE'}
+                    {lastPaymentMethod === 'cash'
+                      ? (lang === 'ar' ? 'أبرز الكود للكاشير' : 'SHOW TO CASHIER')
+                      : (lang === 'ar' ? 'المسح عند البوابة' : 'SCAN AT GATE')}
                   </span>
                 </div>
 
-                <div style={{ fontSize: '0.82rem', color: '#475569' }}>
-                  {lang === 'ar' ? 'تم الدفع عبر ' : 'Paid via '}
-                  <strong>
-                    {paymentMethod === 'points' 
-                      ? (lang === 'ar' ? `${subtotalPts} نقطة` : `${subtotalPts} Points`)
-                      : (lang === 'ar' ? `${subtotalEgp} ج.م` : `${subtotalEgp} EGP`)}
-                  </strong>
-                  {paymentMethod === 'points' && (
-                    <div style={{ color: '#088395', fontWeight: 700, marginTop: '4px' }}>
-                      {lang === 'ar' ? 'الرصيد المتبقي: ' : 'Remaining Balance: '}
-                      {userPointsBalance} {lang === 'ar' ? 'نقطة' : 'Points'}
+                <div style={{ fontSize: '0.82rem', color: '#475569', lineHeight: 1.5 }}>
+                  {lastPaymentMethod === 'cash' ? (
+                    <div>
+                      {lang === 'ar' ? (
+                        <>المبلغ المطلوب سداده: <strong>{lastOrderDetails?.totalPrice || subtotalEgp} ج.م</strong> نقداً عند الوصول لالوصول لاستلام إسورة وتذكرة الدخول الورقية.</>
+                      ) : (
+                        <>Amount to pay: <strong>{lastOrderDetails?.totalPrice || subtotalEgp} EGP</strong> cash at the counter upon arrival to receive your wristband pass.</>
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                      {lang === 'ar' ? 'تم الدفع عبر ' : 'Paid via '}
+                      <strong>
+                        {lang === 'ar' ? `${subtotalPts} نقطة` : `${subtotalPts} Points`}
+                      </strong>
+                      <div style={{ color: '#088395', fontWeight: 700, marginTop: '4px' }}>
+                        {lang === 'ar' ? 'الرصيد المتبقي: ' : 'Remaining Balance: '}
+                        {userPointsBalance} {lang === 'ar' ? 'نقطة' : 'Points'}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -813,15 +1202,15 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
             </div>
 
             <div className="trips-modal-header" style={{ background: '#f8fafc', borderRadius: '0 0 24px 24px' }}>
-              <button 
-                className="modal-btn outline" 
+              <button
+                className="modal-btn outline"
                 style={{ width: '100%', justifyContent: 'center' }}
                 onClick={() => window.print()}
               >
-                {lang === 'ar' ? '🖨️ طباعة الإسورة الرقمية' : '🖨️ Print Digital Pass'}
+                {lang === 'ar' ? '🖨️ طباعة إيصال الحجز' : '🖨️ Print Reservation Pass'}
               </button>
-              <button 
-                className="modal-btn primary" 
+              <button
+                className="modal-btn primary"
                 style={{ width: '100%', justifyContent: 'center' }}
                 onClick={() => setPaymentSuccess(false)}
               >
@@ -880,7 +1269,7 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                     thumb: '/photo/kid area pic/Junior GP Speedway.png'
                   }
                 ].map((extra) => (
-                  <div 
+                  <div
                     key={extra.id}
                     style={{
                       display: 'flex',
@@ -931,10 +1320,10 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
           <div className="trips-modal-card" style={{ maxWidth: '440px' }} onClick={(e) => e.stopPropagation()}>
             <div className="trips-modal-header" style={{ background: '#fef3c7' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <img 
-                  src="/photo/kid area pic/icon/Icon (17).png" 
-                  alt="Support" 
-                  style={{ width: '22px', height: '22px' }} 
+                <img
+                  src="/photo/kid area pic/icon/Icon (17).png"
+                  alt="Support"
+                  style={{ width: '22px', height: '22px' }}
                 />
                 <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#78350f', fontWeight: 850 }}>
                   {lang === 'ar' ? 'مكتب خدمة كبار الزوار (VIP)' : 'VIP Guest Services Desk'}
@@ -971,23 +1360,23 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
               </div>
 
               <div style={{ display: 'flex', gap: '10px' }}>
-                <a 
-                  href="tel:+201012345678" 
-                  className="modal-btn primary" 
+                <a
+                  href="tel:+201012345678"
+                  className="modal-btn primary"
                   style={{ flex: 1, textDecoration: 'none', justifyContent: 'center' }}
                 >
                   {lang === 'ar' ? '📞 اتصال هاتفي' : '📞 Call Now'}
                 </a>
-                <a 
+                <a
                   href="https://wa.me/201012345678?text=Hello%20VIP%20Desk,%20I%20need%20help%20with%20my%20cart%20checkout"
                   target="_blank"
                   rel="noreferrer"
-                  className="modal-btn whatsapp" 
+                  className="modal-btn whatsapp"
                   style={{ flex: 1, textDecoration: 'none', justifyContent: 'center' }}
                 >
-                  <img 
-                    src="/photo/kid area pic/payment logo/toppng.com-icon-whatsapp-white-color-free-download-626x626.png" 
-                    alt="WhatsApp" 
+                  <img
+                    src="/photo/kid area pic/payment logo/toppng.com-icon-whatsapp-white-color-free-download-626x626.png"
+                    alt="WhatsApp"
                     style={{ width: '18px', height: '18px', objectFit: 'contain' }}
                   />
                   <span>{lang === 'ar' ? 'واتساب' : 'WhatsApp'}</span>
@@ -1007,7 +1396,7 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
             {/* Modal Header */}
             <div className="proof-modal-header">
               <div className="proof-modal-header-left">
-                <img 
+                <img
                   src={
                     moneyMethod === 'instapay'
                       ? '/photo/kid area pic/payment logo/instapay logo.png'
@@ -1023,22 +1412,22 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                 />
                 <div>
                   <h3 className="proof-modal-title">
-                    {moneyOrderSubmitted 
+                    {moneyOrderSubmitted
                       ? (lang === 'ar' ? 'تم إرسال طلب الدفع!' : 'Payment Request Submitted!')
-                      : moneyMethod === 'instapay' 
+                      : moneyMethod === 'instapay'
                         ? (lang === 'ar' ? 'الدفع عبر إنستاباي' : 'Pay via InstaPay')
                         : (lang === 'ar' ? 'الدفع عبر فودافون كاش' : 'Pay via Vodafone Cash')}
                   </h3>
                   <span className="proof-modal-sub">
-                    {moneyOrderSubmitted 
+                    {moneyOrderSubmitted
                       ? (lang === 'ar' ? 'جاري التحقق من الإيصال' : 'Verification in progress')
                       : (lang === 'ar' ? 'حول المبلغ بدقة وأرفق صورة الإيصال' : 'Transfer the exact amount & upload receipt')}
                   </span>
                 </div>
               </div>
-              <button 
-                type="button" 
-                className="proof-modal-close" 
+              <button
+                type="button"
+                className="proof-modal-close"
                 onClick={handleCloseMoneyModal}
                 aria-label={lang === 'ar' ? 'إغلاق' : 'Close'}
               >
@@ -1056,9 +1445,9 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                     className={`proof-tab-btn ${moneyMethod === 'instapay' ? 'active instapay' : ''}`}
                     onClick={() => setMoneyMethod('instapay')}
                   >
-                    <img 
-                      src="/photo/kid area pic/payment logo/instapay logo.png" 
-                      alt="InstaPay" 
+                    <img
+                      src="/photo/kid area pic/payment logo/instapay logo.png"
+                      alt="InstaPay"
                       style={{ width: '20px', height: '20px', borderRadius: '50%' }}
                     />
                     <span>{lang === 'ar' ? 'إنستاباي' : 'InstaPay'}</span>
@@ -1069,9 +1458,9 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                     className={`proof-tab-btn ${moneyMethod === 'vodafone' ? 'active vodafone' : ''}`}
                     onClick={() => setMoneyMethod('vodafone')}
                   >
-                    <img 
-                      src="/photo/kid area pic/payment logo/vodafone_cash_clean.png" 
-                      alt="Vodafone Cash" 
+                    <img
+                      src="/photo/kid area pic/payment logo/vodafone_cash_clean.png"
+                      alt="Vodafone Cash"
                       style={{ width: '20px', height: '20px', borderRadius: '50%' }}
                       onError={(e) => { e.currentTarget.src = '/photo/kid area pic/payment logo/vodafone cash logo.png'; }}
                     />
@@ -1098,7 +1487,7 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                 <div className="proof-account-card">
                   <div className="proof-account-row">
                     <span className="proof-account-label">
-                      {moneyMethod === 'instapay' 
+                      {moneyMethod === 'instapay'
                         ? (lang === 'ar' ? 'عنوان الدفع اللحظي (IPA)' : 'InstaPay IPA / Address')
                         : (lang === 'ar' ? 'رقم محفظة فودافون كاش' : 'Vodafone Cash Wallet Number')}
                     </span>
@@ -1107,7 +1496,9 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                       className={`proof-copy-btn ${copyFeedback ? 'copied' : ''}`}
                       onClick={() =>
                         handleCopyAccount(
-                          moneyMethod === 'instapay' ? 'americandream@instapay' : '01023456789'
+                          moneyMethod === 'instapay'
+                            ? (paymentAccounts.instapay?.accountAddress || 'americandream@instapay')
+                            : (paymentAccounts.vodafoneCash?.walletNumber || '01023456789')
                         )
                       }
                     >
@@ -1125,11 +1516,17 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                     </button>
                   </div>
                   <div className="proof-account-number">
-                    {moneyMethod === 'instapay' ? 'americandream@instapay' : '010 2345 6789'}
+                    {moneyMethod === 'instapay'
+                      ? (paymentAccounts.instapay?.accountAddress || 'americandream@instapay')
+                      : (paymentAccounts.vodafoneCash?.walletNumber || '010 2345 6789')}
                   </div>
                   <div style={{ fontSize: '0.74rem', color: '#0f766e' }}>
                     {lang === 'ar' ? 'اسم المستلم: ' : 'Recipient Name: '}
-                    <strong>{lang === 'ar' ? 'أمريكان دريم كيدز إيريا' : 'American Dream Kids Area'}</strong>
+                    <strong>
+                      {moneyMethod === 'instapay'
+                        ? (paymentAccounts.instapay?.recipientName || 'أمريكان دريم كيدز إيريا')
+                        : (paymentAccounts.vodafoneCash?.recipientName || 'أمريكان دريم كيدز إيريا')}
+                    </strong>
                   </div>
                 </div>
 
@@ -1166,9 +1563,9 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
 
                   {!uploadedReceipt ? (
                     <label className="proof-dropzone">
-                      <input 
-                        type="file" 
-                        accept="image/*" 
+                      <input
+                        type="file"
+                        accept="image/*"
                         style={{ display: 'none' }}
                         onChange={handleReceiptFileChange}
                       />
@@ -1189,10 +1586,10 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                   ) : (
                     <div className="proof-preview-card">
                       <div className="proof-preview-img-wrap">
-                        <img 
-                          src={uploadedReceipt.preview} 
-                          alt="Receipt Preview" 
-                          className="proof-preview-img" 
+                        <img
+                          src={uploadedReceipt.preview}
+                          alt="Receipt Preview"
+                          className="proof-preview-img"
                         />
                       </div>
                       <div className="proof-preview-details">
@@ -1227,13 +1624,13 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
 
                 {/* Optional Sender phone / wallet number */}
                 <div>
-                  <label 
-                    style={{ 
-                      fontSize: '0.78rem', 
-                      fontWeight: 800, 
-                      color: '#0a3342', 
-                      display: 'block', 
-                      marginBottom: '6px' 
+                  <label
+                    style={{
+                      fontSize: '0.78rem',
+                      fontWeight: 800,
+                      color: '#0a3342',
+                      display: 'block',
+                      marginBottom: '6px'
                     }}
                   >
                     {lang === 'ar' ? 'رقم الهاتف أو اسم الحساب المحول منه (اختياري):' : 'Sender Phone or Account Name (Optional):'}
@@ -1337,9 +1734,9 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                     marginBottom: '16px',
                     textAlign: lang === 'ar' ? 'right' : 'left'
                   }}>
-                    <img 
-                      src={uploadedReceipt.preview} 
-                      alt="Uploaded proof" 
+                    <img
+                      src={uploadedReceipt.preview}
+                      alt="Uploaded proof"
                       style={{ width: '38px', height: '38px', borderRadius: '8px', objectFit: 'cover' }}
                     />
                     <div style={{ flex: 1, minWidth: 0, fontSize: '0.76rem', color: '#475569' }}>

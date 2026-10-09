@@ -27,6 +27,7 @@ const DesktopAboutPage = lazy(() => import('./pages/desktop/DesktopAboutPage'));
 const DesktopRestaurantPage = lazy(() => import('./pages/desktop/DesktopRestaurantPage'));
 const DesktopDashboardPage = lazy(() => import('./pages/desktop/DesktopDashboardPage'));
 const DesktopProfilePage = lazy(() => import('./pages/desktop/DesktopProfilePage'));
+const LoginPage = lazy(() => import('./components/auth/Login'));
 
 // Synchronous Layout & UI Components
 import MobileHeader from './components/MobileHeader';
@@ -72,7 +73,7 @@ export default function App() {
         setActiveTab('restaurant');
       } else if (h === 'playzone-orders' || h === 'orders') {
         setActiveTab('dashboard');
-      } else if (['lobby', 'home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'events', 'birthday', 'trips', 'cart', 'about', 'dashboard', 'profile'].includes(h)) {
+      } else if (['lobby', 'home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'events', 'birthday', 'trips', 'cart', 'about', 'dashboard', 'profile', 'login'].includes(h)) {
         setActiveTab(h);
       }
     };
@@ -317,6 +318,10 @@ export default function App() {
                   lang={lang}
                 />
               )}
+
+              {activeTab === 'login' && (
+                <LoginPage />
+              )}
             </Suspense>
           </main>
 
@@ -459,6 +464,10 @@ export default function App() {
                   openModal={openModal}
                   lang={lang}
                 />
+              )}
+
+              {activeTab === 'login' && (
+                <LoginPage />
               )}
             </Suspense>
           </main>

@@ -43,32 +43,51 @@ export default function DesktopProfilePage({
   // Active view: 'overview' (Image 2) | 'edit' (Image 3)
   const [currentView, setCurrentView] = useState(initialView);
 
+  const defaultProfile = {
+    name: 'Ahmed Mohamed',
+    phone: '+20 101 234 5678',
+    address: 'Canal Waterfront Road, Ferdan District, Ismailia',
+    gender: 'male',
+    passId: '#AD-84920',
+    memberSince: 'October 2026',
+    points: 0,
+    storeCredit: 0.00,
+    avatar: '/photo/profile/ahmed-avatar-overview.png',
+    avatarEdit: '/photo/profile/ahmed-avatar-edit.png'
+  };
+
   // Profile Data State
   const [profile, setProfile] = useState(() => {
     const saved = localStorage.getItem('american_dream_user_profile');
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          const pts = Number(parsed.points) || 0;
+          return {
+            ...defaultProfile,
+            ...parsed,
+            points: pts,
+            storeCredit: parsed.storeCredit !== undefined 
+              ? Number(parsed.storeCredit) 
+              : Number((pts * 0.1).toFixed(2)),
+            passId: parsed.passId || ('#AD-' + (parsed.phone ? parsed.phone.replace(/[^0-9]/g, '').slice(-5) : '84920')),
+            memberSince: parsed.memberSince || defaultProfile.memberSince,
+            avatar: parsed.avatar || defaultProfile.avatar,
+            avatarEdit: parsed.avatarEdit || defaultProfile.avatarEdit
+          };
+        }
+      } catch (e) {}
     }
-    return {
-      name: 'Ahmed Mohamed',
-      phone: '+20 101 234 5678',
-      address: 'Canal Waterfront Road, Ferdan District, Ismailia',
-      gender: 'male', // 'male' | 'female'
-      passId: '#AD-84920',
-      memberSince: 'March 2027',
-      points: 1350,
-      storeCredit: 135.00,
-      avatar: '/photo/profile/ahmed-avatar-overview.png',
-      avatarEdit: '/photo/profile/ahmed-avatar-edit.png'
-    };
+    return defaultProfile;
   });
 
   // Edit Form Temp State
   const [formData, setFormData] = useState({
-    name: profile.name,
-    phone: profile.phone,
-    address: profile.address,
-    gender: profile.gender
+    name: profile?.name || '',
+    phone: profile?.phone || '',
+    address: profile?.address || '',
+    gender: profile?.gender || 'male'
   });
 
   // Children State
@@ -207,14 +226,16 @@ export default function DesktopProfilePage({
 
   // Redeem Reward Handler
   const handleRedeemReward = (cost, title) => {
-    if (profile.points < cost) {
+    const currentPoints = Number(profile?.points) || 0;
+    if (currentPoints < cost) {
       alert(isAr ? 'عذراً، رصيد نقاطك غير كافٍ لاسترداد هذه المكافأة' : 'Sorry, you do not have enough points for this reward');
       return;
     }
+    const newPoints = currentPoints - cost;
     setProfile(prev => ({
       ...prev,
-      points: prev.points - cost,
-      storeCredit: Math.max(0, ((prev.points - cost) * 0.1).toFixed(2))
+      points: newPoints,
+      storeCredit: Math.max(0, Number((newPoints * 0.1).toFixed(2)))
     }));
     confetti({ particleCount: 70, spread: 60, origin: { y: 0.5 } });
     showToast(isAr ? `تم استرداد قسيمة: ${title} بنجاح!` : `Voucher redeemed: ${title}!`);
@@ -283,7 +304,7 @@ export default function DesktopProfilePage({
                 />
                 <div className="profile-fun-script" style={{ display: 'none' }}>
                   <span className="script-top">More Fun</span>
-                  <span className="script-bot">{profile.name.split(' ')[0]}!</span>
+                  <span className="script-bot">{(profile?.name || '').split(' ')[0]}!</span>
                 </div>
               </div>
             </div>
@@ -292,13 +313,13 @@ export default function DesktopProfilePage({
             <div className="profile-user-card">
               <div className="profile-user-left">
                 <img 
-                  src={profile.avatar} 
-                  alt={profile.name} 
+                  src={profile?.avatar || '/photo/profile/ahmed-avatar-overview.png'} 
+                  alt={profile?.name || 'Profile'} 
                   className="profile-avatar-circle"
                   onError={(e) => { e.currentTarget.src = '/photo/kid area pic/icon/Symbol.png'; }}
                 />
                 <div className="profile-user-meta">
-                  <h2 className="profile-user-name">{profile.name}</h2>
+                  <h2 className="profile-user-name">{profile?.name || 'عضو أمريكان دريم'}</h2>
                   <p className="profile-welcome-text">
                     {isAr ? 'مرحباً بعودتك! Welcome back!' : 'Welcome back! مرحباً بعودتك!'}
                   </p>
@@ -307,10 +328,10 @@ export default function DesktopProfilePage({
                       className="profile-edit-btn"
                       onClick={() => {
                         setFormData({
-                          name: profile.name,
-                          phone: profile.phone,
-                          address: profile.address,
-                          gender: profile.gender
+                          name: profile?.name || '',
+                          phone: profile?.phone || '',
+                          address: profile?.address || '',
+                          gender: profile?.gender || 'male'
                         });
                         setCurrentView('edit');
                       }}
@@ -342,7 +363,7 @@ export default function DesktopProfilePage({
                     <Coins size={20} />
                   </div>
                   <div className="profile-stat-text-wrap">
-                    <span className="profile-stat-value">{profile.points.toLocaleString()}</span>
+                    <span className="profile-stat-value">{(Number(profile?.points) || 0).toLocaleString()}</span>
                     <span className="profile-stat-label">{isAr ? 'نقطة Points' : 'Points نقطة'}</span>
                   </div>
                   <ChevronRight size={16} className="profile-stat-arrow" />
@@ -426,10 +447,10 @@ export default function DesktopProfilePage({
                   <div className="profile-card-content-row" style={{ marginTop: '16px' }}>
                     <div>
                       <div className="profile-activity-value">
-                        {profile.points.toLocaleString()} {isAr ? 'نقطة' : 'Points'}
+                        {(Number(profile?.points) || 0).toLocaleString()} {isAr ? 'نقطة' : 'Points'}
                       </div>
                       <div className="profile-activity-sub">
-                        = EGP {profile.storeCredit.toFixed(0)}
+                        = EGP {(Number(profile?.storeCredit) || (Number(profile?.points) || 0) * 0.1 || 0).toFixed(0)}
                       </div>
                     </div>
                     <button 
@@ -661,10 +682,10 @@ export default function DesktopProfilePage({
                 </div>
 
                 <div className="profile-edit-meta">
-                  <h2>{profile.name}</h2>
+                  <h2>{profile?.name || 'عضو أمريكان دريم'}</h2>
                   <div className="profile-meta-sub">
                     <Calendar size={14} color="#64748b" />
-                    <span>Member since {profile.memberSince} • Pass ID: {profile.passId}</span>
+                    <span>Member since {profile?.memberSince || 'October 2026'} • Pass ID: {profile?.passId || '#AD-10001'}</span>
                   </div>
                   <div className="profile-meta-tag">
                     <Users size={14} />
@@ -680,10 +701,10 @@ export default function DesktopProfilePage({
                   <span>DREAM POINTS</span>
                 </div>
                 <div className="dream-points-value">
-                  {profile.points.toLocaleString()} <span style={{ fontSize: '1.05rem', fontWeight: 700 }}>Pts</span>
+                  {(Number(profile?.points) || 0).toLocaleString()} <span style={{ fontSize: '1.05rem', fontWeight: 700 }}>Pts</span>
                 </div>
                 <div className="dream-points-credit">
-                  Store Credit Equivalent: <strong>EGP {profile.storeCredit.toFixed(2)}</strong>
+                  Store Credit Equivalent: <strong>EGP {(Number(profile?.storeCredit) || (Number(profile?.points) || 0) * 0.1 || 0).toFixed(2)}</strong>
                 </div>
               </div>
             </div>
@@ -988,10 +1009,10 @@ export default function DesktopProfilePage({
               <div style={{ background: 'linear-gradient(135deg, #012b32, #004655)', color: '#ffffff', padding: '18px', borderRadius: '14px' }}>
                 <span style={{ fontSize: '0.8rem', color: '#99f6e4' }}>CURRENT AVAILABLE BALANCE</span>
                 <div style={{ fontSize: '2rem', fontWeight: 900, color: '#fde047', margin: '4px 0' }}>
-                  {profile.points.toLocaleString()} <span style={{ fontSize: '1.1rem' }}>Pts</span>
+                  {(Number(profile?.points) || 0).toLocaleString()} <span style={{ fontSize: '1.1rem' }}>Pts</span>
                 </div>
                 <div style={{ fontSize: '0.85rem', color: '#e0f2fe' }}>
-                  Store Credit Equivalent: <strong>EGP {profile.storeCredit.toFixed(2)}</strong>
+                  Store Credit Equivalent: <strong>EGP {(Number(profile?.storeCredit) || (Number(profile?.points) || 0) * 0.1 || 0).toFixed(2)}</strong>
                 </div>
               </div>
 
