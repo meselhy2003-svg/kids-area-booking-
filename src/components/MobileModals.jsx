@@ -101,6 +101,16 @@ export default function MobileModals({
     }
   }, [modalType, modalData, user]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [closeModal]);
+
   // Handle Confetti and Pass Persistence on successful booking
   const handleConfirmBooking = async (e) => {
     e.preventDefault();
@@ -658,7 +668,7 @@ export default function MobileModals({
               className="drawer-nav-item"
               onClick={() => { closeModal(); setActiveTab('adventure'); }}
             >
-              <img src="/photo/kid-area-pic/icon/adventure-icon.png" alt="Adventure" className="drawer-icon" />
+              <img src="/photo/kid-area-pic/icon/package-icon.png" alt="Adventure" className="drawer-icon" />
               <span className={lang === 'ar' ? 'font-alexandria' : ''}>
                 {lang === 'ar' ? 'منطقة المغامرات والحبال' : 'Adventure Zone'}
               </span>
@@ -668,7 +678,7 @@ export default function MobileModals({
               className="drawer-nav-item"
               onClick={() => { closeModal(); setActiveTab('package'); }}
             >
-              <img src="/photo/kid-area-pic/icon/package-icon.png" alt="Packages" className="drawer-icon" />
+              <img src="/photo/kid-area-pic/icon/adventure-icon.png" alt="Packages" className="drawer-icon" />
               <span className={lang === 'ar' ? 'font-alexandria' : ''}>
                 {lang === 'ar' ? 'باقات الألعاب والتوفير' : 'Party & Birthday Packages'}
               </span>
@@ -1616,7 +1626,7 @@ export default function MobileModals({
       )}
 
       {/* 5. ATTRACTION DETAIL MODAL */}
-      {modalType === 'attraction-detail' && (
+      {modalType === 'attraction-detail' && !modalData?.imageOnly && (
         <div 
           className="mobile-modal-sheet attraction-sheet" 
           onClick={(e) => e.stopPropagation()}
@@ -1667,6 +1677,87 @@ export default function MobileModals({
             >
               {lang === 'ar' ? 'حجز تذكرة الدخول لهذه اللعبة' : 'Book Entry Pass For This Attraction'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* 5b. IMAGE ONLY MODAL (Shows image only) */}
+      {(modalType === 'image-only' || (modalType === 'attraction-detail' && modalData?.imageOnly)) && (
+        <div 
+          className="image-only-modal-wrap" 
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button 
+            type="button" 
+            className="image-only-close-btn" 
+            onClick={closeModal} 
+            aria-label="Close"
+          >
+            ✕
+          </button>
+          <div className="image-only-img-container">
+            <img 
+              src={modalData?.img || modalData?.image || modalData?.src || modalData?.url || (typeof modalData === 'string' ? modalData : '')} 
+              alt={modalData?.title || ''} 
+              className="image-only-modal-img" 
+              onError={(e) => {
+                const fb = modalData?.fallbackImg || modalData?.fallback || modalData?.fallbackSrc;
+                if (fb && !e.currentTarget.src.includes(fb)) {
+                  e.currentTarget.src = fb;
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* 5c. ALL ATTRACTIONS / GALLERY MODAL (When > 3 images exist and See All is clicked) */}
+      {(modalType === 'all-attractions' || modalType === 'gallery') && (
+        <div 
+          className="mobile-modal-sheet all-attractions-sheet" 
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="sheet-drag-handle" />
+          <button className="sheet-close-x" onClick={closeModal} aria-label="Close">✕</button>
+
+          <h3 className="all-attractions-modal-title">
+            {modalData?.title || (lang === 'ar' ? 'جميع الألعاب والأنشطة' : 'All Attractions & Activities')}
+          </h3>
+
+          <div className="all-attractions-modal-grid">
+            {(modalData?.items || modalData?.attractions || []).map((item) => {
+              const itemTitle = lang === 'ar' ? (item.titleAr || item.title) : (item.titleEn || item.title);
+              const imgSrc = item.img || item.image || item.src || item.url;
+              const fallbackImg = item.fallbackImg || item.fallback || item.fallbackSrc;
+              return (
+                <div 
+                  key={item.id} 
+                  className="all-attractions-grid-item"
+                  onClick={() => openModal('image-only', {
+                    img: imgSrc,
+                    fallbackImg: fallbackImg,
+                    title: itemTitle
+                  })}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <img 
+                    src={imgSrc} 
+                    alt={itemTitle} 
+                    className="all-attractions-grid-img" 
+                    loading="lazy"
+                    onError={(e) => {
+                      if (fallbackImg && !e.currentTarget.src.includes(fallbackImg)) {
+                        e.currentTarget.src = fallbackImg;
+                      }
+                    }}
+                  />
+                  <div className="all-attractions-grid-overlay">
+                    <span>{itemTitle}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

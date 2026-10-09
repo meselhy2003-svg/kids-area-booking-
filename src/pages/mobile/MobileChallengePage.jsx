@@ -140,11 +140,11 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang = 'a
                 alt="Choose Any 4 Games" 
                 className="pass-collage-img" 
               />
+              <div className="pass-save-badge">{isArabic ? 'وفر ٦٠ ج.م' : 'Save 60 EGP'}</div>
             </div>
 
             {/* Right Card Content */}
             <div className="pass-card-right">
-              <div className="pass-save-badge">{isArabic ? 'وفر ٦٠ ج.م' : 'Save 60 EGP'}</div>
               <h4 className="pass-main-title">{isArabic ? 'باقة التحدي' : 'Challenge Pass'}</h4>
               <p className="pass-sub-cyan">{isArabic ? 'اختر أي ٤ ألعاب' : 'Pick any 4 games'}</p>
 
@@ -269,23 +269,31 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang = 'a
       {/* Explore Challenge Zone Section */}
       <div className="zone-section-header" style={{ marginTop: '2rem' }}>
         <h3 className="section-title-plain">{t.zones.challenge.exploreTitle}</h3>
-        <button 
-          className="see-all-link"
-          onClick={() => openModal('all-attractions', { zone: t.zones.challenge.title, attractions })}
-        >
-          {t.zones.seeAll}
-        </button>
+        {((searchQuery ? filteredAttractions : exploreItems)?.length > 3) && (
+          <button 
+            className="see-all-link"
+            onClick={() => openModal('all-attractions', { zone: t.zones.challenge.title, attractions })}
+          >
+            {t.zones.seeAll}
+          </button>
+        )}
       </div>
 
       {/* 3 Attraction Cards with LazyImage */}
       <div className="explore-attractions-row">
-        {(searchQuery ? filteredAttractions : exploreItems).map((attr) => {
+        {(searchQuery ? filteredAttractions : exploreItems).slice(0, 3).map((attr) => {
           const attrTitle = isArabic ? (attr.titleAr || attr.title) : (attr.titleEn || attr.title);
+          const imgSrc = attr.img || attr.image || attr.src;
+          const fallbackImg = attr.fallbackImg || attr.fallback || attr.fallbackSrc;
           return (
             <div 
               key={attr.id} 
               className="explore-attraction-card"
-              onClick={() => openModal('attraction-detail', attr)}
+              onClick={() => openModal('image-only', {
+                img: imgSrc,
+                fallbackImg: fallbackImg,
+                title: attrTitle
+              })}
               role="button"
               tabIndex={0}
             >

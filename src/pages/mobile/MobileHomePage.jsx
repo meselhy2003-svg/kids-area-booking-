@@ -281,16 +281,15 @@ export default function MobileHomePage({ setActiveTab, openModal, lang = 'ar' })
         <div className="four-ways-grid">
           {destinationImages.slice(0, 4).map((item, idx) => {
             const itemTitle = isArabic ? (item.titleAr || item.title) : (item.titleEn || item.title);
-            const itemSubtitle = isArabic ? (item.subtitleAr || item.subtitle) : (item.subtitleEn || item.subtitle);
             return (
               <div 
                 key={item.id || idx} 
                 className="four-way-tile" 
-                onClick={() => {
-                  if (item.targetTab) setActiveTab(item.targetTab);
-                  else if (item.targetModal) openModal(item.targetModal);
-                  else setActiveTab(idx === 1 ? 'adventure' : 'challenge');
-                }}
+                onClick={() => openModal('image-only', {
+                  img: item.src || item.url || item.img || item.image,
+                  fallbackImg: item.fallbackSrc || item.fallbackImg,
+                  title: itemTitle
+                })}
                 role="button"
                 tabIndex={0}
               >
@@ -305,14 +304,6 @@ export default function MobileHomePage({ setActiveTab, openModal, lang = 'ar' })
                     }
                   }}
                 />
-                <div className="tile-overlay">
-                  <span className="tile-title">{itemTitle}</span>
-                  {itemSubtitle && (
-                    <span style={{ fontSize: '0.72rem', color: '#ffd15c', opacity: 0.9, marginTop: '2px' }}>
-                      {itemSubtitle}
-                    </span>
-                  )}
-                </div>
               </div>
             );
           })}

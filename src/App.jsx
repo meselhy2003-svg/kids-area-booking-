@@ -486,8 +486,8 @@ export default function App() {
         </div>
       )}
 
-      {/* Floating 3D Sally AI ChatBot Assistant (Hidden on Admin Dashboard) */}
-      {activeTab !== 'dashboard' && (
+      {/* Floating 3D Sally AI ChatBot Assistant (Hidden on Admin Dashboard & Lobby) */}
+      {activeTab !== 'dashboard' && activeTab !== 'lobby' && (
         <FloatingGirlChatBot 
           setActiveTab={setActiveTab}
           openModal={openModal}

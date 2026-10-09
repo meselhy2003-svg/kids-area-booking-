@@ -75,6 +75,16 @@
   top: 0;
   z-index: 999;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  direction: ltr !important;
+}
+
+[dir="rtl"] .mobile-header,
+html[dir="rtl"] .mobile-header {
+  direction: ltr !important;
+}
+
+[dir="rtl"] .mobile-header-title {
+  direction: rtl;
 }
 
 .mobile-header-left {
@@ -563,6 +573,7 @@
 .choose-experience-section {
   padding: 24px 16px 10px;
   text-align: left;
+  overflow-x: clip;
 }
 
 /* Choose Your Experience - Arabic Right Alignment */
@@ -608,16 +619,37 @@
 
 .experience-cards-list {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
   gap: 16px;
+  padding: 4px 16px 20px;
+  margin: 0 -16px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.experience-cards-list::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .exp-card {
+  flex: 0 0 280px;
+  min-width: 280px;
+  max-width: 82vw;
+  scroll-snap-align: start;
   background: #ffffff;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
   border: 1px solid var(--pz-card-border);
+  display: flex;
+  flex-direction: column;
 }
 
 .exp-card-media {
@@ -635,23 +667,30 @@
 
 .exp-badge-pill {
   position: absolute;
-  top: 10px;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.4px;
+  top: 6px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.48rem;
+  font-weight: 700;
+  letter-spacing: normal;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+[dir="rtl"] .exp-badge-pill,
+.lang-ar .exp-badge-pill {
+  letter-spacing: normal;
 }
 
 .pill-left {
-  left: 10px;
+  left: 6px;
   background: rgba(255, 255, 255, 0.95);
   color: #0b2533;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
 }
 
 .pill-right {
-  right: 10px;
+  right: 6px;
 }
 
 .pill-yellow {
@@ -661,6 +700,10 @@
 
 .exp-card-body {
   padding: 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .exp-card-title {
@@ -682,6 +725,7 @@
   color: #4b5563;
   line-height: 1.35;
   margin: 0 0 14px 0;
+  flex: 1;
 }
 
 .exp-card-btn {
@@ -2189,6 +2233,200 @@
   margin-top: 10px;
 }
 
+/* Image Only Modal (Kids Area Attraction Image Preview) */
+.mobile-modal-backdrop:has(.image-only-modal-wrap) {
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 0, 0, 0.88) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  padding: 20px !important;
+}
+
+.image-only-modal-wrap {
+  position: relative;
+  margin: auto;
+  max-width: 92vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: zoomInImage 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+@keyframes zoomInImage {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.image-only-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  z-index: 25;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.image-only-close-btn:hover {
+  transform: scale(1.1);
+  background: rgba(0, 0, 0, 0.88);
+  color: #ffffff;
+}
+
+.image-only-close-btn:active {
+  transform: scale(0.95);
+}
+
+.image-only-img-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  background: transparent;
+  max-width: 100%;
+  max-height: 85vh;
+}
+
+.image-only-modal-img {
+  max-width: 90vw;
+  max-height: 85vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 20px;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-modal-backdrop:has(.image-only-modal-wrap) {
+    padding: 12px !important;
+  }
+  .image-only-modal-wrap {
+    max-width: 95vw;
+    max-height: 86vh;
+  }
+  .image-only-img-container {
+    border-radius: 16px;
+    max-height: 82vh;
+  }
+  .image-only-modal-img {
+    max-width: 95vw;
+    max-height: 82vh;
+    border-radius: 16px;
+  }
+  .image-only-close-btn {
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+}
+
+/* All Attractions Gallery Modal */
+.all-attractions-sheet {
+  max-width: 680px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 28px;
+}
+
+@media (min-width: 768px) {
+  .mobile-modal-backdrop:has(.all-attractions-sheet) {
+    align-items: center;
+    justify-content: center;
+  }
+  .all-attractions-sheet {
+    border-radius: 24px;
+    margin: auto;
+    width: 90vw;
+  }
+}
+
+.all-attractions-modal-title {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #0b2533;
+  margin: 0 0 18px;
+  text-align: center;
+}
+
+.all-attractions-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding-bottom: 12px;
+}
+
+.all-attractions-grid-item {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: #f1f5f9;
+}
+
+.all-attractions-grid-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.all-attractions-grid-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.all-attractions-grid-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.82) 100%);
+  padding: 20px 8px 8px;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .all-attractions-modal-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+}
+
 /* Attraction Detail Sheet */
 .attraction-detail-hero {
   height: 180px;
@@ -2431,14 +2669,24 @@
 
 .pass-save-badge {
   position: absolute;
-  top: 10px;
-  right: 12px;
+  top: 8px;
+  left: 8px;
   background: #00bcd4;
   color: #ffffff;
   font-size: 0.62rem;
   font-weight: 900;
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: 6px;
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+[dir="rtl"] .pass-save-badge,
+.lang-ar .pass-save-badge {
+  left: auto;
+  right: 8px;
 }
 
 .pass-main-title {
@@ -2803,6 +3051,117 @@
 
 .dream-pass-card {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* ==========================================================
+   MAKE A DAY OF IT / PACKAGE SCREEN - ARABIC (RTL) SUPPORT
+   ========================================================== */
+[dir="rtl"] .package-page-container,
+.package-page-container.lang-ar {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .package-make-day-hero,
+.package-page-container.lang-ar .package-make-day-hero {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .make-day-title,
+.package-page-container.lang-ar .make-day-title {
+  text-align: right;
+  direction: rtl;
+  letter-spacing: normal;
+}
+
+[dir="rtl"] .make-day-orange-sub,
+.package-page-container.lang-ar .make-day-orange-sub,
+[dir="rtl"] .make-day-desc,
+.package-page-container.lang-ar .make-day-desc {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .dream-experience-section,
+.package-page-container.lang-ar .dream-experience-section {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .dream-top-tag,
+.package-page-container.lang-ar .dream-top-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-align: right;
+  direction: rtl;
+  letter-spacing: normal;
+}
+
+[dir="rtl"] .dream-heading,
+.package-page-container.lang-ar .dream-heading,
+[dir="rtl"] .dream-subheading,
+.package-page-container.lang-ar .dream-subheading {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .dream-filter-pills,
+.package-page-container.lang-ar .dream-filter-pills {
+  direction: rtl;
+}
+
+[dir="rtl"] .challenge-pass-card,
+.package-page-container.lang-ar .challenge-pass-card {
+  direction: rtl;
+}
+
+[dir="rtl"] .pass-card-right,
+.package-page-container.lang-ar .pass-card-right {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .pass-main-title,
+.package-page-container.lang-ar .pass-main-title,
+[dir="rtl"] .pass-sub-cyan,
+.package-page-container.lang-ar .pass-sub-cyan {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .adventure-checklist,
+.package-page-container.lang-ar .adventure-checklist {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .adventure-check-item,
+.package-page-container.lang-ar .adventure-check-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .check-item-text,
+.package-page-container.lang-ar .check-item-text {
+  text-align: right;
+  letter-spacing: normal;
+}
+
+[dir="rtl"] .pass-price-row,
+.package-page-container.lang-ar .pass-price-row {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 8px;
+  direction: rtl;
 }
 
 /* ==========================================================

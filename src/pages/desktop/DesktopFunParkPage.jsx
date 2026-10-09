@@ -280,28 +280,33 @@ export default function DesktopFunParkPage({ setActiveTab, openModal, lang = 'ar
         <section className="desktop-zone-section explore-section">
           <div className="desktop-section-header-row">
             <h2 className="desktop-explore-heading">{t.zones.funPark.exploreTitle}</h2>
-            <button 
-              className="desktop-see-all-link"
-              onClick={() => openModal('gallery')}
-            >
-              {t.zones.seeAll}
-            </button>
+            {exploreItems && exploreItems.length > 3 && (
+              <button 
+                className="desktop-see-all-link"
+                onClick={() => openModal('all-attractions', {
+                  title: t.zones.funPark.exploreTitle,
+                  items: exploreItems
+                })}
+              >
+                {t.zones.seeAll}
+              </button>
+            )}
           </div>
 
           {/* 3 FEATURE CARDS */}
           <div className="desktop-explore-grid-3">
-            {exploreItems.map((item) => {
+            {exploreItems.slice(0, 3).map((item) => {
               const itemTitle = isArabic ? (item.titleAr || item.title) : (item.titleEn || item.title);
+              const imgSrc = item.image || item.src || item.img || item.url;
+              const fallbackImg = item.fallback || item.fallbackSrc || item.fallbackImg;
               return (
                 <div 
                   key={item.id} 
                   className="desktop-explore-card"
-                  onClick={() => openModal('attraction-detail', {
-                    title: itemTitle,
-                    titleEn: item.titleEn || item.title,
-                    titleAr: item.titleAr,
-                    desc: isArabic ? (item.descAr || item.desc) : item.desc,
-                    img: item.image || item.src || item.img
+                  onClick={() => openModal('image-only', {
+                    img: imgSrc,
+                    fallbackImg: fallbackImg,
+                    title: itemTitle
                   })}
                   role="button"
                   tabIndex={0}

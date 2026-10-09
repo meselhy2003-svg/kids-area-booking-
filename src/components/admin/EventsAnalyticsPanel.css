@@ -1,0 +1,564 @@
+/* ==========================================================================
+   EVENTS & HALLS ANALYTICS, FLOWCHART & LIVE GRAPHS
+   Admin Dashboard - American Dream Ismailia
+   ========================================================================== */
+
+.ev-panel-root {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 24px;
+  font-family: inherit;
+  color: #ffffff;
+}
+
+/* HEADER ROW */
+.ev-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ev-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ev-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  color: #c084fc;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  width: fit-content;
+}
+
+.ev-live-dot {
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: evPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes evPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.3); }
+}
+
+.ev-heading {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.ev-subheading {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* MODE SWITCHER */
+.ev-mode-switch {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #082d36;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 4px 12px rgba(8, 45, 54, 0.25);
+}
+
+.ev-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ev-mode-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ev-mode-btn.active {
+  background: #a855f7;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.35);
+  font-weight: 900;
+}
+
+/* STATS GRID */
+.ev-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .ev-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .ev-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ev-stat-card {
+  background: #082d36;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.ev-stat-card.clickable {
+  cursor: pointer;
+}
+
+.ev-stat-card.clickable:hover {
+  border-color: rgba(168, 85, 247, 0.45);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.ev-stat-card.active-filter {
+  border-color: #a855f7;
+  background: linear-gradient(135deg, rgba(8, 45, 54, 0.95), rgba(168, 85, 247, 0.15));
+}
+
+.ev-stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ev-stat-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.ev-stat-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ev-stat-icon-wrap.cyan { background: rgba(0, 210, 255, 0.15); color: #00d2ff; }
+.ev-stat-icon-wrap.amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.ev-stat-icon-wrap.purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+.ev-stat-icon-wrap.green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+.ev-stat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ev-stat-value {
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.ev-stat-value.amber { color: #fbbf24; }
+.ev-stat-value.purple { color: #c084fc; }
+.ev-stat-value.green { color: #34d399; }
+
+.ev-stat-curr {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.ev-stat-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.trend-up {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: #34d399;
+  font-weight: 800;
+}
+
+.badge-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.amber-dot {
+  background: #f59e0b;
+  animation: evPulse 1.5s infinite;
+}
+
+.ev-stat-spark {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.ev-panel-root.lang-ar .ev-stat-spark {
+  right: auto;
+  left: 0;
+  transform: scaleX(-1);
+}
+
+/* FLOWCHART CARD */
+.ev-flowchart-card {
+  background: #082d36;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ev-flowchart-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ev-flowchart-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ev-flowchart-title-wrap h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.ev-flowchart-hint {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ev-flow-steps-grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.ev-flow-step {
+  flex: 1;
+  min-width: 150px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ev-flow-step:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(168, 85, 247, 0.4);
+  transform: translateY(-2px);
+}
+
+.ev-flow-step.active-node {
+  border-color: #a855f7;
+  background: rgba(168, 85, 247, 0.15);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
+}
+
+.ev-step-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ev-panel-root.lang-ar .ev-step-badge {
+  right: auto;
+  left: 8px;
+}
+
+.ev-step-icon-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.ev-step-icon-wrap.blue { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.ev-step-icon-wrap.amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.ev-step-icon-wrap.cyan { background: rgba(0, 210, 255, 0.15); color: #00d2ff; }
+.ev-step-icon-wrap.purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+.ev-step-icon-wrap.green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+.ev-step-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.ev-step-metric {
+  font-size: 0.74rem;
+  font-weight: 900;
+  color: #c084fc;
+}
+
+.ev-step-desc {
+  font-size: 0.67rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.35;
+}
+
+.ev-flow-connector {
+  color: rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* GRAPHS GRID */
+.ev-graphs-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 1100px) {
+  .ev-graphs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ev-chart-card {
+  background: #082d36;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ev-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ev-chart-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ev-chart-title-wrap h4 {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.ev-chart-toggles {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.ev-pill-toggle {
+  background: transparent;
+  border: none;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.65);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ev-pill-toggle.active {
+  background: #a855f7;
+  color: #ffffff;
+}
+
+/* SVG Chart Container */
+.ev-svg-chart-container {
+  position: relative;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.ev-bezier-svg {
+  width: 100%;
+  height: 150px;
+  overflow: visible;
+}
+
+.ev-chart-dot {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ev-chart-dot:hover {
+  r: 7;
+}
+
+.ev-chart-tooltip {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  background: #04171c;
+  border: 1px solid #a855f7;
+  border-radius: 8px;
+  padding: 6px 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.tooltip-label {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.tooltip-value {
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: #c084fc;
+}
+
+.ev-svg-x-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding: 0 10px;
+}
+
+.axis-label {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 700;
+}
+
+/* BREAKDOWN ROWS */
+.ev-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ev-breakdown-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.bar-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 700;
+}
+
+.bar-track {
+  width: 100%;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.ev-extra-badges-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.ev-info-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+}

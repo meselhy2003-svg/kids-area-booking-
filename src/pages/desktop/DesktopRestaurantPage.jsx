@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { 
   Calendar, 
@@ -83,6 +83,20 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
   // Digital Menu State
   const [activeMenuCategory, setActiveMenuCategory] = useState('all');
   const [cartCount, setCartCount] = useState(0);
+
+  // Mobile Scroller for the 3 Experience Cards
+  const cardsScrollRef = useRef(null);
+  const [cardsScrollProgress, setCardsScrollProgress] = useState(0);
+
+  const handleCardsScroll = () => {
+    if (!cardsScrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = cardsScrollRef.current;
+    const maxScroll = scrollWidth - clientWidth;
+    if (maxScroll > 0) {
+      const progress = Math.min(1, Math.max(0, Math.abs(scrollLeft) / maxScroll));
+      setCardsScrollProgress(progress);
+    }
+  };
 
   // Quick delivery order items state
   const [orderItems, setOrderItems] = useState([
@@ -493,7 +507,11 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
           </div>
 
           {/* 3 Experience Cards Grid */}
-          <div className="experiences-cards-grid">
+          <div 
+            className="experiences-cards-grid"
+            ref={cardsScrollRef}
+            onScroll={handleCardsScroll}
+          >
             
             {/* CARD 1: DELIVERY */}
             <div className="experience-card">
@@ -538,28 +556,28 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                   className="card-image"
                 />
                 <span className="card-badge badge-teal">
-                  {lang === 'ar' ? 'تناول الطعام بالحديقة' : 'IN-PARK DINE'}
+                  {lang === 'ar' ? 'المنيو الرقمي' : 'DIGITAL MENU'}
                 </span>
               </div>
 
               <div className="card-body">
                 <span className="card-category-tag tag-cyan">
-                  {lang === 'ar' ? 'جلسات عائلية' : 'PARK DINING'}
+                  {lang === 'ar' ? 'قائمة الطعام' : 'FOOD MENU'}
                 </span>
                 <h3 className="card-title">
-                  {lang === 'ar' ? 'الطلب داخل أمريكان دريم' : 'ORDER AT AMERICAN DREAM'}
+                  {lang === 'ar' ? 'قائمة طعام ومشروبات المطعم' : 'FOOD & DRINKS MENU'}
                 </h3>
                 <p className="card-description">
                   {lang === 'ar'
-                    ? 'اطلب أثناء تواجدك في أمريكان دريم واستمتع بوجبتك بسلاسة وبدون انتظار أثناء زيارتك.'
-                    : "Order while you're at American Dream and enjoy your meal seamlessly during your visit without waiting."}
+                    ? 'استعرض أشهى المأكولات الطازجة والمشروبات والحلويات مع كافة الأسعار والتفاصيل.'
+                    : "Browse our full gourmet menu featuring fresh dishes, stone-baked pizzas, drinks & desserts with prices."}
                 </p>
                 <button 
                   className="card-btn card-btn-darkteal"
                   onClick={() => setIsMenuModalOpen(true)}
                 >
                   <Utensils size={17} />
-                  <span>{lang === 'ar' ? 'تصفح المنيو / اطلب هنا' : 'DINE IN / VIEW MENU'}</span>
+                  <span>{lang === 'ar' ? 'تصفح المنيو' : 'VIEW MENU'}</span>
                 </button>
               </div>
             </div>
@@ -598,7 +616,18 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                 </button>
               </div>
             </div>
+          </div>
 
+          {/* Mobile Scroller Track Indicator under the 3 cards */}
+          <div className="experiences-mobile-scroller" aria-hidden="true">
+            <div className="experiences-scroller-track">
+              <div 
+                className="experiences-scroller-thumb" 
+                style={{ 
+                  [lang === 'ar' ? 'right' : 'left']: `${cardsScrollProgress * 65}px` 
+                }} 
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -1156,12 +1185,6 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                       </div>
                       <div className="menu-item-bottom">
                         <span className="menu-item-price">{item.price} {lang === 'ar' ? 'ج.م' : 'EGP'}</span>
-                        <button 
-                          className="btn-add-item"
-                          onClick={() => handleAddItemToCart(item)}
-                        >
-                          + {lang === 'ar' ? 'أضف للطلب' : 'Add to Order'}
-                        </button>
                       </div>
                     </div>
                   </div>

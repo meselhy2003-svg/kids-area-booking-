@@ -30,12 +30,12 @@ export default function MobileBottomNav({ activeTab, setActiveTab, lang = 'ar' }
     {
       id: 'adventure',
       label: t.bottomNav.adventure,
-      icon: '/photo/kid-area-pic/icon/adventure-icon.png'
+      icon: '/photo/kid-area-pic/icon/package-icon.png'
     },
     {
       id: 'package',
       label: t.bottomNav.package,
-      icon: '/photo/kid-area-pic/icon/package-icon.png'
+      icon: '/photo/kid-area-pic/icon/adventure-icon.png'
     }
   ];
 

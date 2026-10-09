@@ -275,6 +275,10 @@
   gap: 28px;
 }
 
+.experiences-mobile-scroller {
+  display: none;
+}
+
 .experience-card {
   background: #ffffff;
   border-radius: 20px;
@@ -1087,17 +1091,146 @@
     padding: 24px 16px 36px;
     box-sizing: border-box;
   }
+  .restaurant-experiences-section {
+    padding: 44px 16px 36px;
+    overflow-x: clip;
+  }
+
+  .experiences-container {
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .experiences-header {
+    margin-bottom: 24px;
+    padding: 0 4px;
+  }
+
+  .experiences-title {
+    font-size: 1.85rem;
+  }
+
+  .experiences-subtitle {
+    font-size: 0.92rem;
+  }
+
+  /* 3 Cards in the same horizontal row with scroller under them only */
   .experiences-cards-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 16px;
+    padding: 8px 16px 14px;
+    margin: 0 -16px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
+
+  /* Hide duplicate native scrollbar so only the single custom scroller is shown */
+  .experiences-cards-grid::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
   .experiences-cards-grid > :last-child {
-    grid-column: span 1;
+    grid-column: auto;
   }
+
+  .experiences-cards-grid .experience-card {
+    flex: 0 0 280px;
+    min-width: 280px;
+    max-width: 82vw;
+    scroll-snap-align: start;
+    border-radius: 18px;
+  }
+
+  .experiences-cards-grid .card-image-wrapper {
+    height: 180px;
+  }
+
+  .experiences-cards-grid .card-body {
+    padding: 18px 16px;
+  }
+
+  .experiences-cards-grid .card-title {
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+  }
+
+  .experiences-cards-grid .card-description {
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+  }
+
+  /* Dedicated Scroller Track Indicator under the 3 cards on Mobile */
+  .experiences-mobile-scroller {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 14px;
+    padding-bottom: 4px;
+  }
+
+  .experiences-scroller-track {
+    width: 110px;
+    height: 5px;
+    background: #e2e8f0;
+    border-radius: 9999px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .experiences-scroller-thumb {
+    width: 45px;
+    height: 100%;
+    background: linear-gradient(90deg, #028090, #00b5d8);
+    border-radius: 9999px;
+    position: absolute;
+    top: 0;
+    transition: left 0.08s ease-out, right 0.08s ease-out;
+    box-shadow: 0 1px 3px rgba(2, 128, 144, 0.4);
+  }
+  .vibes-mosaic-grid {
+    gap: 12px;
+  }
+  .vibes-mosaic-row-1 {
+    gap: 12px;
+  }
+  .vibe-item-card.row1-large,
+  .vibe-item-card.row1-medium {
+    height: 200px;
+    border-radius: 14px;
+  }
+  /* 3 images in section vibes in the same row on mobile */
   .vibes-mosaic-row-2 {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
   }
   .vibe-item-card.row2-card {
-    height: 220px;
+    height: 125px;
+    border-radius: 12px;
+    min-width: 0;
+  }
+  .vibe-item-card.row2-card .vibe-card-overlay {
+    padding: 6px 6px 8px;
+    background: linear-gradient(180deg, transparent 25%, rgba(11, 37, 51, 0.9) 100%);
+  }
+  .vibe-item-card.row2-card .vibe-card-caption {
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   .form-grid-2 {
     grid-template-columns: 1fr;

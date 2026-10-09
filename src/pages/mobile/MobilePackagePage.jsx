@@ -22,7 +22,10 @@ export default function MobilePackagePage({ setActiveTab, openModal, lang = 'ar'
   const featuresList = isArabic ? (currentPkg.featuresAr || currentPkg.features) : currentPkg.features;
 
   return (
-    <div className={`mobile-zone-page package-page-container ${isArabic ? 'lang-ar' : 'lang-en'}`}>
+    <div 
+      className={`mobile-zone-page package-page-container ${isArabic ? 'lang-ar' : 'lang-en'}`}
+      dir={isArabic ? 'rtl' : 'ltr'}
+    >
       {/* Light Top Hero Section */}
       <section className="package-make-day-hero">
         <h1 className="make-day-title">
@@ -101,11 +104,11 @@ export default function MobilePackagePage({ setActiveTab, openModal, lang = 'ar'
               alt={pkgTitle} 
               className="pass-collage-img" 
             />
+            {pkgSaveBadge && <div className="pass-save-badge">{pkgSaveBadge}</div>}
           </div>
 
           {/* Right Card Content */}
           <div className="pass-card-right">
-            <div className="pass-save-badge">{pkgSaveBadge}</div>
             <h4 className="pass-main-title">{pkgTitle}</h4>
             <p className="pass-sub-cyan">{pkgSubtitle}</p>
 

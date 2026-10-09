@@ -27,6 +27,9 @@ import {
   ArrowRight,
   ChevronRight,
   ChevronLeft,
+  Building2,
+  Utensils,
+  PartyPopper,
   LogOut
 } from 'lucide-react';
 import './DesktopDashboardPage.css';
@@ -451,17 +454,39 @@ export default function DesktopDashboardPage({
   // Current active zone tab: 'challenge' | 'kids-area' | 'fun-park' | 'adventure' | 'home' | 'packages'
   const [activeZone, setActiveZone] = useState('challenge');
 
-  // Modals state
+  // Modals & Orders Suite state
+  const [ordersSuiteTab, setOrdersSuiteTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const h = window.location.hash;
+      if (h.includes('restaurant')) return 'restaurant-orders';
+      if (h.includes('event')) return 'events-orders';
+      if (h.includes('trip')) return 'trips-orders';
+    }
+    return 'playzone-orders';
+  });
+
   const [isOrdersViewOpen, setIsOrdersViewOpen] = useState(() => {
     if (typeof window !== 'undefined') {
-      return window.location.hash === '#playzone-orders' || window.location.hash === '#orders';
+      const h = window.location.hash;
+      return h === '#playzone-orders' || h === '#orders' || h === '#trips-orders' || h === '#restaurant-orders' || h === '#events-orders';
     }
     return false;
   });
 
   useEffect(() => {
     const handleHash = () => {
-      if (window.location.hash === '#playzone-orders' || window.location.hash === '#orders') {
+      const h = window.location.hash;
+      if (h === '#playzone-orders' || h === '#orders') {
+        setOrdersSuiteTab('playzone-orders');
+        setIsOrdersViewOpen(true);
+      } else if (h === '#trips-orders') {
+        setOrdersSuiteTab('trips-orders');
+        setIsOrdersViewOpen(true);
+      } else if (h === '#restaurant-orders') {
+        setOrdersSuiteTab('restaurant-orders');
+        setIsOrdersViewOpen(true);
+      } else if (h === '#events-orders') {
+        setOrdersSuiteTab('events-orders');
         setIsOrdersViewOpen(true);
       }
     };
@@ -745,7 +770,7 @@ export default function DesktopDashboardPage({
     }
   };
 
-  // Render Full Play Zone & Trips Orders Management Suite
+  // Render Full Play Zone, Trips, Restaurant & Events Orders Management Suite
   if (isOrdersViewOpen) {
     return (
       <PlayZoneOrdersManager 
@@ -753,6 +778,7 @@ export default function DesktopDashboardPage({
         onGoHome={() => setActiveTab && setActiveTab('home')}
         lang={lang} 
         setLang={setLang}
+        initialView={ordersSuiteTab}
       />
     );
   }
@@ -793,11 +819,14 @@ export default function DesktopDashboardPage({
             {isAr ? <ChevronLeft size={14} color="#94a3b8" /> : <ChevronRight size={14} color="#94a3b8" />}
           </button>
 
-          {/* Play Zone Orders Nav Link */}
+          {/* 1. Play Zone Orders Nav Link */}
           <button 
             className="ados-sidebar-nav-link"
-            onClick={() => setIsOrdersViewOpen(true)}
-            title={isAr ? 'إدارة طلبات البلاي زون والرحلات' : 'Manage Play Zone & Trips Orders'}
+            onClick={() => {
+              setOrdersSuiteTab('playzone-orders');
+              setIsOrdersViewOpen(true);
+            }}
+            title={isAr ? 'إدارة طلبات البلاي زون وتذاكر الألعاب' : 'Manage Play Zone Orders & Tickets'}
           >
             <span>
               <Ticket size={15} color="#00d2ff" />
@@ -813,6 +842,84 @@ export default function DesktopDashboardPage({
               fontWeight: 800 
             }}>
               86
+            </span>
+          </button>
+
+          {/* 2. Trips Orders Nav Link */}
+          <button 
+            className="ados-sidebar-nav-link"
+            onClick={() => {
+              setOrdersSuiteTab('trips-orders');
+              setIsOrdersViewOpen(true);
+            }}
+            title={isAr ? 'إدارة حجوزات رحلات المدارس والمجموعات' : 'Manage School & Group Trips Orders'}
+          >
+            <span>
+              <Building2 size={15} color="#38bdf8" />
+              {isAr ? 'طلبات الرحلات' : 'Trips Orders'}
+            </span>
+            <span style={{ 
+              marginInlineStart: 'auto', 
+              background: '#38bdf8', 
+              color: '#002830', 
+              padding: '2px 8px', 
+              borderRadius: '10px', 
+              fontSize: '11px', 
+              fontWeight: 800 
+            }}>
+              12
+            </span>
+          </button>
+
+          {/* 3. Restaurant & Cafe Orders Nav Link */}
+          <button 
+            className="ados-sidebar-nav-link"
+            onClick={() => {
+              setOrdersSuiteTab('restaurant-orders');
+              setIsOrdersViewOpen(true);
+            }}
+            title={isAr ? 'إدارة طلبات المطعم والكافيه وحجوزات الطاولات' : 'Manage Restaurant Orders & Table Bookings'}
+          >
+            <span>
+              <Utensils size={15} color="#10b981" />
+              {isAr ? 'طلبات المطعم والكافيه' : 'Restaurant & Cafe'}
+            </span>
+            <span style={{ 
+              marginInlineStart: 'auto', 
+              background: '#10b981', 
+              color: '#ffffff', 
+              padding: '2px 8px', 
+              borderRadius: '10px', 
+              fontSize: '11px', 
+              fontWeight: 800 
+            }}>
+              34
+            </span>
+          </button>
+
+          {/* 4. Events & Halls Bookings Nav Link */}
+          <button 
+            className="ados-sidebar-nav-link"
+            onClick={() => {
+              setOrdersSuiteTab('events-orders');
+              setIsOrdersViewOpen(true);
+            }}
+            title={isAr ? 'إدارة حجوزات الحفلات وأعياد الميلاد والقاعات' : 'Manage Events, Birthday Parties & Hall Rentals'}
+          >
+            <span>
+              <PartyPopper size={15} color="#c084fc" />
+              {isAr ? 'حجوزات الحفلات والقاعات' : 'Events & Halls'}
+            </span>
+            <span style={{ 
+              marginInlineStart: 'auto', 
+              background: '#a855f7', 
+              color: '#ffffff', 
+              padding: '2px 8px', 
+              borderRadius: '10px', 
+              fontSize: '11px', 
+              fontWeight: 800 
+            }}>
+              18
             </span>
           </button>
         </div>

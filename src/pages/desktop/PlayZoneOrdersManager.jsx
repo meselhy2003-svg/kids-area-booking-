@@ -3,6 +3,8 @@ import { getAllPurchases } from '../../api/buyingService';
 import OrderDetailsUpdateForm from '../../components/admin/OrderDetailsUpdateForm';
 import RealTimeAnalyticsPanel from '../../components/admin/RealTimeAnalyticsPanel';
 import TripsAnalyticsPanel from '../../components/admin/TripsAnalyticsPanel';
+import RestaurantOrdersManager from '../../components/admin/RestaurantOrdersManager';
+import EventsOrdersManager from '../../components/admin/EventsOrdersManager';
 import { 
   Ticket, 
   Calendar, 
@@ -25,6 +27,7 @@ import {
   Coffee, 
   Layers, 
   Sparkles,
+  PartyPopper,
   ShieldCheck,
   CheckCircle2,
   Clock4,
@@ -137,12 +140,19 @@ export default function PlayZoneOrdersManager({
   onBackToDashboard, 
   onGoHome,
   lang = 'ar',
-  setLang
+  setLang,
+  initialView = 'playzone-orders'
 }) {
   const isAr = lang === 'ar';
 
-  // Navigation View State: 'playzone-orders' | 'trips-orders' | 'trip-detail'
-  const [currentView, setCurrentView] = useState('playzone-orders');
+  // Navigation View State: 'playzone-orders' | 'trips-orders' | 'trip-detail' | 'restaurant-orders' | 'events-orders'
+  const [currentView, setCurrentView] = useState(initialView || 'playzone-orders');
+  
+  useEffect(() => {
+    if (initialView) {
+      setCurrentView(initialView);
+    }
+  }, [initialView]);
   
   // Live Purchases Data States (ADOS Buying API)
   const [orders, setOrders] = useState([]);
@@ -676,6 +686,24 @@ export default function PlayZoneOrdersManager({
           >
             <Building2 size={15} />
             <span>{isAr ? 'طلبات الرحلات' : 'TRIPS ORDERS'}</span>
+          </button>
+
+          <button 
+            type="button"
+            className={`pz-header-view-btn ${currentView === 'restaurant-orders' ? 'active' : ''}`}
+            onClick={() => setCurrentView('restaurant-orders')}
+          >
+            <Utensils size={15} />
+            <span>{isAr ? 'طلبات المطعم والكافيه' : 'RESTAURANT & CAFE'}</span>
+          </button>
+
+          <button 
+            type="button"
+            className={`pz-header-view-btn ${currentView === 'events-orders' ? 'active' : ''}`}
+            onClick={() => setCurrentView('events-orders')}
+          >
+            <PartyPopper size={15} />
+            <span>{isAr ? 'حجوزات الحفلات والقاعات' : 'EVENTS & HALLS'}</span>
           </button>
         </div>
       </header>
@@ -1732,6 +1760,28 @@ export default function PlayZoneOrdersManager({
           </div>
 
         </main>
+      )}
+
+      {/* ========================================================================= */}
+      {/* VIEW 4: RESTAURANT & CAFE ORDERS (DELIVERY + TABLE RESERVATIONS)          */}
+      {/* ========================================================================= */}
+      {currentView === 'restaurant-orders' && (
+        <RestaurantOrdersManager 
+          isAr={isAr}
+          lang={lang}
+          onBackToDashboard={onBackToDashboard}
+        />
+      )}
+
+      {/* ========================================================================= */}
+      {/* VIEW 5: EVENTS & HALLS BOOKINGS (BIRTHDAYS + PRIVATE HALL RENTALS)        */}
+      {/* ========================================================================= */}
+      {currentView === 'events-orders' && (
+        <EventsOrdersManager 
+          isAr={isAr}
+          lang={lang}
+          onBackToDashboard={onBackToDashboard}
+        />
       )}
 
       {/* ========================================================================= */}

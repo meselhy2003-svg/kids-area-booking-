@@ -314,7 +314,7 @@ export const translations = {
       chooseSub: 'أربع مناطق مجهزة ومصممة لتناسب مختلف الأعمار ومستويات الطاقة.',
       safetyPill: 'جميع التذاكر تشمل نظام مراقبة كامل وخزائن أمانات',
       kidsCard: {
-        tag: 'ألعاب آمنة وإسفنجية 🧸',
+        tag: 'ألعاب آمنة وإسفنجية',
         age: 'الأعمار: ١ - ٣ سنوات',
         name: 'منطقة الأطفال',
         quote: '"عالم مليان فرح، ضحك، وابتسامات متخلصش."',
@@ -808,7 +808,7 @@ export const translations = {
       chooseSub: 'Four distinct zones designed for every age group and energy level.',
       safetyPill: 'All tickets include full safety surveillance & lockers',
       kidsCard: {
-        tag: 'SAFE & SOFT PLAY 🧸',
+        tag: 'SAFE & SOFT PLAY',
         age: 'AGES 1 - 3',
         name: 'KIDS AREA',
         quote: '"A world of fun, laughter, and endless smiles."',
