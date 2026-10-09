@@ -4,7 +4,7 @@
  * Provides:
  * 1. Functions to get and manage media by page (`getPageMedia`, `getAllPagesMedia`).
  * 2. Exported page keys (`PAGE_MEDIA_KEYS`) and pre-structured default media data (`pageMediaData`).
- * 3. Connection to Postman/backend API: https://unfraternised-luella-unexpeditiously.ngrok-free.dev
+ * 3. Connection to Backend API: https://backend-ados.vercel.app
  * 4. Stale-while-revalidate persistent caching, image preloading, and robust offline fallback.
  */
 
@@ -101,8 +101,8 @@ export const normalizePageKey = (key = '') => {
 /**
  * Resolves any image identifier (file name from backend, local asset path, external URL)
  * into a fully-qualified browser accessible URL.
- * Automatically strips internal backend developer hosts (e.g. localhost:9500) and routes
- * through the Vite /media proxy for 100% reliable image loading without CORS or ngrok blocks.
+ * Resolves any image identifier (file name from backend, local asset path, external URL)
+ * into a fully-qualified browser accessible URL.
  */
 export const resolveImageUrl = (img) => {
   if (!img) return '';
@@ -115,11 +115,6 @@ export const resolveImageUrl = (img) => {
   }
   if (!img || typeof img !== 'string') return '';
   let trimmed = img.trim();
-
-  // 1. Strip developer machine internal host if returned by server (e.g. http://localhost:9500/media/...)
-  trimmed = trimmed.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, '');
-  // 2. Strip remote ngrok domain if embedded to leverage local proxy
-  trimmed = trimmed.replace(/^https?:\/\/[a-z0-9-]+\.ngrok-free\.dev/i, '');
 
   // 3. Local bundled public assets or data URLs
   if (
@@ -143,7 +138,7 @@ export const resolveImageUrl = (img) => {
     cleanPath = cleanPath.substring(6);
   }
 
-  // In browser on localhost, use /media/<encodedFilename> via Vite proxy (avoids CORS & ngrok blocks!)
+  // In local browser development, leverage Vite /media proxy
   const encoded = encodeURI(cleanPath);
   if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
     return `/media/${encoded}`;
@@ -318,30 +313,11 @@ export const getMediaByPage = async (pageName) => {
     }
 
     const normKey = normalizePageKey(pageName);
-    const candidates = new Set([normKey]);
-    if (normKey === PAGE_MEDIA_KEYS.KIDS_AREA) {
-      candidates.add('kids');
-      candidates.add('kids-area');
-      candidates.add('hero');
-    } else if (normKey === PAGE_MEDIA_KEYS.FUN_PARK) {
-      candidates.add('fun-park');
-      candidates.add('funpark');
-      candidates.add('funzone');
-      candidates.add('funZone');
-    } else if (normKey === PAGE_MEDIA_KEYS.HOME) {
-      candidates.add('home');
-      candidates.add('Home');
-      candidates.add('hero');
-    }
-
-    const listResults = await Promise.allSettled(
-      Array.from(candidates).map(c => apiClient.get(`/api/media/page/${encodeURIComponent(c)}`))
-    );
+    const res = await apiClient.get(`/api/media/page/${encodeURIComponent(normKey)}`);
     const all = [];
     const seen = new Set();
-    listResults.forEach(r => {
-      if (r.status === 'fulfilled' && r.value && r.value.success && r.value.data) {
-        const list = Array.isArray(r.value.data) ? r.value.data : (Array.isArray(r.value.data.data) ? r.value.data.data : []);
+    if (res && res.success && res.data) {
+      const list = Array.isArray(res.data) ? res.data : (Array.isArray(res.data.data) ? res.data.data : []);
         list.forEach(item => {
           if (item && item._id && !seen.has(item._id)) {
             seen.add(item._id);
@@ -357,7 +333,6 @@ export const getMediaByPage = async (pageName) => {
           }
         });
       }
-    });
     return all;
   } catch (err) {
     console.warn('[mediaService.getMediaByPage] error:', err);
@@ -627,20 +602,8 @@ export const getPageMedia = async (pageKey, options = {}) => {
     if (endpoint) {
       res = await apiClient.get(endpoint);
     } else {
-      // 1. Primary Live Apidog endpoint: /api/media/page/:page
+      // Direct database endpoint: /api/media/page/:page
       res = await apiClient.get(`/api/media/page/${encodeURIComponent(normKey)}`);
-      if (!res.success && normKey === PAGE_MEDIA_KEYS.FUN_PARK) {
-        res = await apiClient.get('/api/media/page/funZone');
-      }
-      if (!res.success && res.status === 404) {
-        res = await apiClient.get(`/api/media/pages/${normKey}`);
-      }
-      if (!res.success && res.status === 404) {
-        res = await apiClient.get(`/api/media/${normKey}`);
-      }
-      if (!res.success && res.status === 404) {
-        res = await apiClient.get('/api/media', { page: normKey });
-      }
     }
 
     if (res && res.success && res.data) {
@@ -955,18 +918,6 @@ export const getPageImages = async (pageName, options = {}) => {
     } else {
       // Primary Live Apidog endpoint: /api/media/page/:page
       res = await apiClient.get(`/api/media/page/${encodeURIComponent(normKey)}`);
-      if (!res.success && normKey === PAGE_MEDIA_KEYS.FUN_PARK) {
-        res = await apiClient.get('/api/media/page/funZone');
-      }
-      if (!res.success) {
-        res = await apiClient.get(`/api/media/${normKey}`);
-      }
-      if (!res.success) {
-        res = await apiClient.get(`/api/media/pages/${normKey}`);
-      }
-      if (!res.success) {
-        res = await apiClient.get('/api/media', { page: normKey });
-      }
     }
 
     if (res && res.success && res.data) {
@@ -1053,23 +1004,8 @@ export const mediaService = {
   async fetchLivePageMediaItems(pageName, sectionName = null) {
     try {
       const normKey = normalizePageKey(pageName);
-      const candidatePages = new Set([normKey]);
-      if (normKey === PAGE_MEDIA_KEYS.KIDS_AREA) {
-        candidatePages.add('kids');
-        candidatePages.add('kids-area');
-        candidatePages.add('hero');
-      } else if (normKey === PAGE_MEDIA_KEYS.FUN_PARK) {
-        candidatePages.add('fun-park');
-        candidatePages.add('funpark');
-        candidatePages.add('funzone');
-        candidatePages.add('funZone');
-      } else if (normKey === PAGE_MEDIA_KEYS.HOME) {
-        candidatePages.add('home');
-        candidatePages.add('Home');
-        candidatePages.add('hero');
-      }
-
-      const endpoints = Array.from(candidatePages).map(p => `/api/media/page/${encodeURIComponent(p)}`);
+      const endpoints = [`/api/media/page/${encodeURIComponent(normKey)}`];
+      
       if (sectionName) {
         endpoints.push(`/api/media/section/${encodeURIComponent(sectionName)}`);
       }

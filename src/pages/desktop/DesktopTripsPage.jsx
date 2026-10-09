@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import html2canvas from 'html2canvas';
 import { Camera, Download, Copy, Check, FileImage } from 'lucide-react';
+import { isUserAuthenticated } from '../../api/authService';
 import './DesktopTripsPage.css';
 
 export default function DesktopTripsPage({ setActiveTab, openModal, lang = 'ar' }) {
@@ -183,6 +184,20 @@ export default function DesktopTripsPage({ setActiveTab, openModal, lang = 'ar' 
 
   // Handle final booking submission
   const handleProceedBooking = () => {
+    if (!isUserAuthenticated()) {
+      if (openModal) {
+        openModal('auth-required', {
+          action: 'booking',
+          onSuccess: () => {
+            setIsBookingModalOpen(true);
+            setBookingConfirmed(false);
+            setModalTab('review');
+          }
+        });
+      }
+      return;
+    }
+
     setIsBookingModalOpen(true);
     setBookingConfirmed(false);
     setModalTab('review');
@@ -246,6 +261,22 @@ export default function DesktopTripsPage({ setActiveTab, openModal, lang = 'ar' 
 
   // Handle confirm reservation with screenshot
   const handleConfirmReservation = () => {
+    if (!isUserAuthenticated()) {
+      setIsBookingModalOpen(false);
+      if (openModal) {
+        openModal('auth-required', {
+          action: 'booking',
+          onSuccess: () => {
+            setIsBookingModalOpen(true);
+            setBookingConfirmed(true);
+            setModalTab('quotation');
+            triggerConfetti();
+          }
+        });
+      }
+      return;
+    }
+
     setBookingConfirmed(true);
     setModalTab('quotation');
     triggerConfetti();

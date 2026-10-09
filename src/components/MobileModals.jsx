@@ -1,7 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
+import { 
+  X, 
+  Sparkles, 
+  User, 
+  Phone, 
+  Calendar, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  Users, 
+  Plus, 
+  Trash2, 
+  ArrowRight, 
+  ArrowLeft,
+  LogOut
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { isUserAuthenticated } from '../api/authService';
 import MediaUploadModal from './common/MediaUploadModal';
+import '../pages/LobbyPage.css';
 
 export default function MobileModals({ 
   modalType, 
@@ -21,6 +39,20 @@ export default function MobileModals({
   const [guestPhone, setGuestPhone] = useState('');
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [bookingCode, setBookingCode] = useState('');
+
+  // Auth Required Interception State (Guest -> Offer / Checkout / Booking)
+  const [authReqTab, setAuthReqTab] = useState('register'); // 'login' | 'register'
+  const [authReqPhone, setAuthReqPhone] = useState('');
+  const [authReqName, setAuthReqName] = useState('');
+  const [authReqAge, setAuthReqAge] = useState('');
+  const [authReqGender, setAuthReqGender] = useState('male'); // 'male' | 'female'
+  const [authReqPassword, setAuthReqPassword] = useState('');
+  const [authReqConfirmPassword, setAuthReqConfirmPassword] = useState('');
+  const [showAuthPassword, setShowAuthPassword] = useState(false);
+  const [authReqChildren, setAuthReqChildren] = useState([]); // [{ name: '', age: '', gender: 'boy' }]
+  const [authReqError, setAuthReqError] = useState('');
+  const [authReqSuccess, setAuthReqSuccess] = useState('');
+  const [authReqLoading, setAuthReqLoading] = useState(false);
 
   // 360 Tour State
   const [panX, setPanX] = useState(0);
@@ -58,11 +90,30 @@ export default function MobileModals({
       setProfileView('profile');
       setAuthMsg('');
     }
+    if (modalType === 'auth-required' || modalType === 'auth') {
+      setAuthReqTab('login');
+      setAuthReqPhone('');
+      setAuthReqName('');
+      setAuthReqPassword('');
+      setAuthReqError('');
+      setAuthReqSuccess('');
+      setAuthReqLoading(false);
+    }
   }, [modalType, modalData, user]);
 
   // Handle Confetti and Pass Persistence on successful booking
   const handleConfirmBooking = async (e) => {
     e.preventDefault();
+
+    if (!isUserAuthenticated()) {
+      openModal('auth-required', {
+        action: 'booking',
+        returnData: modalData,
+        returnType: 'booking'
+      });
+      return;
+    }
+
     const code = 'PZ-' + Math.floor(100000 + Math.random() * 900000);
     setBookingCode(code);
     setBookingSuccess(true);
@@ -89,6 +140,127 @@ export default function MobileModals({
       });
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  // Children helper functions for guest sign up
+  const handleAddChild = () => {
+    setAuthReqChildren(prev => [
+      ...prev,
+      { name: '', age: '', gender: 'boy' }
+    ]);
+  };
+
+  const handleRemoveChild = (index) => {
+    setAuthReqChildren(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateChild = (index, field, value) => {
+    setAuthReqChildren(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  // Handle Auth Required Login (Guest Interception)
+  const handleAuthReqLogin = async (e) => {
+    e.preventDefault();
+    setAuthReqError('');
+    const clean = authReqPhone.trim();
+    if (!clean) {
+      setAuthReqError(lang === 'ar' ? 'يرجى إدخال رقم الهاتف' : 'Please enter your phone number');
+      return;
+    }
+    if (!authReqPassword.trim()) {
+      setAuthReqError(lang === 'ar' ? 'يرجى إدخال كلمة المرور' : 'Please enter password');
+      return;
+    }
+    setAuthReqLoading(true);
+    try {
+      await login({ identifier: clean, password: authReqPassword });
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('american_dream_user_logged_in', 'true');
+        localStorage.removeItem('american_dream_is_guest');
+      }
+
+      setAuthReqSuccess(lang === 'ar' ? 'تم تسجيل الدخول بنجاح! جاري المتابعة...' : 'Logged in successfully! Continuing...');
+      try { confetti({ particleCount: 75, spread: 70, origin: { y: 0.55 } }); } catch {}
+
+      setTimeout(() => {
+        closeModal();
+        if (modalData?.onSuccess) {
+          modalData.onSuccess();
+        } else if (modalData?.action === 'offer' || modalData?.returnType === 'booking') {
+          openModal('booking', modalData?.offerData || modalData?.returnData);
+        }
+      }, 550);
+    } catch (err) {
+      setAuthReqError(err.message || (lang === 'ar' ? 'بيانات الدخول غير صحيحة، يرجى المحاولة ثانية' : 'Login failed, please check details'));
+    } finally {
+      setAuthReqLoading(false);
+    }
+  };
+
+  // Handle Auth Required Register (Guest Interception - Matches Image 2)
+  const handleAuthReqRegister = async (e) => {
+    e.preventDefault();
+    setAuthReqError('');
+    const cleanName = authReqName.trim();
+    const cleanPhone = authReqPhone.trim();
+    if (!cleanName) {
+      setAuthReqError(lang === 'ar' ? 'يرجى إدخال الاسم بالكامل' : 'Please enter your full name');
+      return;
+    }
+    if (!cleanPhone) {
+      setAuthReqError(lang === 'ar' ? 'يرجى إدخال رقم الهاتف' : 'Please enter your phone number');
+      return;
+    }
+    if (!authReqAge.trim()) {
+      setAuthReqError(lang === 'ar' ? 'يرجى إدخال العمر' : 'Please enter your age');
+      return;
+    }
+    if (!authReqPassword.trim()) {
+      setAuthReqError(lang === 'ar' ? 'يرجى إدخال كلمة المرور' : 'Please enter password');
+      return;
+    }
+    if (authReqConfirmPassword && authReqPassword !== authReqConfirmPassword) {
+      setAuthReqError(lang === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match');
+      return;
+    }
+
+    setAuthReqLoading(true);
+    try {
+      await register({
+        name: cleanName,
+        phone: cleanPhone,
+        age: authReqAge.trim(),
+        gender: authReqGender,
+        password: authReqPassword,
+        children: authReqChildren
+      });
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('american_dream_user_logged_in', 'true');
+        localStorage.removeItem('american_dream_is_guest');
+      }
+
+      setAuthReqSuccess(lang === 'ar' ? 'تم إنشاء الحساب بنجاح! جاري المتابعة...' : 'Account created successfully! Continuing...');
+      try { confetti({ particleCount: 85, spread: 80, origin: { y: 0.55 } }); } catch {}
+
+      setTimeout(() => {
+        closeModal();
+        if (modalData?.onSuccess) {
+          modalData.onSuccess();
+        } else if (modalData?.action === 'offer' || modalData?.returnType === 'booking') {
+          openModal('booking', modalData?.offerData || modalData?.returnData);
+        }
+      }, 550);
+    } catch (err) {
+      setAuthReqError(err.message || (lang === 'ar' ? 'حدث خطأ في إنشاء الحساب' : 'Registration failed'));
+    } finally {
+      setAuthReqLoading(false);
     }
   };
 
@@ -569,6 +741,28 @@ export default function MobileModals({
               </span>
             </button>
 
+            {isAuthenticated && (
+              <button 
+                className="drawer-nav-item"
+                onClick={async () => {
+                  closeModal();
+                  await logout();
+                  setActiveTab('lobby');
+                  if (typeof window !== 'undefined') {
+                    window.location.hash = '#lobby';
+                  }
+                }}
+                style={{ background: 'rgba(239, 68, 68, 0.08)', marginTop: '4px' }}
+              >
+                <div style={{ width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
+                  <LogOut size={18} />
+                </div>
+                <span className={lang === 'ar' ? 'font-alexandria' : ''} style={{ color: '#ef4444', fontWeight: 800 }}>
+                  {lang === 'ar' ? 'تسجيل الخروج (Log Out)' : 'Log Out'}
+                </span>
+              </button>
+            )}
+
           </div>
 
           <div className="drawer-divider" />
@@ -590,6 +784,407 @@ export default function MobileModals({
           </div>
         </div>
       )}
+
+      {/* 3.5 AUTH REQUIRED MODAL (FOR GUEST USERS: OFFERS / CHECKOUT / PROCEED TO BOOKING) */}
+      {(modalType === 'auth-required' || modalType === 'auth') && (() => {
+        const destinationName = modalData?.destination 
+          || modalData?.title 
+          || (modalData?.action === 'offer' 
+                ? (lang === 'ar' ? 'العروض الحصرية' : 'Exclusive Offers')
+                : modalData?.action === 'checkout'
+                ? (lang === 'ar' ? 'إتمام الشراء' : 'Checkout')
+                : modalData?.action === 'booking'
+                ? (lang === 'ar' ? 'حجز التذاكر' : 'Play Zone Tickets')
+                : (lang === 'ar' ? 'الرحلات' : 'Trips'));
+
+        return (
+          <div 
+            className="lobby-auth-card auth-required-gateway-card" 
+            onClick={(e) => e.stopPropagation()}
+            dir={lang === 'ar' ? 'rtl' : 'ltr'}
+          >
+            {/* Header: Logo, Title, Close Button */}
+            <div className="lobby-auth-header">
+              <div className="lobby-auth-logo-row">
+                <img 
+                  src="/photo/logo/logo nav bar and footer.png" 
+                  alt="American Dream" 
+                  className="lobby-auth-logo"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+                <h3 className="lobby-auth-title">
+                  {lang === 'ar' ? 'بوابة دخول أمريكان دريم' : 'American Dream Gateway'}
+                </h3>
+              </div>
+              <button 
+                type="button" 
+                className="lobby-auth-close-btn"
+                onClick={closeModal}
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Destination Pill */}
+            <div className="lobby-auth-destination-pill">
+              <Sparkles size={16} color="#fde047" />
+              <span>
+                {lang === 'ar' ? 'الوجهة المختارة:' : 'Selected Destination:'}{' '}
+                <strong>{destinationName}</strong>
+              </span>
+            </div>
+
+            {/* Segmented Auth Tabs */}
+            <div className="lobby-auth-tabs">
+              <button 
+                type="button"
+                className={`lobby-auth-tab-btn ${authReqTab === 'login' ? 'active' : ''}`}
+                onClick={() => { setAuthReqTab('login'); setAuthReqError(''); setAuthReqSuccess(''); }}
+              >
+                {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+              </button>
+              <button 
+                type="button"
+                className={`lobby-auth-tab-btn ${authReqTab === 'register' ? 'active' : ''}`}
+                onClick={() => { setAuthReqTab('register'); setAuthReqError(''); setAuthReqSuccess(''); }}
+              >
+                {lang === 'ar' ? 'إنشاء حساب جديد' : 'Sign Up'}
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="lobby-auth-body">
+              {/* Status alerts */}
+              {authReqError && (
+                <div className="lobby-auth-error">
+                  <span>⚠️</span>
+                  <span>{authReqError}</span>
+                </div>
+              )}
+              {authReqSuccess && (
+                <div className="lobby-auth-success">
+                  <span>✓</span>
+                  <span>{authReqSuccess}</span>
+                </div>
+              )}
+
+              {/* TAB 1: LOGIN FORM */}
+              {authReqTab === 'login' && (
+                <form onSubmit={handleAuthReqLogin} className="lobby-auth-form">
+                  {/* Phone */}
+                  <div className="lobby-auth-field-group">
+                    <label className="lobby-auth-label">
+                      {lang === 'ar' ? 'رقم الهاتف المسجل:' : 'Registered Phone Number:'} *
+                    </label>
+                    <div className="lobby-auth-input-wrap">
+                      <Phone size={18} className="lobby-auth-input-icon" />
+                      <input 
+                        type="tel" 
+                        required
+                        className="lobby-auth-input"
+                        placeholder={lang === 'ar' ? '01012345678 أو +20...' : '+20 101 234 5678'}
+                        value={authReqPhone}
+                        onChange={(e) => setAuthReqPhone(e.target.value)}
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+
+                  {/* Password */}
+                  <div className="lobby-auth-field-group">
+                    <label className="lobby-auth-label">
+                      {lang === 'ar' ? 'كلمة المرور:' : 'Password:'} *
+                    </label>
+                    <div className="lobby-auth-input-wrap">
+                      <Lock size={18} className="lobby-auth-input-icon" />
+                      <input 
+                        type={showAuthPassword ? 'text' : 'password'} 
+                        required
+                        className="lobby-auth-input"
+                        placeholder="••••••••"
+                        value={authReqPassword}
+                        onChange={(e) => setAuthReqPassword(e.target.value)}
+                      />
+                      <button 
+                        type="button" 
+                        className="lobby-auth-eye-btn"
+                        onClick={() => setShowAuthPassword(!showAuthPassword)}
+                        aria-label="Toggle password visibility"
+                      >
+                        {showAuthPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button type="submit" className="lobby-auth-submit-btn" disabled={authReqLoading}>
+                    <span>
+                      {authReqLoading 
+                        ? (lang === 'ar' ? 'جاري التحقق...' : 'Signing in...')
+                        : (lang === 'ar' 
+                            ? `تسجيل الدخول والمتابعة إلى ${destinationName}` 
+                            : `Sign In & Continue to ${destinationName}`)}
+                    </span>
+                    {lang === 'ar' ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
+                  </button>
+
+                  {/* Switch to Sign Up */}
+                  <div className="lobby-auth-switch-text">
+                    <span>{lang === 'ar' ? 'ليس لديك حساب؟' : "Don't have an account?"}</span>{' '}
+                    <button 
+                      type="button" 
+                      className="lobby-auth-switch-link"
+                      onClick={() => { setAuthReqTab('register'); setAuthReqError(''); }}
+                    >
+                      {lang === 'ar' ? 'سجّل بياناتك كـ Guest الآن' : 'Sign Up as Guest now'}
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* TAB 2: SIGN UP FORM (MATCHING IMAGE 2 EXACTLY) */}
+              {authReqTab === 'register' && (
+                <form onSubmit={handleAuthReqRegister} className="lobby-auth-form">
+                  {/* Full Name: * */}
+                  <div className="lobby-auth-field-group">
+                    <label className="lobby-auth-label">
+                      {lang === 'ar' ? 'الاسم بالكامل:' : 'Full Name:'} *
+                    </label>
+                    <div className="lobby-auth-input-wrap">
+                      <User size={18} className="lobby-auth-input-icon" />
+                      <input 
+                        type="text" 
+                        required
+                        className="lobby-auth-input"
+                        placeholder={lang === 'ar' ? 'مثال: أحمد محمد' : 'e.g. Ahmed Mohamed'}
+                        value={authReqName}
+                        onChange={(e) => setAuthReqName(e.target.value)}
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+
+                  {/* Phone Number: * */}
+                  <div className="lobby-auth-field-group">
+                    <label className="lobby-auth-label">
+                      {lang === 'ar' ? 'رقم الهاتف:' : 'Phone Number:'} *
+                    </label>
+                    <div className="lobby-auth-input-wrap">
+                      <Phone size={18} className="lobby-auth-input-icon" />
+                      <input 
+                        type="tel" 
+                        required
+                        className="lobby-auth-input"
+                        placeholder={lang === 'ar' ? '01012345678 أو +20...' : '+20 101 234 5678'}
+                        value={authReqPhone}
+                        onChange={(e) => setAuthReqPhone(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Age & Gender Grid */}
+                  <div className="lobby-auth-grid-2">
+                    {/* Age: * */}
+                    <div className="lobby-auth-field-group">
+                      <label className="lobby-auth-label">
+                        {lang === 'ar' ? 'العمر (السن):' : 'Age:'} *
+                      </label>
+                      <div className="lobby-auth-input-wrap">
+                        <Calendar size={18} className="lobby-auth-input-icon" />
+                        <input 
+                          type="number" 
+                          required
+                          min="1"
+                          max="120"
+                          className="lobby-auth-input"
+                          placeholder={lang === 'ar' ? 'مثال: 32' : 'e.g. 32'}
+                          value={authReqAge}
+                          onChange={(e) => setAuthReqAge(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Gender: * */}
+                    <div className="lobby-auth-field-group">
+                      <label className="lobby-auth-label">
+                        {lang === 'ar' ? 'النوع:' : 'Gender:'} *
+                      </label>
+                      <div className="lobby-gender-toggles">
+                        <button
+                          type="button"
+                          className={`lobby-gender-btn ${authReqGender === 'male' ? 'active' : ''}`}
+                          onClick={() => setAuthReqGender('male')}
+                        >
+                          <span>👨</span>
+                          <span>{lang === 'ar' ? 'ذكر' : 'Male'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          className={`lobby-gender-btn ${authReqGender === 'female' ? 'active' : ''}`}
+                          onClick={() => setAuthReqGender('female')}
+                        >
+                          <span>👩</span>
+                          <span>{lang === 'ar' ? 'أنثى' : 'Female'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Password & Confirm Password Grid */}
+                  <div className="lobby-auth-grid-2">
+                    {/* Password */}
+                    <div className="lobby-auth-field-group">
+                      <label className="lobby-auth-label">
+                        {lang === 'ar' ? 'كلمة المرور:' : 'Password:'} *
+                      </label>
+                      <div className="lobby-auth-input-wrap">
+                        <Lock size={18} className="lobby-auth-input-icon" />
+                        <input 
+                          type={showAuthPassword ? 'text' : 'password'} 
+                          required
+                          className="lobby-auth-input"
+                          placeholder="••••••••"
+                          value={authReqPassword}
+                          onChange={(e) => setAuthReqPassword(e.target.value)}
+                        />
+                        <button 
+                          type="button" 
+                          className="lobby-auth-eye-btn"
+                          onClick={() => setShowAuthPassword(!showAuthPassword)}
+                          aria-label="Toggle password visibility"
+                        >
+                          {showAuthPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div className="lobby-auth-field-group">
+                      <label className="lobby-auth-label">
+                        {lang === 'ar' ? 'تأكيد كلمة المرور:' : 'Confirm Password:'} *
+                      </label>
+                      <div className="lobby-auth-input-wrap">
+                        <Lock size={18} className="lobby-auth-input-icon" />
+                        <input 
+                          type={showAuthPassword ? 'text' : 'password'} 
+                          required
+                          className="lobby-auth-input"
+                          placeholder="••••••••"
+                          value={authReqConfirmPassword}
+                          onChange={(e) => setAuthReqConfirmPassword(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Accompanying Children Section */}
+                  <div className="lobby-children-card">
+                    <div className="lobby-children-header">
+                      <div className="lobby-children-title">
+                        <Users size={16} />
+                        <span>{lang === 'ar' ? 'الأطفال المرافقين' : 'Accompanying Children'}</span>
+                        <span className="lobby-child-badge">
+                          {authReqChildren.length} {lang === 'ar' ? 'طفل' : 'child'}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        className="lobby-add-child-btn"
+                        onClick={handleAddChild}
+                      >
+                        <Plus size={14} />
+                        <span>{lang === 'ar' ? 'إضافة طفل' : 'Add Child'}</span>
+                      </button>
+                    </div>
+
+                    {authReqChildren.length === 0 ? (
+                      <div className="lobby-no-children-note">
+                        {lang === 'ar' 
+                          ? 'لم تتم إضافة أطفال بعد. اضغط (+ إضافة طفل) لإضافة طفل مرافق.' 
+                          : 'No children added yet. Click (+ Add Child) to register a child.'}
+                      </div>
+                    ) : (
+                      <div className="lobby-children-list">
+                        {authReqChildren.map((child, index) => (
+                          <div key={index} className="lobby-child-row">
+                            <div className="lobby-child-row-top">
+                              <span className="lobby-child-badge">
+                                {lang === 'ar' ? `الطفل ${index + 1}` : `Child ${index + 1}`}
+                              </span>
+                              <button
+                                type="button"
+                                className="lobby-child-remove-btn"
+                                onClick={() => handleRemoveChild(index)}
+                                title={lang === 'ar' ? 'حذف الطفل' : 'Remove Child'}
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            </div>
+
+                            <div className="lobby-child-fields-grid">
+                              <input 
+                                type="text"
+                                required
+                                className="lobby-child-input"
+                                placeholder={lang === 'ar' ? 'اسم الطفل' : 'Child name'}
+                                value={child.name}
+                                onChange={(e) => handleUpdateChild(index, 'name', e.target.value)}
+                              />
+                              <input 
+                                type="number"
+                                required
+                                min="1"
+                                max="18"
+                                className="lobby-child-input"
+                                placeholder={lang === 'ar' ? 'العمر' : 'Age'}
+                                value={child.age}
+                                onChange={(e) => handleUpdateChild(index, 'age', e.target.value)}
+                              />
+                              <select
+                                className="lobby-child-gender-select"
+                                value={child.gender}
+                                onChange={(e) => handleUpdateChild(index, 'gender', e.target.value)}
+                              >
+                                <option value="boy">{lang === 'ar' ? 'ولد 👦' : 'Boy 👦'}</option>
+                                <option value="girl">{lang === 'ar' ? 'بنت 👧' : 'Girl 👧'}</option>
+                              </select>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Glowing Radiant Orange Submit Button */}
+                  <button type="submit" className="lobby-auth-submit-btn" disabled={authReqLoading}>
+                    <span>
+                      {authReqLoading 
+                        ? (lang === 'ar' ? 'جاري إنشاء الحساب...' : 'Creating Account...') 
+                        : (lang === 'ar' 
+                            ? `إنشاء الحساب ومتابعة إلى ${destinationName}` 
+                            : `Sign Up & Continue to ${destinationName}`)}
+                    </span>
+                    {lang === 'ar' ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
+                  </button>
+
+                  {/* Switch to Sign In */}
+                  <div className="lobby-auth-switch-text">
+                    <span>{lang === 'ar' ? 'لديك حساب بالفعل؟' : 'Already have an account?'}</span>{' '}
+                    <button 
+                      type="button" 
+                      className="lobby-auth-switch-link"
+                      onClick={() => { setAuthReqTab('login'); setAuthReqError(''); }}
+                    >
+                      {lang === 'ar' ? 'تسجيل الدخول الآن' : 'Sign In'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 4. USER PROFILE & AUTHENTICATION MODAL */}
       {modalType === 'profile' && (
@@ -739,13 +1334,17 @@ export default function MobileModals({
                     onClick={async () => {
                       await logout();
                       closeModal();
+                      setActiveTab('lobby');
+                      if (typeof window !== 'undefined') {
+                        window.location.hash = '#lobby';
+                      }
                     }}
-                    style={{ opacity: 0.8 }}
+                    style={{ opacity: 0.9 }}
                   >
                     <div className="profile-btn-icon-wrap" style={{ background: 'rgba(239, 68, 68, 0.15)' }}>
-                      <span style={{ fontSize: '1.1rem' }}>🚪</span>
+                      <LogOut size={18} color="#ef4444" />
                     </div>
-                    <span className="profile-btn-text" style={{ color: '#ef4444' }}>
+                    <span className="profile-btn-text" style={{ color: '#ef4444', fontWeight: 700 }}>
                       {lang === 'ar' ? 'تسجيل الخروج' : 'Log Out'}
                     </span>
                   </button>

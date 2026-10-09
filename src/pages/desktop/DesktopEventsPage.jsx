@@ -1,8 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useEventsMedia } from '../../hooks';
+import BirthdayBuilderPage from './BirthdayBuilderPage';
 import './DesktopEventsPage.css';
 
-export default function DesktopEventsPage({ setActiveTab, openModal, lang = 'ar' }) {
+export default function DesktopEventsPage({ 
+  setActiveTab, 
+  openModal, 
+  lang = 'ar',
+  initialBirthdayView = false
+}) {
+  // Birthday Builder View State
+  const [isBirthdayView, setIsBirthdayView] = useState(initialBirthdayView);
+
+  useEffect(() => {
+    if (initialBirthdayView !== undefined) {
+      setIsBirthdayView(initialBirthdayView);
+    }
+  }, [initialBirthdayView]);
+
   // Media Hook: Synchronous cache hydration + background revalidation with server replacement
   const { 
     heroSlides, 
@@ -14,6 +29,17 @@ export default function DesktopEventsPage({ setActiveTab, openModal, lang = 'ar'
 
   // Lightbox State
   const [lightboxData, setLightboxData] = useState(null);
+
+  if (isBirthdayView) {
+    return (
+      <BirthdayBuilderPage 
+        onBack={() => setIsBirthdayView(false)}
+        setActiveTab={setActiveTab}
+        openModal={openModal}
+        lang={lang}
+      />
+    );
+  }
 
   const occasionCards = [
     {
@@ -267,7 +293,16 @@ export default function DesktopEventsPage({ setActiveTab, openModal, lang = 'ar'
                   <button 
                     type="button" 
                     className="events-card-btn"
-                    onClick={() => openModal && openModal('booking', card.bookingData)}
+                    onClick={() => {
+                      if (card.id === 'birthday') {
+                        setIsBirthdayView(true);
+                        if (typeof window !== 'undefined') {
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                      } else {
+                        openModal && openModal('booking', card.bookingData);
+                      }
+                    }}
                   >
                     <span>{card.btnText}</span>
                     <span className="events-card-btn-arrow">&rarr;</span>

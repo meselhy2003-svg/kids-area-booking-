@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
 import { Copy, Check, FolderOpen, UploadCloud, X, Phone, MessageSquare, AlertCircle, ArrowRight } from 'lucide-react';
+import { isUserAuthenticated } from '../../api/authService';
 import './DesktopCartPage.css';
 
 export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }) {
@@ -234,9 +235,25 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
   const handlePayment = () => {
     if (totalPasses === 0) return;
 
+    if (!isUserAuthenticated()) {
+      if (openModal) {
+        openModal('auth-required', {
+          action: 'checkout',
+          onSuccess: () => {
+            proceedPaymentExecution();
+          }
+        });
+      }
+      return;
+    }
+
+    proceedPaymentExecution();
+  };
+
+  const proceedPaymentExecution = () => {
     if (paymentMethod === 'points') {
       if (userPointsBalance < subtotalPts) {
-        alert('Insufficient points balance! Please select "Pay with Money" or top up your wristband.');
+        alert(lang === 'ar' ? 'رصيد النقاط غير كافٍ! يرجى اختيار الدفع بالمال.' : 'Insufficient points balance! Please select "Pay with Money" or top up your wristband.');
         return;
       }
       setUserPointsBalance((prev) => prev - subtotalPts);
@@ -244,11 +261,13 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
       setLastPaymentRef(ref);
       setPaymentSuccess(true);
 
-      confetti({
-        particleCount: 100,
-        spread: 80,
-        origin: { y: 0.6 }
-      });
+      try {
+        confetti({
+          particleCount: 100,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      } catch {}
     } else {
       // paymentMethod === 'money' -> Open Money Payment & Receipt Upload Pop Screen
       setShowMoneyProofModal(true);

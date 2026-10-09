@@ -1366,3 +1366,483 @@
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ========================================================================= */
+/* DELIVERY DETAILS CHECKOUT PAGE (Exact Match to Design Screenshot)         */
+/* ========================================================================= */
+.deliv-checkout-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  background: #00181d;
+  background-image: 
+    radial-gradient(circle at 10% 15%, rgba(0, 169, 195, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 90% 85%, rgba(245, 158, 11, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(1, 43, 50, 0.8) 0%, #00181d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 16px 60px 16px;
+  box-sizing: border-box;
+}
+
+.deliv-details-card {
+  max-width: 530px;
+  width: 100%;
+  background: #002830;
+  border: 1.5px solid rgba(0, 169, 195, 0.35);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 50px rgba(0, 169, 195, 0.12);
+  padding: 36px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: relative;
+  box-sizing: border-box;
+  animation: delivFadeIn 0.3s ease;
+}
+
+@keyframes delivFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Badge Pill */
+.deliv-badge-pill {
+  align-self: flex-start;
+  background: #ffffff;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.deliv-badge-dot {
+  color: #004d5a;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.deliv-badge-text {
+  font-size: 0.78rem;
+  font-weight: 850;
+  color: #012b32;
+  letter-spacing: 0.4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.deliv-badge-bolt {
+  color: #f59e0b;
+}
+
+/* Title & Subtitle */
+.deliv-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.deliv-main-heading {
+  font-size: 2.1rem;
+  font-weight: 900;
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+}
+
+.deliv-title-white {
+  color: #ffffff;
+}
+
+.deliv-title-yellow {
+  color: #f59e0b;
+}
+
+.deliv-title-cyan {
+  color: #00a9c3;
+}
+
+.deliv-main-subtitle {
+  margin: 0;
+  font-size: 0.92rem;
+  color: #99dfe9;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+/* Form Fields */
+.deliv-form-block {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.deliv-field-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.deliv-field-label {
+  font-size: 0.88rem;
+  font-weight: 750;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.deliv-field-hint {
+  font-size: 0.8rem;
+  font-weight: 750;
+  color: #f59e0b;
+}
+
+.deliv-white-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #ffffff;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.deliv-white-input-wrap:focus-within {
+  box-shadow: 0 0 0 3px rgba(0, 169, 195, 0.45);
+}
+
+.deliv-white-input-icon {
+  position: absolute;
+  left: 14px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.lang-ar .deliv-white-input-icon {
+  left: auto;
+  right: 14px;
+}
+
+.deliv-white-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 13px 14px 13px 44px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #012b32;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.lang-ar .deliv-white-input {
+  padding: 13px 44px 13px 14px;
+}
+
+.deliv-white-input::placeholder {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.deliv-white-textarea {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #ffffff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #012b32;
+  outline: none;
+  min-height: 82px;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.deliv-white-textarea:focus {
+  box-shadow: 0 0 0 3px rgba(0, 169, 195, 0.45);
+}
+
+.deliv-white-textarea::placeholder {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* Summary Card */
+.deliv-summary-box {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.deliv-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.deliv-summary-icon-box {
+  background: #012b32;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.deliv-summary-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.deliv-summary-items-count {
+  font-size: 0.94rem;
+  font-weight: 850;
+  color: #012b32;
+}
+
+.deliv-summary-pay-note {
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: #64748b;
+}
+
+.deliv-summary-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.lang-ar .deliv-summary-right {
+  align-items: flex-start;
+}
+
+.deliv-summary-due-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.deliv-summary-due-amount {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #012b32;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.deliv-summary-egp {
+  font-size: 0.82rem;
+  font-weight: 850;
+  color: #00a9c3;
+}
+
+/* Confirm Order Button */
+.deliv-confirm-btn {
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 15px 24px;
+  font-size: 1.05rem;
+  font-weight: 850;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+  transition: all 0.22s ease;
+  width: 100%;
+}
+
+.deliv-confirm-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.6);
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+}
+
+/* Back Link */
+.deliv-back-link {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 750;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px;
+  transition: color 0.2s ease;
+  align-self: center;
+}
+
+.deliv-back-link:hover {
+  color: #fde047;
+  text-decoration: underline;
+}
+
+/* Error banner */
+.deliv-checkout-error {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid #ef4444;
+  border-radius: 10px;
+  padding: 8px 12px;
+  color: #fca5a5;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Footer note */
+.deliv-footer-note {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.deliv-footer-secure {
+  font-size: 0.76rem;
+  color: #a5f3fc;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.deliv-footer-branch {
+  font-size: 0.72rem;
+  font-weight: 850;
+  color: #e2e8f0;
+  letter-spacing: 0.6px;
+}
+
+/* Order Success Screen within Delivery Details Card */
+.deliv-success-card {
+  max-width: 530px;
+  width: 100%;
+  background: #002830;
+  border: 1.5px solid rgba(0, 169, 195, 0.35);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 50px rgba(0, 169, 195, 0.12);
+  padding: 36px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+  animation: delivFadeIn 0.3s ease;
+}
+
+.deliv-success-check-badge {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  border: 2px solid #10b981;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-weight: 900;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
+}
+
+.deliv-success-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0;
+}
+
+.deliv-success-desc {
+  font-size: 0.9rem;
+  color: #99dfe9;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.deliv-tracking-code-pill {
+  background: rgba(0, 169, 195, 0.15);
+  border: 1.5px dashed #00a9c3;
+  border-radius: 14px;
+  padding: 12px 20px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.deliv-tracking-label {
+  font-size: 0.74rem;
+  color: #a5f3fc;
+  font-weight: 700;
+}
+
+.deliv-tracking-val {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #fde047;
+  letter-spacing: 1.5px;
+}
+
+.deliv-success-breakdown {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: right;
+}
+
+.lang-en .deliv-success-breakdown {
+  text-align: left;
+}
+
+.deliv-success-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+
+.deliv-success-row.grand {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 8px;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+

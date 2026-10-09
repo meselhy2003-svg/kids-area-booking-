@@ -1,0 +1,861 @@
+/* ==========================================================================
+   BOOK A TABLE PAGE CSS (Choose your area, pick your table, and enjoy)
+   High-Fidelity Implementation matching the uploaded restaurant mockup
+   ========================================================================== */
+
+.book-table-root {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(circle at 10% 15%, rgba(0, 169, 195, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 90% 25%, rgba(245, 158, 11, 0.04) 0%, transparent 40%);
+  padding: 24px 20px 80px 20px;
+  font-family: var(--font-main, 'Outfit', 'Alexandria', sans-serif);
+  color: #0c212b;
+  box-sizing: border-box;
+}
+
+.book-table-root.lang-ar {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Alexandria', 'Tajawal', sans-serif;
+}
+
+.book-table-container {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   TOP BREADCRUMB / BACK BUTTON
+   -------------------------------------------------------------------------- */
+.book-table-top-bar {
+  margin-bottom: 18px;
+}
+
+.book-table-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+.book-table-back-btn:hover {
+  background: #f1f5f9;
+  color: #0284c7;
+  border-color: #cbd5e1;
+  transform: translateX(-2px);
+}
+
+.lang-ar .book-table-back-btn:hover {
+  transform: translateX(2px);
+}
+
+/* --------------------------------------------------------------------------
+   HERO HEADER: TITLE & SUBTITLE
+   -------------------------------------------------------------------------- */
+.book-table-hero-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.book-table-main-title {
+  font-size: clamp(2rem, 3.2vw, 2.65rem);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin: 0 0 8px 0;
+  line-height: 1.25;
+}
+
+.book-table-main-title .title-navy {
+  color: #0c212b;
+}
+
+.book-table-main-title .title-cyan {
+  color: #00a9c3;
+}
+
+.book-table-main-title .title-orange {
+  color: #f59e0b;
+}
+
+.book-table-main-title .title-gold {
+  color: #f59e0b;
+}
+
+.book-table-hero-subtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 450;
+}
+
+/* --------------------------------------------------------------------------
+   BASE CARD CONTAINER FOR SECTIONS
+   -------------------------------------------------------------------------- */
+.book-table-section-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.025);
+  transition: box-shadow 0.25s ease;
+}
+
+.book-table-section-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+/* Step Header Layout */
+.step-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.step-number-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #0c212b;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.step-title-group {
+  flex: 1;
+}
+
+.step-card-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.step-card-title .title-navy {
+  color: #0c212b;
+}
+
+.step-card-title .title-cyan {
+  color: #00a9c3;
+}
+
+.step-card-title .title-orange {
+  color: #f59e0b;
+}
+
+.step-card-subtitle {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   STEP 1: DINING AREAS GRID (2 columns x 3 rows)
+   -------------------------------------------------------------------------- */
+.dining-areas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.dining-area-item {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.dining-area-item:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.dining-area-item.active-area {
+  border-color: #f59e0b;
+  background: #fffdfa;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.12), 0 0 0 1px #f59e0b;
+}
+
+.area-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.area-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.area-icon {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.area-icon.active {
+  color: #f59e0b;
+}
+
+.area-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0c212b;
+}
+
+.area-name.active {
+  color: #f59e0b;
+}
+
+.area-radio-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.area-radio-circle.active {
+  border-color: #f59e0b;
+  background: #f59e0b;
+}
+
+.area-item-desc {
+  font-size: 0.76rem;
+  color: #64748b;
+  margin: 6px 0 0 0;
+  line-height: 1.45;
+}
+
+/* --------------------------------------------------------------------------
+   CARD 2: EXPLORE AREAS & AMBIANCE
+   -------------------------------------------------------------------------- */
+.ambiance-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.ambiance-title-group {
+  flex: 1;
+  min-width: 260px;
+}
+
+.ambiance-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  margin: 0 0 4px 0;
+}
+
+.ambiance-title .title-navy {
+  color: #0c212b;
+}
+
+.ambiance-title .title-cyan {
+  color: #00a9c3;
+}
+
+.ambiance-title .title-orange {
+  color: #f59e0b;
+}
+
+.ambiance-subtitle {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Ambiance Tabs */
+.ambiance-tabs-list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ambiance-tab-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.ambiance-tab-pill:hover {
+  background: #e2e8f0;
+  color: #0c212b;
+}
+
+.ambiance-tab-pill.active {
+  background: #0c212b;
+  color: #ffffff;
+  border-color: #0c212b;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(12, 33, 43, 0.25);
+}
+
+.tab-active-label {
+  font-size: 0.72rem;
+  color: #38bdf8;
+}
+
+/* 4 Photos 2x2 Grid */
+.ambiance-photos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.ambiance-photo-card {
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  background: #0c212b;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.ambiance-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.ambiance-photo-card:hover .ambiance-img {
+  transform: scale(1.05);
+}
+
+.ambiance-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(12, 33, 43, 0.65) 0%, transparent 60%);
+  display: flex;
+  align-items: flex-end;
+  padding: 12px 14px;
+  opacity: 0.95;
+  transition: opacity 0.2s ease;
+}
+
+.ambiance-photo-caption {
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* --------------------------------------------------------------------------
+   CARD 3: STEP 2 — TABLE DETAILS
+   -------------------------------------------------------------------------- */
+.table-details-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.table-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-group-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e293b;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.form-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.optional-tag {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+/* Seats Pills */
+.seats-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.seat-pill {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.seat-pill:hover {
+  background: #e2e8f0;
+  color: #0c212b;
+}
+
+.seat-pill.active {
+  background: #0c212b;
+  color: #ffffff;
+  border-color: #0c212b;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(12, 33, 43, 0.2);
+}
+
+.seat-selected-badge {
+  font-size: 0.74rem;
+  color: #38bdf8;
+}
+
+/* Dining Date Wrap */
+.dining-date-input-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.2s ease;
+}
+
+.dining-date-input-wrap:hover {
+  border-color: #cbd5e1;
+}
+
+.dining-date-val {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.dining-date-icon {
+  color: #64748b;
+}
+
+.dining-native-date {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+/* Time Slots Grid */
+.time-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.time-slot-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #f1f5f9;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  min-height: 48px;
+}
+
+.time-slot-btn:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+.time-slot-btn.active {
+  background: #0c212b;
+  border-color: #0c212b;
+  box-shadow: 0 3px 10px rgba(12, 33, 43, 0.25);
+}
+
+.time-main {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #0c212b;
+}
+
+.time-slot-btn.active .time-main {
+  color: #ffffff;
+}
+
+.time-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+.time-slot-btn.active .time-tag {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.time-tag.sunset {
+  color: #0284c7;
+  font-weight: 700;
+}
+
+.time-slot-btn.active .time-tag.sunset {
+  color: #38bdf8;
+}
+
+/* Special Requests Textarea */
+.special-requests-textarea {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: #1e293b;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.special-requests-textarea:focus {
+  outline: none;
+  border-color: #00a9c3;
+  background: #ffffff;
+}
+
+/* Submit Button Wrap */
+.submit-btn-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.book-table-submit-btn {
+  background: #0c3a44;
+  color: #ffffff;
+  font-size: 0.96rem;
+  font-weight: 800;
+  border: none;
+  border-radius: 28px;
+  padding: 13px 48px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(12, 58, 68, 0.25);
+  transition: all 0.2s ease;
+}
+
+.book-table-submit-btn:hover {
+  background: #08282f;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(12, 58, 68, 0.35);
+}
+
+.book-table-submit-btn:active {
+  transform: translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   CONFIRMATION MODAL
+   -------------------------------------------------------------------------- */
+.book-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 33, 43, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.book-modal-card {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  padding: 28px 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  position: relative;
+  border: 1px solid #e2e8f0;
+  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.book-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: all 0.15s ease;
+}
+
+.lang-ar .book-modal-close {
+  right: auto;
+  left: 16px;
+}
+
+.book-modal-close:hover {
+  background: #e2e8f0;
+  color: #0c212b;
+}
+
+.book-modal-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.book-modal-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #e0f2fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px auto;
+  box-shadow: 0 4px 12px rgba(0, 169, 195, 0.2);
+}
+
+.book-modal-title {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #0c212b;
+  margin: 0 0 4px 0;
+}
+
+.book-modal-code {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #0284c7;
+  margin: 0;
+}
+
+.book-modal-summary {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.book-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.summary-lbl {
+  font-weight: 600;
+}
+
+.summary-val {
+  font-weight: 800;
+  color: #0c212b;
+}
+
+.summary-val.highlight {
+  color: #ea580c;
+}
+
+.book-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.book-share-whatsapp-btn {
+  width: 100%;
+  background: #25d366;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 800;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+  transition: all 0.2s ease;
+}
+
+.book-share-whatsapp-btn:hover {
+  background: #20ba5a;
+  transform: translateY(-1px);
+}
+
+.book-close-done-btn {
+  width: 100%;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.book-close-done-btn:hover {
+  background: #e2e8f0;
+}
+
+/* --------------------------------------------------------------------------
+   PHOTO LIGHTBOX
+   -------------------------------------------------------------------------- */
+.lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.2s ease;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 850px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lightbox-img {
+  max-width: 100%;
+  max-height: 75vh;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  object-fit: contain;
+}
+
+.lightbox-caption {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE DESIGN (Mobile & Tablet)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .book-table-root {
+    padding: 18px 12px 60px 12px;
+  }
+  .book-table-section-card {
+    padding: 18px 16px;
+  }
+  .dining-areas-grid,
+  .ambiance-photos-grid {
+    grid-template-columns: 1fr;
+  }
+  .time-slots-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .ambiance-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
