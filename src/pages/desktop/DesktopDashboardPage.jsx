@@ -594,11 +594,20 @@ export default function DesktopDashboardPage({
   // File input ref for upload
   const fileInputRef = useRef(null);
 
-  // Get current zone data
-  const currentZoneData = zonesData[activeZone] || zonesData['challenge'];
-  const currentHero = currentZoneData.hero;
-  const currentHeroImages = currentHero?.images || ['/photo/kid area pic/Graphic Composition.png'];
-  const activeSlideIndex = currentHero?.activeSlideIndex || 0;
+  // Get current zone data with bulletproof fallback to INITIAL_ZONES_DATA
+  const fallbackZone = INITIAL_ZONES_DATA[activeZone] || INITIAL_ZONES_DATA['challenge'] || {};
+  const currentZoneData = {
+    ...fallbackZone,
+    ...((zonesData && zonesData[activeZone]) || (zonesData && zonesData['challenge']) || {})
+  };
+  const currentHero = {
+    ...(fallbackZone.hero || {}),
+    ...(currentZoneData.hero || {})
+  };
+  const currentHeroImages = Array.isArray(currentHero.images) && currentHero.images.length > 0
+    ? currentHero.images
+    : (fallbackZone.hero?.images || ['/photo/kid area pic/Graphic Composition.png']);
+  const activeSlideIndex = typeof currentHero.activeSlideIndex === 'number' ? currentHero.activeSlideIndex : 0;
   const currentBannerImg = currentHeroImages[activeSlideIndex] || currentHeroImages[0];
   const activeSubTab = currentZoneData.subTab || 'packages';
 
@@ -900,7 +909,6 @@ export default function DesktopDashboardPage({
                     className={`ados-submenu-item ${adminSection === item.key ? 'active' : ''}`}
                     onClick={() => {
                       setAdminSection(item.key);
-                      window.location.hash = '#' + item.key;
                     }}
                   >
                     <span>{isAr ? item.labelAr : item.labelEn}</span>
@@ -1523,11 +1531,6 @@ export default function DesktopDashboardPage({
             isEmbedded={true}
             onBackToDashboard={() => setAdminSection('play-zones')}
             onGoHome={() => setActiveTab && setActiveTab('home')}
-            onViewChange={(view) => {
-              if (view === 'trips-orders') setAdminSection('trips-orders');
-              else if (view === 'restaurant-orders') setAdminSection('restaurant-orders');
-              else if (view === 'events-orders') setAdminSection('events-orders');
-            }}
             lang={lang}
             setLang={setLang}
           />
@@ -1539,11 +1542,6 @@ export default function DesktopDashboardPage({
             isEmbedded={true}
             onBackToDashboard={() => setAdminSection('play-zones')}
             onGoHome={() => setActiveTab && setActiveTab('home')}
-            onViewChange={(view) => {
-              if (view === 'playzone-orders') setAdminSection('orders');
-              else if (view === 'trips-orders') setAdminSection('trips-orders');
-              else if (view === 'events-orders') setAdminSection('events-orders');
-            }}
             lang={lang}
             setLang={setLang}
           />
@@ -1555,11 +1553,6 @@ export default function DesktopDashboardPage({
             isEmbedded={true}
             onBackToDashboard={() => setAdminSection('play-zones')}
             onGoHome={() => setActiveTab && setActiveTab('home')}
-            onViewChange={(view) => {
-              if (view === 'playzone-orders') setAdminSection('orders');
-              else if (view === 'trips-orders') setAdminSection('trips-orders');
-              else if (view === 'restaurant-orders') setAdminSection('restaurant-orders');
-            }}
             lang={lang}
             setLang={setLang}
           />
@@ -1571,11 +1564,6 @@ export default function DesktopDashboardPage({
             isEmbedded={true}
             onBackToDashboard={() => setAdminSection('play-zones')}
             onGoHome={() => setActiveTab && setActiveTab('home')}
-            onViewChange={(view) => {
-              if (view === 'playzone-orders') setAdminSection('orders');
-              else if (view === 'restaurant-orders') setAdminSection('restaurant-orders');
-              else if (view === 'events-orders') setAdminSection('events-orders');
-            }}
             lang={lang}
             setLang={setLang}
           />

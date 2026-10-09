@@ -297,11 +297,6 @@ export default function PlayZoneOrdersManager({
     }
   }, [initialView]);
 
-  useEffect(() => {
-    if (onViewChange) {
-      onViewChange(currentView);
-    }
-  }, [currentView, onViewChange]);
   
   // Live Purchases Data States (ADOS Buying API)
   const [orders, setOrders] = useState([]);

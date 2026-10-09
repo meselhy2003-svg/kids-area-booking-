@@ -37,7 +37,8 @@ export class ErrorBoundary extends React.Component {
           fontFamily: "'Alexandria', sans-serif"
         }} dir="rtl">
           <div style={{
-            maxWidth: '480px',
+            maxWidth: '680px',
+            width: '100%',
             backgroundColor: '#16202c',
             border: '1px solid #334155',
             borderRadius: '24px',
@@ -51,6 +52,30 @@ export class ErrorBoundary extends React.Component {
             <p style={{ fontSize: '0.9rem', color: '#94a3b8', marginBottom: '24px', lineHeight: 1.6 }}>
               نعتذر عن هذا الخطأ المؤقت. يمكنك الضغط على الزر أدناه للعودة للصفحة الرئيسية واستئناف التصفح بأمان.
             </p>
+            {this.state.error && (
+              <div style={{
+                textAlign: 'left',
+                direction: 'ltr',
+                backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                borderRadius: '8px',
+                padding: '12px 16px',
+                marginBottom: '20px',
+                fontSize: '12px',
+                color: '#fca5a5',
+                overflowX: 'auto',
+                fontFamily: 'monospace'
+              }}>
+                <div style={{ fontWeight: 'bold', marginBottom: '6px' }}>
+                  {this.state.error.name}: {this.state.error.message}
+                </div>
+                {this.state.error.stack && (
+                  <pre style={{ margin: 0, whiteSpace: 'pre-wrap', maxHeight: '160px', overflowY: 'auto' }}>
+                    {this.state.error.stack}
+                  </pre>
+                )}
+              </div>
+            )}
             <button
               onClick={this.handleReset}
               style={{
