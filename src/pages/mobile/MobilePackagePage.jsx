@@ -1,25 +1,59 @@
 import React from 'react';
 import { usePackages } from '../../hooks/usePackages';
+import { useData } from '../../context/DataContext';
 import { getTranslations } from '../../data/translations';
 
 export default function MobilePackagePage({ setActiveTab, openModal, lang = 'ar' }) {
   const t = getTranslations(lang);
   const isArabic = lang === 'ar';
+  const { addToCart } = useData();
 
-  const { 
-    activeCategory, 
-    setActiveCategory, 
-    currentPackage: currentPkg 
+  const {
+    activeCategory,
+    setActiveCategory,
+    packageList,
+    currentPackage: currentPkg,
+    loading
   } = usePackages('adventure');
 
-  const pkgTitle = isArabic ? (currentPkg.titleAr || currentPkg.title) : currentPkg.title;
-  const pkgSubtitle = isArabic ? (currentPkg.subtitleAr || currentPkg.subtitle) : currentPkg.subtitle;
-  const pkgSaveBadge = isArabic ? (currentPkg.saveBadgeAr || currentPkg.saveBadge) : currentPkg.saveBadge;
-  const priceDisplay = isArabic ? `${currentPkg.priceNum || 100} ج.م` : (currentPkg.price || 'EGP 100');
-  const origPriceDisplay = currentPkg.origPrice 
-    ? (isArabic ? `${currentPkg.origPrice} ج.م` : currentPkg.origPrice) 
+  const pkgTitle = currentPkg ? (currentPkg.title || (isArabic ? currentPkg.titleAr : currentPkg.titleEn) || '') : '';
+  const pkgSubtitle = currentPkg ? (currentPkg.subtitle || (isArabic ? currentPkg.subtitleAr : currentPkg.subtitleEn) || '') : '';
+  const pkgSaveBadge = currentPkg ? (currentPkg.saveBadge || (isArabic ? currentPkg.saveBadgeAr : currentPkg.saveBadgeEn) || '') : '';
+  const priceDisplay = currentPkg ? (isArabic ? `${currentPkg.priceNum || 0} ج.م` : `EGP ${currentPkg.priceNum || 0}`) : '';
+  const origPriceDisplay = currentPkg?.oldPrice && currentPkg.oldPrice > currentPkg.priceNum
+    ? (isArabic ? `${currentPkg.oldPrice} ج.م` : `EGP ${currentPkg.oldPrice}`)
     : null;
-  const featuresList = isArabic ? (currentPkg.featuresAr || currentPkg.features) : currentPkg.features;
+  const featuresList = currentPkg ? (
+    (Array.isArray(currentPkg.features) && currentPkg.features.length > 0)
+      ? currentPkg.features
+      : (Array.isArray(currentPkg.feature) && currentPkg.feature.length > 0
+        ? currentPkg.feature
+        : (isArabic ? currentPkg.featuresAr : currentPkg.featuresEn) || [])
+  ) : [];
+
+  const handleBooking = () => {
+    if (!currentPkg) return;
+    addToCart({
+      id: currentPkg._id || currentPkg.id || `package-${activeCategory}`,
+      package: currentPkg._id || currentPkg.id || `package-${activeCategory}`,
+      type: 'package',
+      title: pkgTitle,
+      titleAr: pkgTitle,
+      titleEn: pkgTitle,
+      zone: 'packages',
+      zoneLabel: isArabic ? 'باقات الرحلات' : 'Packages',
+      age: 'All Ages',
+      inclusions: currentPkg.details || currentPkg.description || (Array.isArray(featuresList) ? featuresList.join(' • ') : ''),
+      priceEgp: currentPkg.priceNum || 0,
+      oldPriceEgp: currentPkg.oldPrice,
+      pointsGets: currentPkg.pointsGets || 0,
+      thumb: currentPkg.image || currentPkg.img,
+      saveBadge: pkgSaveBadge
+    });
+    if (typeof setActiveTab === 'function') {
+      setActiveTab('cart');
+    }
+  };
 
   return (
     <div className={`mobile-zone-page package-page-container ${isArabic ? 'lang-ar' : 'lang-en'}`}>
@@ -40,10 +74,10 @@ export default function MobilePackagePage({ setActiveTab, openModal, lang = 'ar'
       <section className="dream-experience-section">
         {/* Top Tag */}
         <div className="dream-top-tag">
-          <img 
-            src="/photo/kid-area-pic/icon/Vector (3).png" 
-            alt="tag" 
-            className="dream-tag-icon" 
+          <img
+            src="/photo/kid-area-pic/icon/Vector (3).png"
+            alt="tag"
+            className="dream-tag-icon"
           />
           <span>{t.zones.packages.dreamTag}</span>
         </div>
@@ -52,102 +86,85 @@ export default function MobilePackagePage({ setActiveTab, openModal, lang = 'ar'
         <h2 className="dream-heading">{t.zones.packages.dreamTitle}</h2>
         <p className="dream-subheading">{t.zones.packages.dreamSub}</p>
 
-        {/* 4 Horizontal Pill Buttons */}
+        {/* Dynamic Horizontal Pill Buttons from Server */}
         <div className="dream-filter-pills">
-          <button 
-            className={`dream-pill-btn ${activeCategory === 'adventure' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('adventure')}
-          >
-            {t.zones.packages.tabs.adventure}
-          </button>
-          <button 
-            className={`dream-pill-btn ${activeCategory === 'challenge' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('challenge')}
-          >
-            {t.zones.packages.tabs.challenge}
-          </button>
-          <button 
-            className={`dream-pill-btn ${activeCategory === 'midweek' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('midweek')}
-          >
-            {t.zones.packages.tabs.midWeek}
-          </button>
-          <button 
-            className={`dream-pill-btn ${activeCategory === 'weekend' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('weekend')}
-          >
-            {t.zones.packages.tabs.weekend}
-          </button>
+          {packageList && packageList.length > 0 ? (
+            packageList.map((pkg) => {
+              const isSelected = (currentPkg?._id === pkg._id) || (activeCategory === pkg._id);
+              const tabTitle = pkg.title || (isArabic ? pkg.titleAr : pkg.titleEn) || pkg.titleAr;
+              return (
+                <button
+                  key={pkg._id}
+                  className={`dream-pill-btn ${isSelected ? 'active' : ''}`}
+                  onClick={() => setActiveCategory(pkg._id)}
+                >
+                  {tabTitle}
+                </button>
+              );
+            })
+          ) : (
+            <button className="dream-pill-btn active">{t.zones.packages.tabs.adventure}</button>
+          )}
         </div>
 
         {/* The Feature Pass Card */}
-        <div className="challenge-pass-card dream-pass-card">
-          {/* Left Preview Box */}
-          <div 
-            className="pass-card-left dream-card-media"
-            onClick={() => openModal('booking', {
-              name: pkgTitle,
-              price: priceDisplay,
-              priceNum: currentPkg.priceNum || 100,
-              discount: pkgSaveBadge,
-              details: currentPkg.details
-            })}
-            role="button"
-            tabIndex={0}
-            title={`Click to book ${pkgTitle}`}
-          >
-            <img 
-              src={currentPkg.img} 
-              alt={pkgTitle} 
-              className="pass-collage-img" 
-            />
-          </div>
-
-          {/* Right Card Content */}
-          <div className="pass-card-right">
-            <div className="pass-save-badge">{pkgSaveBadge}</div>
-            <h4 className="pass-main-title">{pkgTitle}</h4>
-            <p className="pass-sub-cyan">{pkgSubtitle}</p>
-
-            {/* Cyan Checklist */}
-            <div className="adventure-checklist">
-              {featuresList && featuresList.map((feat, idx) => (
-                <div key={idx} className="adventure-check-item">
-                  <svg className="cyan-check-svg" viewBox="0 0 20 20" fill="none">
-                    <circle cx="10" cy="10" r="8.5" stroke="#00bcd4" strokeWidth="1.8" />
-                    <path d="M6 10.2L8.6 12.8L14 7.5" stroke="#00bcd4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span className="check-item-text">{feat}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Price Row */}
-            <div className="pass-price-row">
-              <span className="pass-price-current">{priceDisplay}</span>
-              {origPriceDisplay && <span className="pass-price-orig">{origPriceDisplay}</span>}
-            </div>
-
-            {/* Get This Offer Button */}
-            <button 
-              className="get-this-offer-btn"
-              onClick={() => openModal('booking', {
-                name: pkgTitle,
-                price: priceDisplay,
-                priceNum: currentPkg.priceNum || 100,
-                discount: pkgSaveBadge,
-                details: currentPkg.details
-              })}
+        {currentPkg && (
+          <div className="challenge-pass-card dream-pass-card">
+            {/* Left Preview Box */}
+            <div
+              className="pass-card-left dream-card-media"
+              onClick={handleBooking}
+              role="button"
+              tabIndex={0}
+              title={`Click to book ${pkgTitle}`}
             >
-              <img 
-                src="/photo/kid-area-pic/icon/Vector (3).png" 
-                alt="ticket" 
-                className="btn-ticket-vector-icon" 
+              <img
+                src={currentPkg.image || currentPkg.img || '/photo/kid-area-pic/family-bumper-cars.png'}
+                alt={pkgTitle}
+                className="pass-collage-img"
               />
-              <span>{t.zones.getThisOffer}</span>
-            </button>
+            </div>
+
+            {/* Right Card Content */}
+            <div className="pass-card-right">
+              {pkgSaveBadge && <div className="pass-save-badge">{pkgSaveBadge}</div>}
+              <h4 className="pass-main-title">{pkgTitle}</h4>
+              <p className="pass-sub-cyan">{pkgSubtitle}</p>
+
+              {/* Cyan Checklist */}
+              <div className="adventure-checklist">
+                {featuresList && featuresList.map((feat, idx) => (
+                  <div key={idx} className="adventure-check-item">
+                    <svg className="cyan-check-svg" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="8.5" stroke="#00bcd4" strokeWidth="1.8" />
+                      <path d="M6 10.2L8.6 12.8L14 7.5" stroke="#00bcd4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="check-item-text">{feat}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Price Row */}
+              <div className="pass-price-row">
+                <span className="pass-price-current">{priceDisplay}</span>
+                {origPriceDisplay && <span className="pass-price-orig">{origPriceDisplay}</span>}
+              </div>
+
+              {/* Get This Offer Button */}
+              <button
+                className="get-this-offer-btn"
+                onClick={handleBooking}
+              >
+                <img
+                  src="/photo/kid-area-pic/icon/Vector (3).png"
+                  alt="ticket"
+                  className="btn-ticket-vector-icon"
+                />
+                <span>{t.zones.getThisOffer}</span>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
       {/* Bottom spacer for floating wave dock */}

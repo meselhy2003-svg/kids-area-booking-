@@ -1,96 +1,68 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { usePackages } from '../../hooks/usePackages';
+import { useData } from '../../context/DataContext';
 import { getTranslations } from '../../data/translations';
 
 export default function DesktopPackagePage({ setActiveTab, openModal, lang = 'ar' }) {
   const t = getTranslations(lang);
   const isArabic = lang === 'ar';
-  const [selectedCategory, setSelectedCategory] = useState('adventure'); // 'adventure' | 'challenge' | 'mid-week' | 'weekend'
+  const { addToCart } = useData();
 
-  const packageOffers = {
-    adventure: {
-      id: 'adventure-pass',
-      title: 'Adventure Pass',
-      titleAr: 'باقة المغامرة',
-      subtitle: 'All Game Experience',
-      subtitleAr: 'تجربة شاملة لجميع ألعاب المغامرة',
-      saveBadge: 'Save 60 EGP',
-      saveBadgeAr: 'وفر ٦٠ ج.م',
-      type: 'checklist',
-      perks: ['BUMPER CARS', 'PUBG', 'Bubble Ball'],
-      perksAr: ['سيارات التصادم الحديثة', 'حلبة ببجي الواقعية', 'كرات البامبر الدائرية'],
-      price: 100,
-      oldPrice: 160
-    },
-    challenge: {
-      id: 'challenge-pass',
-      title: 'Challenge Pass',
-      titleAr: 'باقة التحدي',
-      subtitle: 'Pick any 4 games',
-      subtitleAr: 'اختر أي ٤ ألعاب مفضلة',
-      saveBadge: 'Save 60 EGP',
-      saveBadgeAr: 'وفر ٦٠ ج.م',
-      type: 'grid',
-      perks: [
-        { label: 'VR', labelAr: 'واقع افتراضي VR', icon: 'vr' },
-        { label: 'Basketball', labelAr: 'كرة السلة التفاعلية', icon: 'ball' },
-        { label: 'Shooting', labelAr: 'الرماية بالليزر', icon: 'target' },
-        { label: 'Car Racing', labelAr: 'سباق السيارات', icon: 'wheel' }
-      ],
-      price: 100,
-      oldPrice: 160
-    },
-    'mid-week': {
-      id: 'midweek-pass',
-      title: 'Mid-Week Super Saver',
-      titleAr: 'سوبر توفير منتصف الأسبوع',
-      subtitle: 'All Day Fun Experience',
-      subtitleAr: 'يوم كامل من اللعب والمرح طوال الأسبوع',
-      saveBadge: 'Save 85 EGP',
-      saveBadgeAr: 'وفر ٨٥ ج.م',
-      type: 'checklist',
-      perks: ['All-Day Access to All Zones', '1 VR Simulation Session Included', 'Free Grip Socks at Reception'],
-      perksAr: ['دخول مفتوح طوال اليوم لكل المناطق', 'جلسة واقع افتراضي VR مجاناً', 'جوارب مضادة للانزلاق هدية عند الاستقبال'],
-      price: 120,
-      oldPrice: 205
-    },
-    weekend: {
-      id: 'weekend-pass',
-      title: 'Weekend Ultimate Pass',
-      titleAr: 'باقة عطلة نهاية الأسبوع الملكية',
-      subtitle: 'Peak Energy & Mascot Shows',
-      subtitleAr: 'أقوى أجواء الويكند وعروض الشخصيات الكرتونية',
-      saveBadge: 'Save 120 EGP',
-      saveBadgeAr: 'وفر ١٢٠ ج.م',
-      type: 'checklist',
-      perks: ['Entry for 2 Adults + 2 Kids', '4 Arcade Tokens + 2 VR Sessions', 'Free Mascot & Bubble Show Access'],
-      perksAr: ['دخول عائلي لفردين بالغين + طفلين', '٤ عملات آركيد + جلستين VR', 'حضور عروض الشخصيات وفقاعات الصابون مجاناً'],
-      price: 250,
-      oldPrice: 370
-    }
-  };
+  const {
+    activeCategory,
+    setActiveCategory,
+    packageList,
+    currentPackage: currentPkg,
+    loading
+  } = usePackages('adventure');
 
-  const currentPkg = packageOffers[selectedCategory] || packageOffers.adventure;
-  const currentTitle = isArabic ? currentPkg.titleAr : currentPkg.title;
-  const currentSubtitle = isArabic ? currentPkg.subtitleAr : currentPkg.subtitle;
-  const currentBadge = isArabic ? currentPkg.saveBadgeAr : currentPkg.saveBadge;
-  const priceDisplay = isArabic ? `${currentPkg.price} ج.م` : `EGP ${currentPkg.price}`;
-  const oldPriceDisplay = isArabic ? `${currentPkg.oldPrice} ج.م` : `EGP ${currentPkg.oldPrice}`;
+  const currentTitle = currentPkg ? (currentPkg.title || (isArabic ? currentPkg.titleAr : currentPkg.titleEn) || '') : '';
+  const currentSubtitle = currentPkg ? (currentPkg.subtitle || (isArabic ? currentPkg.subtitleAr : currentPkg.subtitleEn) || '') : '';
+  const currentBadge = currentPkg ? (currentPkg.saveBadge || (isArabic ? currentPkg.saveBadgeAr : currentPkg.saveBadgeEn) || '') : '';
+  const priceDisplay = currentPkg ? (isArabic ? `${currentPkg.priceNum || 0} ج.م` : `EGP ${currentPkg.priceNum || 0}`) : '';
+  const oldPriceDisplay = currentPkg?.oldPrice && currentPkg.oldPrice > currentPkg.priceNum
+    ? (isArabic ? `${currentPkg.oldPrice} ج.م` : `EGP ${currentPkg.oldPrice}`)
+    : null;
+
+  const featureItems = currentPkg ? (
+    (Array.isArray(currentPkg.features) && currentPkg.features.length > 0)
+      ? currentPkg.features
+      : (Array.isArray(currentPkg.feature) && currentPkg.feature.length > 0
+        ? currentPkg.feature
+        : (isArabic ? currentPkg.featuresAr : currentPkg.featuresEn) || [])
+  ) : [];
 
   const handleBooking = (pkg) => {
-    const pkgTitle = isArabic ? pkg.titleAr : pkg.title;
-    const curr = isArabic ? 'ج.م' : 'EGP';
-    openModal('booking', {
-      name: pkgTitle,
-      price: `${pkg.price} ${curr}`,
-      priceNum: pkg.price,
-      discount: isArabic ? pkg.saveBadgeAr : pkg.saveBadge,
-      details: isArabic ? pkg.subtitleAr : pkg.subtitle
+    if (!pkg) return;
+    const pkgTitle = pkg.title || (isArabic ? pkg.titleAr : pkg.titleEn) || pkg.titleAr;
+    const currentPrice = pkg.priceNum || pkg.priceAfterDiscount || 0;
+    const origPrice = pkg.oldPrice || pkg.price;
+
+    addToCart({
+      id: pkg._id || pkg.id || `package-${activeCategory}`,
+      package: pkg._id || pkg.id || `package-${activeCategory}`,
+      type: 'package',
+      title: pkgTitle,
+      titleAr: pkgTitle,
+      titleEn: pkgTitle,
+      zone: 'packages',
+      zoneLabel: isArabic ? 'باقات الرحلات' : 'Packages',
+      age: 'All Ages',
+      inclusions: pkg.description || pkg.details || pkg.subtitle || (Array.isArray(featureItems) ? featureItems.join(' • ') : ''),
+      priceEgp: currentPrice,
+      oldPriceEgp: origPrice,
+      pointsGets: pkg.pointsGets || 0,
+      thumb: pkg.image || pkg.img || '/photo/kid-area-pic/family-bumper-cars.png',
+      saveBadge: pkg.saveBadge || (isArabic ? pkg.saveBadgeAr : pkg.saveBadge)
     });
+    if (typeof setActiveTab === 'function') {
+      setActiveTab('cart');
+    }
   };
 
   return (
     <div className={`desktop-page desktop-packages-page ${isArabic ? 'lang-ar' : 'lang-en'}`}>
-      
+
       {/* 1. TOP HERO SECTION */}
       <section className="desktop-pkg-hero-section">
         <div className="desktop-page-container">
@@ -111,9 +83,9 @@ export default function DesktopPackagePage({ setActiveTab, openModal, lang = 'ar
             {/* Right Column: 3-panel selfie card */}
             <div className="desktop-pkg-hero-right">
               <div className="desktop-pkg-hero-img-card">
-                <img 
-                  src="/photo/kid-area-pic/packages-hero-trio.png" 
-                  alt={currentTitle} 
+                <img
+                  src="/photo/kid-area-pic/packages-hero-trio.png"
+                  alt={currentTitle || 'American Dream Packages'}
                   className="desktop-pkg-hero-img"
                   onError={(e) => { e.target.src = '/photo/kid-area-pic/Photo 3_ VR Arena Friends.png'; }}
                 />
@@ -126,7 +98,7 @@ export default function DesktopPackagePage({ setActiveTab, openModal, lang = 'ar
       {/* 2. SELECT YOUR DREAM EXPERIENCE */}
       <section className="desktop-pkg-experience-section">
         <div className="desktop-page-container">
-          
+
           {/* Header Row */}
           <div className="desktop-pkg-header-row">
             <div className="desktop-pkg-header-left">
@@ -149,42 +121,37 @@ export default function DesktopPackagePage({ setActiveTab, openModal, lang = 'ar
             </div>
           </div>
 
-          {/* Filter Tabs Row */}
+          {/* Filter Tabs Row - Dynamic from Server Packages */}
           <div className="desktop-pkg-tabs-row">
-            <button 
-              className={`desktop-pkg-tab-btn ${selectedCategory === 'adventure' ? 'active' : ''}`}
-              onClick={() => setSelectedCategory('adventure')}
-            >
-              {t.zones.packages.tabs.adventure}
-            </button>
-            <button 
-              className={`desktop-pkg-tab-btn ${selectedCategory === 'challenge' ? 'active' : ''}`}
-              onClick={() => setSelectedCategory('challenge')}
-            >
-              {t.zones.packages.tabs.challenge}
-            </button>
-            <button 
-              className={`desktop-pkg-tab-btn ${selectedCategory === 'mid-week' ? 'active' : ''}`}
-              onClick={() => setSelectedCategory('mid-week')}
-            >
-              {t.zones.packages.tabs.midWeek}
-            </button>
-            <button 
-              className={`desktop-pkg-tab-btn ${selectedCategory === 'weekend' ? 'active' : ''}`}
-              onClick={() => setSelectedCategory('weekend')}
-            >
-              {t.zones.packages.tabs.weekend}
-            </button>
+            {packageList && packageList.length > 0 ? (
+              packageList.map((pkg) => {
+                const isSelected = (currentPkg?._id === pkg._id) || (activeCategory === pkg._id);
+                const tabTitle = pkg.title || (isArabic ? pkg.titleAr : pkg.titleEn) || pkg.titleAr;
+                return (
+                  <button
+                    key={pkg._id}
+                    className={`desktop-pkg-tab-btn ${isSelected ? 'active' : ''}`}
+                    onClick={() => setActiveCategory(pkg._id)}
+                  >
+                    {tabTitle}
+                  </button>
+                );
+              })
+            ) : (
+              <button className="desktop-pkg-tab-btn active">
+                {t.zones.packages.tabs.adventure}
+              </button>
+            )}
           </div>
 
           {/* The Selected Package Offer Card */}
           <div className="desktop-horizontal-pass-container">
             <div className="desktop-horizontal-pass-card">
-              {/* Left 4-split composite photo */}
+              {/* Left composite photo */}
               <div className="pass-card-left-img-wrap">
-                <img 
-                  src="/photo/kid-area-pic/Graphic Composition.png" 
-                  alt={currentTitle} 
+                <img
+                  src={currentPkg.image || currentPkg.img || '/photo/kid-area-pic/family-bumper-cars.png'}
+                  alt={currentTitle}
                   className="pass-card-composite-img"
                   onError={(e) => { e.target.src = '/photo/mobile-challenge/offer-collage.png'; }}
                 />
@@ -197,49 +164,30 @@ export default function DesktopPackagePage({ setActiveTab, openModal, lang = 'ar
                     <h3 className="pass-card-main-title">{currentTitle}</h3>
                     <span className="pass-card-subtitle-cyan">{currentSubtitle}</span>
                   </div>
-                  <span className="pass-card-save-badge">{currentBadge}</span>
+                  {currentBadge && <span className="pass-card-save-badge">{currentBadge}</span>}
                 </div>
 
-                {/* Checklist Type (Adventure, Mid-Week, Weekend) */}
-                {currentPkg.type === 'checklist' && (
-                  <div className="pass-card-checklist">
-                    {(isArabic ? currentPkg.perksAr : currentPkg.perks).map((item, idx) => (
-                      <div key={idx} className="pass-check-item">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#00a9c3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="pass-check-svg">
-                          <circle cx="12" cy="12" r="10" />
-                          <polyline points="16 9 11 14 8 11" />
-                        </svg>
-                        <span className="pass-check-bold">{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Grid Type (Challenge) */}
-                {currentPkg.type === 'grid' && (
-                  <div className="pass-card-perks-grid">
-                    {currentPkg.perks.map((p, idx) => (
-                      <div key={idx} className="pass-card-perk-item">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#00a9c3" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="pass-perk-icon">
-                          {p.icon === 'vr' && <rect x="2" y="6" width="20" height="12" rx="3" />}
-                          {p.icon === 'ball' && <circle cx="12" cy="12" r="10" />}
-                          {p.icon === 'target' && <><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /></>}
-                          {p.icon === 'wheel' && <><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="3" /></>}
-                        </svg>
-                        <span>{isArabic ? p.labelAr : p.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {/* Vertical Checklist with Cyan Circles for all packages */}
+                <div className="pass-card-checklist">
+                  {featureItems.map((item, idx) => (
+                    <div key={idx} className="pass-check-item">
+                      <svg viewBox="0 0 20 20" fill="none" className="pass-check-svg" style={{ width: 20, height: 20, flexShrink: 0 }}>
+                        <circle cx="10" cy="10" r="8.5" stroke="#00bcd4" strokeWidth="1.8" />
+                        <path d="M6 10.2L8.6 12.8L14 7.5" stroke="#00bcd4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <span className="pass-check-bold">{typeof item === 'object' ? (isArabic ? item.labelAr || item.label : item.label) : item}</span>
+                    </div>
+                  ))}
+                </div>
 
                 {/* Price & Action Button */}
                 <div className="pass-card-price-action-row">
                   <div className="pass-price-group">
                     <strong className="pass-current-price">{priceDisplay}</strong>
-                    <span className="pass-old-price">{oldPriceDisplay}</span>
+                    {oldPriceDisplay && <span className="pass-old-price">{oldPriceDisplay}</span>}
                   </div>
 
-                  <button 
+                  <button
                     className="pass-get-offer-btn"
                     onClick={() => handleBooking(currentPkg)}
                   >

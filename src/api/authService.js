@@ -375,13 +375,29 @@ export async function logout() {
   }
 }
 
+export function getCurrentUserSync() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const rawUser = localStorage.getItem(AUTH_KEYS.USER) ||
+                    localStorage.getItem(AUTH_KEYS.LEGACY_USER) ||
+                    localStorage.getItem('american_dream_user_profile') ||
+                    localStorage.getItem('american_dream_active_user');
+    if (!rawUser) return null;
+    const user = JSON.parse(rawUser);
+    const profile = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
+    return { ...profile, ...user };
+  } catch {
+    return null;
+  }
+}
+
 export async function getCurrentUser() {
-  if (!getStoredToken()) return null;
+  if (!getStoredToken()) return getCurrentUserSync();
   try {
     const res = await getProfile();
-    return res.user;
+    return res.user || getCurrentUserSync();
   } catch (err) {
-    return null;
+    return getCurrentUserSync();
   }
 }
 
@@ -433,6 +449,7 @@ export const authService = {
   login,
   getProfile,
   getCurrentUser,
+  getCurrentUserSync,
   refreshToken,
   logout,
   isUserAuthenticated,

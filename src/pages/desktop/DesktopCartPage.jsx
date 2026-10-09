@@ -6,62 +6,19 @@ import {
 } from 'lucide-react';
 import { buyingService } from '../../api/buyingService';
 import { authService, isUserAuthenticated } from '../../api/authService';
+import { useData } from '../../context/DataContext';
 import './DesktopCartPage.css';
 
 export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }) {
   const isAr = lang === 'ar';
 
-  // 1. Initial 4 Passes matching screenshot: Total = 450 EGP / 1450 Points
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 'pass-kids-area',
-      title: 'Super Explorer Pass',
-      zone: 'kids-area',
-      zoneLabel: 'Kids Area',
-      age: 'Ages 1 - 6',
-      inclusions: 'All-Day Soft Play + Ball Pit + Sensory Arena',
-      priceEgp: 100,
-      pricePts: 300,
-      qty: 1,
-      thumb: '/photo/kid area pic/Kids sliding into colorful ball pit.png'
-    },
-    {
-      id: 'pass-fun-park',
-      title: 'All-Day Thrill Pass',
-      zone: 'fun-park',
-      zoneLabel: 'Fun Park',
-      age: 'All Ages',
-      inclusions: 'Unlimited Carousel + Bumper Collision Bay',
-      priceEgp: 150,
-      pricePts: 500,
-      qty: 1,
-      thumb: '/photo/kid area pic/Classic illuminated carousel ride.png'
-    },
-    {
-      id: 'pass-challenge',
-      title: 'Tactical Arena Pass',
-      zone: 'challenge',
-      zoneLabel: 'Challenge Zone',
-      age: 'Ages 8+',
-      inclusions: 'VR Headset Battle + Air Hockey Arena',
-      priceEgp: 100,
-      pricePts: 350,
-      qty: 1,
-      thumb: '/photo/kid area pic/Kid wearing VR headset in neon arcade.png'
-    },
-    {
-      id: 'pass-adventure',
-      title: 'High Ropes Suspension Pass',
-      zone: 'adventure',
-      zoneLabel: 'Adventure Zone',
-      age: 'Ages 6+',
-      inclusions: 'High Ropes Course + Safety Harness & Guide',
-      priceEgp: 100,
-      pricePts: 300,
-      qty: 1,
-      thumb: '/photo/kid area pic/High ropes suspended course.png'
-    }
-  ]);
+  const {
+    cartItems,
+    setCartItems,
+    updateCartQty,
+    removeFromCart,
+    clearCart
+  } = useData();
 
   // User Points Balance (loaded dynamically from logged-in profile or fallback)
   const [userPointsBalance, setUserPointsBalance] = useState(() => {
@@ -179,27 +136,17 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
 
   // Stepper increment/decrement
   const updateQty = (id, delta) => {
-    setCartItems((prev) =>
-      prev
-        .map((item) => {
-          if (item.id === id) {
-            const newQty = item.qty + delta;
-            return newQty > 0 ? { ...item, qty: newQty } : null;
-          }
-          return item;
-        })
-        .filter(Boolean)
-    );
+    updateCartQty(id, delta);
   };
 
   // Remove single item
   const removeItem = (id) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+    removeFromCart(id);
   };
 
   // Clear all items
   const clearAll = () => {
-    setCartItems([]);
+    clearCart();
   };
 
   // Reset demo cart
@@ -293,10 +240,15 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
   // Helper to extract active user profile
   const getActiveUser = () => {
     try {
-      const cur = authService.getCurrentUser();
-      if (cur) return cur;
+      const cur = authService.getCurrentUserSync ? authService.getCurrentUserSync() : null;
+      if (cur && (cur.phone || cur.name || cur._id)) return cur;
+
       const prof = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
-      return prof;
+      const usr = JSON.parse(localStorage.getItem('user') || '{}');
+      const legacy = JSON.parse(localStorage.getItem('kids_area_auth_user') || localStorage.getItem('american_dream_active_user') || '{}');
+
+      const merged = { ...legacy, ...prof, ...usr };
+      return merged;
     } catch {
       return {};
     }
@@ -314,32 +266,43 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
 
     try {
       const user = getActiveUser();
-      const guestPhone = user?.phone || '';
-      const guestName = user?.name || (isAr ? 'عميل أمريكان دريم' : 'American Dream Guest');
-      const guestId = user?._id || user?.id;
+      const guestPhone = user?.phone || user?.telephone || '';
+      const guestName = user?.name || user?.fullName || (isAr ? 'عميل أمريكان دريم' : 'American Dream Guest');
+      const guestId = user?._id || user?.id || undefined;
 
-      const ticketsPayload = cartItems.map((item) => ({
-        ticket: item.id,
-        title: isAr
-          ? (item.id === 'pass-kids-area' ? 'تذكرة المستكشف الصغير (منطقة الأطفال)'
-            : item.id === 'pass-fun-park' ? 'تذكرة المرح والإثارة (فن بارك)'
-              : item.id === 'pass-challenge' ? 'تذكرة ساحة التحدي والآركيد'
-                : item.id === 'pass-adventure' ? 'تذكرة مسار الحبال المعلقة (المغامرات)'
-                  : (item.titleAr || item.title))
-          : (item.titleEn || item.title),
-        quantity: item.qty,
-        priceEgp: item.priceEgp,
-        pricePts: item.pricePts,
-        zone: item.zone
-      }));
+      const ticketsPayload = cartItems
+        .filter((item) => item.type !== 'package')
+        .map((item) => ({
+          ticket: item.ticket || item._id || item.id,
+          title: item.titleAr || item.title || item.name || '',
+          quantity: item.qty,
+          unitPrice: item.priceEgp,
+          priceEgp: item.priceEgp,
+          pricePts: item.pricePts,
+          zone: item.zone,
+          age: item.age
+        }));
+
+      const packagesPayload = cartItems
+        .filter((item) => item.type === 'package')
+        .map((item) => ({
+          package: item.package || item.id,
+          title: item.titleAr || item.title || item.name || '',
+          quantity: item.qty,
+          unitPrice: item.priceEgp,
+          totalPrice: item.priceEgp * item.qty,
+          priceEgp: item.priceEgp,
+          pricePts: item.pricePts
+        }));
 
       const chosenMethod = moneyMethod === 'vodafone' ? 'vodafone_cash' : 'instapay';
       const notes = isAr
-        ? `طلب حجز تذاكر عبر ${moneyMethod === 'vodafone' ? 'فودافون كاش' : 'إنستاباي'} - حساب المحول: ${senderPhoneOrAccount || 'غير محدد'}`
-        : `Ticket purchase via ${moneyMethod === 'vodafone' ? 'Vodafone Cash' : 'InstaPay'} - Sender: ${senderPhoneOrAccount || 'Not specified'}`;
+        ? `طلب حجز عبر ${moneyMethod === 'vodafone' ? 'فودافون كاش' : 'إنستاباي'} - حساب المحول: ${senderPhoneOrAccount || 'غير محدد'}`
+        : `Purchase via ${moneyMethod === 'vodafone' ? 'Vodafone Cash' : 'InstaPay'} - Sender: ${senderPhoneOrAccount || 'Not specified'}`;
 
       const res = await buyingService.createPurchase({
-        tickets: ticketsPayload,
+        tickets: ticketsPayload.length > 0 ? ticketsPayload : undefined,
+        packages: packagesPayload.length > 0 ? packagesPayload : undefined,
         paymentMethod: chosenMethod,
         paymentStatus: 'pending_verification',
         paymentProofFile: uploadedReceipt.file,
@@ -355,7 +318,7 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
       setLastOrderDetails(res.data);
       setLastPaymentMethod(chosenMethod);
 
-      // Save booked passes to user wallet
+      // Save booked passes & packages to user wallet
       cartItems.forEach((item) => {
         authService.addPassToWallet({
           code: orderCode,
@@ -368,6 +331,7 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
       });
 
       setMoneyOrderSubmitted(true);
+      clearCart();
       try {
         confetti({
           particleCount: 120,
@@ -387,7 +351,7 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
   const handleCloseMoneyModal = () => {
     setShowMoneyProofModal(false);
     if (moneyOrderSubmitted) {
-      setCartItems([]);
+      clearCart();
       setMoneyOrderSubmitted(false);
       setUploadedReceipt(null);
       setSenderPhoneOrAccount('');
@@ -428,24 +392,34 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
     }
 
     const user = getActiveUser();
-    const guestPhone = user?.phone || '';
-    const guestName = user?.name || (isAr ? 'عميل أمريكان دريم' : 'American Dream Guest');
-    const guestId = user?._id || user?.id;
+    const guestPhone = user?.phone || user?.telephone || '';
+    const guestName = user?.name || user?.fullName || (isAr ? 'عميل أمريكان دريم' : 'American Dream Guest');
+    const guestId = user?._id || user?.id || undefined;
 
-    const ticketsPayload = cartItems.map((item) => ({
-      ticket: item.id,
-      title: isAr
-        ? (item.id === 'pass-kids-area' ? 'تذكرة المستكشف الصغير (منطقة الأطفال)'
-          : item.id === 'pass-fun-park' ? 'تذكرة المرح والإثارة (فن بارك)'
-            : item.id === 'pass-challenge' ? 'تذكرة ساحة التحدي والآركيد'
-              : item.id === 'pass-adventure' ? 'تذكرة مسار الحبال المعلقة (المغامرات)'
-                : (item.titleAr || item.title))
-        : (item.titleEn || item.title),
-      quantity: item.qty,
-      priceEgp: item.priceEgp,
-      pricePts: item.pricePts,
-      zone: item.zone
-    }));
+    const ticketsPayload = cartItems
+      .filter((item) => item.type !== 'package')
+      .map((item) => ({
+        ticket: item.ticket || item._id || item.id,
+        title: item.titleAr || item.title || item.name || '',
+        quantity: item.qty,
+        unitPrice: item.priceEgp,
+        priceEgp: item.priceEgp,
+        pricePts: item.pricePts,
+        zone: item.zone,
+        age: item.age
+      }));
+
+    const packagesPayload = cartItems
+      .filter((item) => item.type === 'package')
+      .map((item) => ({
+        package: item.package || item.id,
+        title: item.titleAr || item.title || item.name || '',
+        quantity: item.qty,
+        unitPrice: item.priceEgp,
+        totalPrice: item.priceEgp * item.qty,
+        priceEgp: item.priceEgp,
+        pricePts: item.pricePts
+      }));
 
     if (paymentMethod === 'points') {
       if (userPointsBalance < subtotalPts) {
@@ -456,13 +430,14 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
       setIsSubmittingCheckout(true);
       try {
         const res = await buyingService.createPurchase({
-          tickets: ticketsPayload,
+          tickets: ticketsPayload.length > 0 ? ticketsPayload : undefined,
+          packages: packagesPayload.length > 0 ? packagesPayload : undefined,
           paymentMethod: 'points',
           paymentStatus: 'paid',
           guest: guestId,
           guestName,
           guestPhone,
-          notes: isAr ? 'شراء تذاكر برصيد النقاط' : 'Purchased with points'
+          notes: isAr ? 'شراء تذاكر وباقات برصيد النقاط' : 'Purchased with points'
         });
 
         const orderCode = res.data?.orderCode || `PZ-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -494,7 +469,7 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
           });
         });
 
-        setCartItems([]);
+        clearCart();
         setPaymentSuccess(true);
         try {
           confetti({
@@ -514,13 +489,14 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
       setIsSubmittingCheckout(true);
       try {
         const res = await buyingService.createPurchase({
-          tickets: ticketsPayload,
+          tickets: ticketsPayload.length > 0 ? ticketsPayload : undefined,
+          packages: packagesPayload.length > 0 ? packagesPayload : undefined,
           paymentMethod: 'cash',
           paymentStatus: 'pending',
           guest: guestId,
           guestName,
           guestPhone,
-          notes: isAr ? 'حجز تذاكر نقداً عند الوصول (الدفع عند الوصول)' : 'Cash upon arrival reservation'
+          notes: isAr ? 'حجز تذاكر وباقات نقداً عند الوصول (الدفع عند الوصول)' : 'Cash upon arrival reservation'
         });
 
         const orderCode = res.data?.orderCode || `PZ-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -540,7 +516,7 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
           });
         });
 
-        setCartItems([]);
+        clearCart();
         setPaymentSuccess(true);
         try {
           confetti({
@@ -728,14 +704,23 @@ export default function DesktopCartPage({ setActiveTab, openModal, lang = 'ar' }
                     ? 'أضف تذاكر الألعاب، أو أساور اليوم الكامل، أو باقات الرحلات للمتابعة.'
                     : 'Add thrill passes, all-day wristbands, or group packages to proceed.'}
                 </p>
-                <button
-                  type="button"
-                  className="card-btn selected"
-                  style={{ maxWidth: '240px', margin: '0 auto' }}
-                  onClick={resetDemoCart}
-                >
-                  {lang === 'ar' ? 'استعادة ٤ تذاكر (٤٥٠ ج.م)' : 'Restore 4 Passes (450 EGP)'}
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center', marginTop: '16px' }}>
+                  <button
+                    type="button"
+                    className="card-btn selected"
+                    style={{ minWidth: '220px', padding: '12px 24px', fontSize: '0.95rem' }}
+                    onClick={() => setActiveTab && setActiveTab('kids-area')}
+                  >
+                    {lang === 'ar' ? 'تصفح تذاكر وباقات الألعاب' : 'Browse Tickets & Packages'}
+                  </button>
+                  <button
+                    type="button"
+                    style={{ background: 'transparent', border: 'none', color: '#00a9c3', fontSize: '0.82rem', cursor: 'pointer', textDecoration: 'underline' }}
+                    onClick={resetDemoCart}
+                  >
+                    {lang === 'ar' ? 'إضافة ٤ تذاكر تجريبية للسلة' : 'Add 4 Demo Passes to Cart'}
+                  </button>
+                </div>
               </div>
             )}
           </div>

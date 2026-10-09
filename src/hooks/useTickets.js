@@ -1,33 +1,47 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ticketService } from '../api/ticketService';
-import { challengeGameTickets, adventureGameTickets } from '../data/mock/tickets.mock';
+import { ticketService, mapZoneToPage } from '../api/ticketService';
+import {
+  kidsAreaOffers,
+  funParkOffers,
+  challengeGameTickets,
+  adventureGameTickets
+} from '../data/mock/tickets.mock';
 import { useAuth } from '../context/AuthContext';
 
+const getInitialFallback = (zone) => {
+  const mapped = mapZoneToPage(zone);
+  if (mapped === 'kidsArea') return kidsAreaOffers;
+  if (mapped === 'funZone') return [...funParkOffers.weekend, ...funParkOffers.midweek];
+  if (mapped === 'adventureZone') return adventureGameTickets;
+  return challengeGameTickets;
+};
+
 export function useTickets(zone = 'challenge') {
-  const initialGames = zone === 'adventure' ? adventureGameTickets : challengeGameTickets;
-  const [gameTickets, setGameTickets] = useState(initialGames);
+  const [tickets, setTickets] = useState(() => getInitialFallback(zone));
   const [loading, setLoading] = useState(false);
-  const { user, addPassToWallet } = useAuth();
+  const [error, setError] = useState(null);
+  const { user } = useAuth();
+
+  const loadTickets = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await ticketService.getOffers(zone);
+      if (data && data.length > 0) {
+        setTickets(data);
+        console.log(`[useTickets] Loaded ${data.length} tickets for zone "${zone}":`, data);
+      }
+    } catch (e) {
+      console.warn(`[useTickets] Failed to load tickets for "${zone}":`, e);
+      setError(e.message || 'Failed to load tickets');
+    } finally {
+      setLoading(false);
+    }
+  }, [zone]);
 
   useEffect(() => {
-    let isMounted = true;
-    async function loadGames() {
-      setLoading(true);
-      try {
-        const games = await ticketService.getGameTickets(zone);
-        if (isMounted && games) {
-          setGameTickets(games);
-          console.log(`[useTickets] Loaded game tickets data for zone "${zone}":`, games);
-        }
-      } catch (e) {
-        console.warn('Failed to load game tickets:', e);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    }
-    loadGames();
-    return () => { isMounted = false; };
-  }, [zone]);
+    loadTickets();
+  }, [loadTickets]);
 
   const reservePass = useCallback(async (ticketData) => {
     const res = await ticketService.createBooking({
@@ -39,9 +53,13 @@ export function useTickets(zone = 'challenge') {
   }, [user]);
 
   return {
-    gameTickets,
+    tickets,
+    gameTickets: tickets, // alias for backwards compatibility
     loading,
+    error,
+    refetch: loadTickets,
     userActivePasses: user?.activePasses || [],
     reservePass
   };
 }
+

@@ -8,7 +8,17 @@ const DataContext = createContext(null);
 export function DataProvider({ children }) {
   const [parkStatus, setParkStatus] = useState(defaultParkStatus);
   const [recentBookings, setRecentBookings] = useState([]);
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('kids_area_cart');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.warn('Failed to parse cart from localStorage:', e);
+      }
+    }
+    return [];
+  });
   const [loading, setLoading] = useState(false);
 
   // Load park status and recent bookings on mount
@@ -23,10 +33,6 @@ export function DataProvider({ children }) {
         if (isMounted) {
           if (status) setParkStatus(status);
           if (bookings) setRecentBookings(bookings);
-          console.log('[DataContext] Initialized park status & bookings data:', {
-            parkStatus: status,
-            recentBookings: bookings
-          });
         }
       } catch (e) {
         console.warn('DataContext init warning:', e);
@@ -35,6 +41,15 @@ export function DataProvider({ children }) {
     initData();
     return () => { isMounted = false; };
   }, []);
+
+  // Sync cartItems changes to localStorage
+  const syncCartStorage = (items) => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('kids_area_cart', JSON.stringify(items));
+      } catch (e) {}
+    }
+  };
 
   // Book a ticket pass
   const bookTicket = useCallback(async (bookingData) => {
@@ -48,32 +63,84 @@ export function DataProvider({ children }) {
     }
   }, []);
 
-  // Cart Management for Snack Box / Items
+  // Cart Management for Passes / Tickets / Packages
   const addToCart = useCallback((item) => {
+    const rawId = item._id || item.id || `item-${Date.now()}`;
+    const unitPrice = Number(item.priceAfterDiscount ?? item.priceNum ?? item.priceEgp ?? item.price ?? 100);
+    const oldPrice = Number(item.oldPrice ?? item.origPrice ?? item.price ?? unitPrice);
+
+    const isPackage = item.type === 'package';
+
+    const normalized = {
+      id: rawId,
+      _id: rawId,
+      ticket: !isPackage ? (item.ticket || rawId) : undefined,
+      package: isPackage ? (item.package || rawId) : undefined,
+      type: isPackage ? 'package' : 'ticket',
+      title: item.title || item.name || '',
+      titleAr: item.titleAr || item.title || item.name || '',
+      titleEn: item.titleEn || item.title || item.name || '',
+      zone: item.zone || item.page || 'kidsArea',
+      zoneLabel: item.zoneLabel || item.zone || 'Play Zone',
+      age: item.age || 'All Ages',
+      inclusions: item.inclusions || item.description || item.bundle || (Array.isArray(item.features) ? item.features.join(' • ') : ''),
+      priceEgp: unitPrice,
+      pricePts: Number(item.pricePts ?? (unitPrice * 3)),
+      oldPriceEgp: oldPrice > unitPrice ? oldPrice : null,
+      qty: Number(item.qty || 1),
+      thumb: item.thumb || item.image || item.img || '/photo/kid-area-pic/graphic-composition.png',
+      saveBadge: item.saveBadge || ''
+    };
+
     setCartItems(prev => {
-      const existing = prev.find(i => i.id === item.id);
-      if (existing) {
-        return prev.map(i => i.id === item.id ? { ...i, qty: (i.qty || 1) + 1 } : i);
+      const idx = prev.findIndex(i => i.id === normalized.id);
+      let updated;
+      if (idx > -1) {
+        updated = prev.map((it, i) => i === idx ? { ...it, qty: it.qty + (normalized.qty || 1) } : it);
+      } else {
+        updated = [...prev, normalized];
       }
-      return [...prev, { ...item, qty: 1 }];
+      syncCartStorage(updated);
+      return updated;
+    });
+  }, []);
+
+  const updateCartQty = useCallback((id, delta) => {
+    setCartItems(prev => {
+      const updated = prev.map(item => {
+        if (item.id === id) {
+          const nextQty = Math.max(1, item.qty + delta);
+          return { ...item, qty: nextQty };
+        }
+        return item;
+      });
+      syncCartStorage(updated);
+      return updated;
     });
   }, []);
 
   const removeFromCart = useCallback((itemId) => {
-    setCartItems(prev => prev.filter(i => i.id !== itemId));
+    setCartItems(prev => {
+      const updated = prev.filter(i => i.id !== itemId);
+      syncCartStorage(updated);
+      return updated;
+    });
   }, []);
 
   const clearCart = useCallback(() => {
     setCartItems([]);
+    syncCartStorage([]);
   }, []);
 
   const value = {
     parkStatus,
     recentBookings,
     cartItems,
+    setCartItems,
     loading,
     bookTicket,
     addToCart,
+    updateCartQty,
     removeFromCart,
     clearCart
   };

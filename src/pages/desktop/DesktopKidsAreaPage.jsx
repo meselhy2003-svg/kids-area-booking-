@@ -1,40 +1,56 @@
 import React from 'react';
 import { useZoneData } from '../../hooks/useZoneData';
 import { useKidsAreaMedia } from '../../hooks';
+import { useData } from '../../context/DataContext';
 import { getTranslations } from '../../data/translations';
 
 export default function DesktopKidsAreaPage({ setActiveTab, openModal, lang = 'ar', searchQuery }) {
   const t = getTranslations(lang);
   const isArabic = lang === 'ar';
+  const { addToCart } = useData();
   const { filteredOffers } = useZoneData('kids-area', searchQuery);
-  
+
   // Kids Area Hero & Explore image caching and server synchronization
-  const { 
-    heroBanners, 
-    exploreItems, 
-    activeSlide, 
-    setActiveSlide, 
-    currentHero 
+  const {
+    heroBanners,
+    exploreItems,
+    activeSlide,
+    setActiveSlide,
+    currentHero
   } = useKidsAreaMedia();
 
   const handleBooking = (offer) => {
-    const title = isArabic ? (offer.titleAr || offer.title) : (offer.titleEn || offer.title);
-    const curr = isArabic ? 'ج.م' : 'EGP';
-    openModal('booking', {
-      name: title,
-      price: `${offer.priceNum || offer.price} ${curr}`,
-      priceNum: offer.priceNum || offer.price,
-      discount: offer.saveBadge,
-      details: `${offer.bundle || offer.features?.join(', ') || ''} ${offer.extra || ''}`
+    const title = offer.title || (isArabic ? offer.titleAr : offer.titleEn) || offer.titleAr;
+    const currentPrice = offer.priceAfterDiscount ?? offer.priceNum ?? offer.price;
+    const origPrice = (offer.price && offer.price > currentPrice) ? offer.price : (offer.oldPrice || offer.origPrice);
+
+    addToCart({
+      id: offer._id || offer.id,
+      ticket: offer._id || offer.id,
+      type: 'ticket',
+      title: title,
+      titleAr: title,
+      titleEn: title,
+      zone: 'kids-area',
+      zoneLabel: isArabic ? 'منطقة الأطفال' : 'Kids Area',
+      age: offer.age,
+      inclusions: offer.description || offer.bundle || (Array.isArray(offer.features) ? offer.features.join(' • ') : ''),
+      priceEgp: currentPrice,
+      oldPriceEgp: origPrice,
+      thumb: offer.image || offer.thumb,
+      saveBadge: offer.saveBadge
     });
+    if (typeof setActiveTab === 'function') {
+      setActiveTab('cart');
+    }
   };
 
   return (
     <div className={`desktop-page desktop-zone-page ${isArabic ? 'lang-ar' : 'lang-en'}`}>
       <div className="desktop-page-container">
-        
+
         {/* 1. HERO ZONE BANNER WITH TILTED BADGE */}
-        <div 
+        <div
           className="desktop-zone-hero-banner kids-hero-banner"
           style={{
             backgroundImage: (currentHero?.image || currentHero?.src)
@@ -57,7 +73,7 @@ export default function DesktopKidsAreaPage({ setActiveTab, openModal, lang = 'a
                 <h2 className="desktop-zone-hero-tagline">{currentHero?.subtitleEn || t.zones.kidsArea.subtitle}</h2>
               </>
             )}
-            
+
             {/* Carousel Dots */}
             <div className="desktop-zone-hero-dots">
               {heroBanners.map((_, i) => (
@@ -88,12 +104,12 @@ export default function DesktopKidsAreaPage({ setActiveTab, openModal, lang = 'a
             </h2>
             <div className="desktop-offers-filters">
               <span className="desktop-age-badge dark-badge">{t.zones.kidsArea.ageFilter}</span>
-              <button 
+              <button
                 className="desktop-see-all-link"
-                onClick={() => openModal('booking', { 
-                  name: isArabic ? 'تذكرة منطقة الأطفال الشاملة' : 'Kids Area All-Inclusive Pass', 
-                  price: isArabic ? '١٠٠ ج.م' : '100 EGP', 
-                  priceNum: 100 
+                onClick={() => openModal('booking', {
+                  name: isArabic ? 'تذكرة منطقة الأطفال الشاملة' : 'Kids Area All-Inclusive Pass',
+                  price: isArabic ? '١٠٠ ج.م' : '100 EGP',
+                  priceNum: 100
                 })}
               >
                 {t.zones.seeAll}
@@ -104,18 +120,20 @@ export default function DesktopKidsAreaPage({ setActiveTab, openModal, lang = 'a
           {/* 4 OFFERS CARDS GRID */}
           <div className="desktop-offers-grid-4">
             {filteredOffers.map((offer) => {
-              const offerTitle = isArabic ? (offer.titleAr || offer.title) : (offer.titleEn || offer.title);
-              const priceDisplay = isArabic ? `${offer.priceNum || offer.price} ج.م` : `EGP ${offer.priceNum || offer.price}`;
-              const oldPriceDisplay = (offer.oldPrice || offer.origPrice) 
-                ? (isArabic ? `${offer.oldPrice || offer.origPrice} ج.م` : `EGP ${offer.oldPrice || offer.origPrice}`) 
+              const offerTitle = offer.title || (isArabic ? offer.titleAr : offer.titleEn) || offer.titleAr;
+              const currentPrice = offer.priceAfterDiscount ?? offer.priceNum ?? offer.price;
+              const priceDisplay = isArabic ? `${currentPrice} ج.م` : `EGP ${currentPrice}`;
+              const origPrice = (offer.price && offer.price > currentPrice) ? offer.price : (offer.oldPrice || offer.origPrice);
+              const oldPriceDisplay = (origPrice && origPrice > currentPrice)
+                ? (isArabic ? `${origPrice} ج.م` : `EGP ${origPrice}`)
                 : null;
 
               return (
-                <div key={offer.id} className="desktop-offer-card">
+                <div key={offer._id || offer.id} className="desktop-offer-card">
                   <div className="desktop-offer-img-box">
-                    <img 
-                      src={offer.image || offer.thumb} 
-                      alt={offerTitle} 
+                    <img
+                      src={offer.image || offer.thumb}
+                      alt={offerTitle}
                       className="desktop-offer-img"
                       onError={(e) => { e.target.src = '/photo/kid-area-pic/kids-ball-pit-slide.png'; }}
                     />
@@ -163,7 +181,7 @@ export default function DesktopKidsAreaPage({ setActiveTab, openModal, lang = 'a
                         )}
                       </div>
 
-                      <button 
+                      <button
                         className="desktop-get-offer-btn"
                         onClick={() => handleBooking(offer)}
                       >
@@ -184,7 +202,7 @@ export default function DesktopKidsAreaPage({ setActiveTab, openModal, lang = 'a
         <section className="desktop-zone-section explore-section">
           <div className="desktop-section-header-row">
             <h2 className="desktop-explore-heading">{t.zones.kidsArea.exploreTitle}</h2>
-            <button 
+            <button
               className="desktop-see-all-link"
               onClick={() => openModal('gallery')}
             >
@@ -197,8 +215,8 @@ export default function DesktopKidsAreaPage({ setActiveTab, openModal, lang = 'a
             {exploreItems.map((item) => {
               const itemTitle = isArabic ? (item.titleAr || item.title) : (item.titleEn || item.title);
               return (
-                <div 
-                  key={item.id} 
+                <div
+                  key={item.id}
                   className="desktop-explore-card"
                   onClick={() => openModal('attraction-detail', {
                     title: itemTitle,
@@ -210,12 +228,12 @@ export default function DesktopKidsAreaPage({ setActiveTab, openModal, lang = 'a
                   role="button"
                   tabIndex={0}
                 >
-                  <img 
-                    src={item.image || item.src || item.img || item.url} 
-                    alt={itemTitle} 
+                  <img
+                    src={item.image || item.src || item.img || item.url}
+                    alt={itemTitle}
                     className="desktop-explore-img"
                     loading="lazy"
-                    onError={(e) => { 
+                    onError={(e) => {
                       const fb = item.fallback || item.fallbackSrc || item.fallbackImg;
                       if (fb && !e.currentTarget.src.includes(fb)) {
                         e.currentTarget.src = fb;
@@ -233,7 +251,7 @@ export default function DesktopKidsAreaPage({ setActiveTab, openModal, lang = 'a
 
         {/* 4. EXPLORE 360° CENTER BUTTON */}
         <div className="desktop-360-btn-wrap">
-          <button 
+          <button
             className="desktop-360-pill-btn"
             onClick={() => openModal('virtual-tour')}
           >
