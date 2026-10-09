@@ -106,65 +106,88 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
     { id: 'd1', nameEn: 'Fresh Mango Sunshine Smoothie', nameAr: 'سموذي مانجو الواحة الطازج', price: 65, qty: 2 }
   ]);
 
-  // Extended Menu Data with Real Restaurant Photos
-  const extendedMenu = [
-    {
-      id: 101,
-      category: 'burgers',
-      nameEn: 'Artisanal Brioche Cheeseburger Meal',
-      nameAr: 'وجبة برجر البريوش بالجبنة الفاخرة',
-      descEn: 'Freshly grilled beef patty, melted cheddar, crispy shoestring fries & signature sauce',
-      descAr: 'برجر لحم مشوي طازج مع جبن الشيدر الذائب، بطاطس مقرمشة وصوص أمريكان دريم الخاص',
-      price: 185,
-      rating: 4.9,
-      image: '/photo/kid area pic/Freshly grilled brioche cheeseburger with crispy shoestring fries and artisanal dip in craft takeaway presentation.png'
-    },
-    {
-      id: 102,
-      category: 'grills',
-      nameEn: 'Waterfront Sunset Mixed Grill',
-      nameAr: 'مشاوي الواجهة المائية المشكلة',
-      descEn: 'Tender kebab skewers, shish tawook, grilled kofta, basmati rice & fresh salads',
-      descAr: 'كباب وكفتة وشيش طاووق متبل على الفحم يقدم مع أرز بسمتي وسلطات طازجة',
-      price: 340,
-      rating: 5.0,
-      image: '/photo/kid area pic/Canal-side sunset dinner terrace with warm string lights, dining tables, grilled meats, salads, and sparkling water.png'
-    },
-    {
-      id: 103,
-      category: 'pizza',
-      nameEn: 'Italian Stone-Baked Quattro Formaggi',
-      nameAr: 'بيتزا الأجبان الأربعة الحجرية',
-      descEn: 'Authentic thin crust pizza with mozzarella, parmesan, gorgonzola & fresh basil',
-      descAr: 'عجينة إيطالية هشة ومقرمشة مع مزيج 4 أجبان فاخرة وصلصة الطماطم الإيطالية',
-      price: 175,
-      rating: 4.8,
-      image: '/photo/kid area pic/mosaic-card-2.png'
-    },
-    {
-      id: 104,
-      category: 'drinks',
-      nameEn: 'Island Breeze Mango Mocktail',
-      nameAr: 'كوكتيل نسيم الجزيرة بالمانجو',
-      descEn: 'Fresh Ismailia mango puree, passion fruit syrup, sparkling soda & mint',
-      descAr: 'مانجو إسماعيلية طازجة مع باشن فروت وصودا منعشة وأوراق النعناع',
-      price: 70,
-      rating: 4.9,
-      image: '/photo/kid area pic/Image (1).png'
-    },
-    {
-      id: 105,
-      category: 'coffee',
-      nameEn: 'Iced Caramel Macchiato & Latte',
-      nameAr: 'آيسد كراميل ماكياتو ولاتيه إسباني',
-      descEn: 'Premium double espresso shots, chilled steamed milk & golden buttery caramel drizzle',
-      descAr: 'إسبريسو فاخر مع حليب بارد وصلصة كراميل غنية ومثلجة على ضفاف القناة',
-      price: 65,
-      rating: 4.8,
-      image: '/photo/kid area pic/Image (2).png'
-    },
-    ...mockMenuItems
-  ];
+  // Extended Menu Data with Real Restaurant Photos & Live Sync with Admin Dashboard
+  const extendedMenu = (() => {
+    try {
+      const savedData = localStorage.getItem('ados_restaurant_menu_data_v2');
+      if (savedData) {
+        const parsed = JSON.parse(savedData);
+        if (parsed.items && Array.isArray(parsed.items) && parsed.items.length > 0) {
+          return parsed.items.map(item => ({
+            id: item.id,
+            category: item.category,
+            nameEn: item.title,
+            nameAr: item.titleAr,
+            descEn: item.subtitle,
+            descAr: item.subtitleAr,
+            price: item.price,
+            rating: item.rating || 4.9,
+            image: item.image
+          }));
+        }
+      }
+    } catch (e) {
+      console.warn('Using default extended menu data:', e);
+    }
+    return [
+      {
+        id: 101,
+        category: 'burgers',
+        nameEn: 'Artisanal Brioche Cheeseburger Meal',
+        nameAr: 'وجبة برجر البريوش بالجبنة الفاخرة',
+        descEn: 'Freshly grilled beef patty, melted cheddar, crispy shoestring fries & signature sauce',
+        descAr: 'برجر لحم مشوي طازج مع جبن الشيدر الذائب، بطاطس مقرمشة وصوص أمريكان دريم الخاص',
+        price: 185,
+        rating: 4.9,
+        image: '/photo/kid area pic/Freshly grilled brioche cheeseburger with crispy shoestring fries and artisanal dip in craft takeaway presentation.png'
+      },
+      {
+        id: 102,
+        category: 'grills',
+        nameEn: 'Waterfront Sunset Mixed Grill',
+        nameAr: 'مشاوي الواجهة المائية المشكلة',
+        descEn: 'Tender kebab skewers, shish tawook, grilled kofta, basmati rice & fresh salads',
+        descAr: 'كباب وكفتة وشيش طاووق متبل على الفحم يقدم مع أرز بسمتي وسلطات طازجة',
+        price: 340,
+        rating: 5.0,
+        image: '/photo/kid area pic/Canal-side sunset dinner terrace with warm string lights, dining tables, grilled meats, salads, and sparkling water.png'
+      },
+      {
+        id: 103,
+        category: 'pizza',
+        nameEn: 'Italian Stone-Baked Quattro Formaggi',
+        nameAr: 'بيتزا الأجبان الأربعة الحجرية',
+        descEn: 'Authentic thin crust pizza with mozzarella, parmesan, gorgonzola & fresh basil',
+        descAr: 'عجينة إيطالية هشة ومقرمشة مع مزيج 4 أجبان فاخرة وصلصة الطماطم الإيطالية',
+        price: 175,
+        rating: 4.8,
+        image: '/photo/kid area pic/mosaic-card-2.png'
+      },
+      {
+        id: 104,
+        category: 'drinks',
+        nameEn: 'Island Breeze Mango Mocktail',
+        nameAr: 'كوكتيل نسيم الجزيرة بالمانجو',
+        descEn: 'Fresh Ismailia mango puree, passion fruit syrup, sparkling soda & mint',
+        descAr: 'مانجو إسماعيلية طازجة مع باشن فروت وصودا منعشة وأوراق النعناع',
+        price: 70,
+        rating: 4.9,
+        image: '/photo/kid area pic/Image (1).png'
+      },
+      {
+        id: 105,
+        category: 'coffee',
+        nameEn: 'Iced Caramel Macchiato & Latte',
+        nameAr: 'آيسد كراميل ماكياتو ولاتيه إسباني',
+        descEn: 'Premium double espresso shots, chilled steamed milk & golden buttery caramel drizzle',
+        descAr: 'إسبريسو فاخر مع حليب بارد وصلصة كراميل غنية ومثلجة على ضفاف القناة',
+        price: 65,
+        rating: 4.8,
+        image: '/photo/kid area pic/Image (2).png'
+      },
+      ...mockMenuItems
+    ];
+  })();
 
   // Helper to show notification toast
   const showToast = (msg) => {
