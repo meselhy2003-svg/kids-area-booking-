@@ -27,76 +27,54 @@ import {
 import './RestaurantMenuEditor.css';
 import PlayZoneOrdersManager from '../../pages/desktop/PlayZoneOrdersManager';
 
-// Curated Local Assets for Restaurant & Cafe
-const LOCAL_RESTAURANT_GALLERY = [
-  { 
-    name: 'Artisanal Brioche Cheeseburger Meal', 
-    path: '/photo/kid area pic/Freshly grilled brioche cheeseburger with crispy shoestring fries and artisanal dip in craft takeaway presentation.png' 
-  },
-  { 
-    name: 'Canal-side Sunset Dinner Terrace', 
-    path: '/photo/kid area pic/Canal-side sunset dinner terrace with warm string lights, dining tables, grilled meats, salads, and sparkling water.png' 
-  },
-  { 
-    name: 'Artisanal Chef Kitchen', 
-    path: '/photo/vibe_4_chef.png' 
-  },
-  { 
-    name: 'Lake Sunset Cocktail & Mocktail Bar', 
-    path: '/photo/vibe_3_cocktail.png' 
-  },
-  { 
-    name: 'Stone-Baked Quattro Formaggi Pizza', 
-    path: '/photo/kid area pic/mosaic-card-2.png' 
-  },
-  { 
-    name: 'Island Breeze Mango Mocktail', 
-    path: '/photo/kid area pic/Image (1).png' 
-  },
-  { 
-    name: 'Iced Caramel Macchiato & Latte', 
-    path: '/photo/kid area pic/Image (2).png' 
-  },
-  { 
-    name: 'Gourmet Dish Presentation', 
-    path: '/photo/kid area pic/dish_burger.png' 
-  },
-  { 
-    name: 'Lake Timsah Sunset Gathering', 
-    path: '/photo/vibe_5_sunset.png' 
-  },
-  { 
-    name: 'Luxury Event Dining Hall', 
-    path: '/photo/kid area pic/American Dream Ismailia luxury event hall architecture setup.png' 
-  },
-  { 
-    name: 'Golden Crispy Chicken Nuggets', 
-    path: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=500&auto=format&fit=crop&q=80' 
-  },
-  { 
-    name: 'Kids Mini Cheeseburger', 
-    path: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=80' 
-  },
-  { 
-    name: 'Mozzarella Cheese Pizza Slice', 
-    path: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&auto=format&fit=crop&q=80' 
-  },
-  { 
-    name: 'Fresh Mango Sunshine Smoothie', 
-    path: 'https://images.unsplash.com/photo-1546173159-315724a31696?w=500&auto=format&fit=crop&q=80' 
-  },
-  { 
-    name: 'Berry Blast Milkshake', 
-    path: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=500&auto=format&fit=crop&q=80' 
-  },
-  { 
-    name: 'Rainbow Ice Cream Sundae', 
-    path: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500&auto=format&fit=crop&q=80' 
-  },
-  { 
-    name: 'Caramel Butter Popcorn Bucket', 
-    path: 'https://images.unsplash.com/photo-1585647347483-22b66260dfff?w=500&auto=format&fit=crop&q=80' 
-  }
+// Project Media Library Assets matching Image 2 exactly
+const ALL_PROJECT_ASSETS = [
+  // 12 Assets directly visible in the user's reference screenshot (Image 2)
+  { name: 'Arcade VR Experience', path: '/photo/kid area pic/Kid wearing VR headset in neon arcade.png' },
+  { name: 'VR Friends Arena', path: '/photo/kid area pic/Photo 3_ VR Arena Friends.png' },
+  { name: 'Arcade Graphic Composition', path: '/photo/kid area pic/Graphic Composition.png' },
+  { name: 'Laser & Tactical Arena', path: '/photo/kid area pic/Laser & Tactical Arena.png' },
+  { name: 'Skeeball Fun Arena', path: '/photo/kid area pic/Family celebrating victory at skeeball.png' },
+  { name: 'Boxing Machine', path: '/photo/kid area pic/Boxing Punch Machine.png' },
+  { name: 'Boxing Machine 2', path: '/photo/kid area pic/Boxing Punch Machine (1).png' },
+  { name: 'Ping Pong Table', path: '/photo/kid area pic/Table Tennis Ping Pong.png' },
+  { name: 'PS4 Gaming Station', path: '/photo/kid area pic/PS4 PlayStation Gaming.png' },
+  { name: 'Air Hockey Table', path: '/photo/kid area pic/Air Hockey Table.png' },
+  { name: 'Billiards Pool Table', path: '/photo/kid area pic/Billiards Pool Table.png' },
+  { name: 'High Ropes Suspension', path: '/photo/kid area pic/High ropes suspended course.png' },
+  
+  // Food, Drinks & Restaurant Lake Assets
+  { name: 'Brioche Cheeseburger Meal', path: '/photo/kid area pic/Freshly grilled brioche cheeseburger with crispy shoestring fries and artisanal dip in craft takeaway presentation.png' },
+  { name: 'Canal-side Sunset Dinner Terrace', path: '/photo/kid area pic/Canal-side sunset dinner terrace with warm string lights, dining tables, grilled meats, salads, and sparkling water.png' },
+  { name: 'Artisanal Chef Kitchen', path: '/photo/vibe_4_chef.png' },
+  { name: 'Lake Sunset Cocktail & Mocktail Bar', path: '/photo/vibe_3_cocktail.png' },
+  { name: 'Stone-Baked Quattro Formaggi Pizza', path: '/photo/kid area pic/mosaic-card-2.png' },
+  { name: 'Island Breeze Mango Mocktail', path: '/photo/kid area pic/Image (1).png' },
+  { name: 'Iced Caramel Macchiato & Latte', path: '/photo/kid area pic/Image (2).png' },
+  { name: 'Gourmet Dish Presentation', path: '/photo/kid area pic/dish_burger.png' },
+  { name: 'Lake Timsah Sunset Gathering', path: '/photo/vibe_5_sunset.png' },
+  { name: 'Luxury Event Dining Hall', path: '/photo/kid area pic/American Dream Ismailia luxury event hall architecture setup.png' },
+  { name: 'Golden Crispy Chicken Nuggets', path: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=500&auto=format&fit=crop&q=80' },
+  { name: 'Kids Mini Cheeseburger', path: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=80' },
+  { name: 'Mozzarella Cheese Pizza Slice', path: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&auto=format&fit=crop&q=80' },
+  { name: 'Fresh Mango Sunshine Smoothie', path: 'https://images.unsplash.com/photo-1546173159-315724a31696?w=500&auto=format&fit=crop&q=80' },
+  { name: 'Berry Blast Milkshake', path: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=500&auto=format&fit=crop&q=80' },
+  { name: 'Rainbow Ice Cream Sundae', path: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500&auto=format&fit=crop&q=80' },
+  { name: 'Caramel Butter Popcorn Bucket', path: 'https://images.unsplash.com/photo-1585647347483-22b66260dfff?w=500&auto=format&fit=crop&q=80' },
+
+  // Additional Play Zone & Adventure Assets
+  { name: 'Ropes Bridge Girl', path: '/photo/kid area pic/Young girl balancing on high rope suspension bridge.png' },
+  { name: 'Kids Ball Pit Slides', path: '/photo/kid area pic/Kids sliding into colorful ball pit.png' },
+  { name: 'Toddler in Ball Pit', path: '/photo/kid area pic/Little boy laughing in ball pit2.png' },
+  { name: 'Soft Ball Pit Play', path: '/photo/kid area pic/Toddler laughing in soft ball pit.png' },
+  { name: 'Boy with Toys', path: '/photo/kid area pic/Boy laughing playing with toys.png' },
+  { name: 'Bumper Collision Bay', path: '/photo/kid area pic/Bumper Collision Bay.png' },
+  { name: 'Family Bumper Cars', path: '/photo/kid area pic/Family bumper car arena.png' },
+  { name: 'Illuminated Carousel', path: '/photo/kid area pic/Classic illuminated carousel ride.png' },
+  { name: 'Junior GP Speedway', path: '/photo/kid area pic/Junior GP Speedway.png' },
+  { name: 'High-Octane Racing', path: '/photo/kid area pic/High-Octane Racing.png' },
+  { name: 'Motorcycle Racing Arcade', path: '/photo/kid area pic/Motorcycle Racing Arcade.png' },
+  { name: 'Cinematic Backdrop', path: '/photo/kid area pic/Cinematic Full-Width Backdrop.png' }
 ];
 
 // Initial Master Data for Restaurant & Cafe Dashboard
@@ -428,6 +406,7 @@ export default function RestaurantMenuEditor({
   const [isImagePickerOpen, setIsImagePickerOpen] = useState(false);
   const [imagePickerTarget, setImagePickerTarget] = useState(null); // { type: 'hero' | 'explore' | 'item', slotIndex?: number }
   const [is360ModalOpen, setIs360ModalOpen] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Subview toggle: 'menu' (editor) | 'orders' (incoming orders)
   const [currentViewMode, setCurrentViewMode] = useState('menu');
@@ -566,7 +545,7 @@ export default function RestaurantMenuEditor({
       badgeAr: isCombo ? 'وفر 70 ج.م' : 'صنف جديد',
       unit: isCombo ? '/ combo' : '/ meal',
       rating: 5.0,
-      image: LOCAL_RESTAURANT_GALLERY[0].path,
+      image: ALL_PROJECT_ASSETS[12]?.path || ALL_PROJECT_ASSETS[0]?.path,
       features: isCombo ? ['Main Dish', 'Fries Basket', 'Cold Drink', 'Surprise Treat'] : [],
       isCombo
     });
@@ -1438,47 +1417,97 @@ export default function RestaurantMenuEditor({
       )}
 
       {/* ------------------------------------------------------------------ */}
-      {/* 5. MODAL: IMAGE PICKER & UPLOAD                                    */}
+      {/* 5. MODAL: IMAGE PICKER & UPLOADER (Exact match to Image 2)          */}
       {/* ------------------------------------------------------------------ */}
       {isImagePickerOpen && (
         <div className="ados-modal-backdrop" onClick={() => setIsImagePickerOpen(false)}>
-          <div className="ados-image-picker-window" onClick={e => e.stopPropagation()} dir={isAr ? 'rtl' : 'ltr'}>
+          <div className="ados-modal-window ados-modal-window-wide" onClick={e => e.stopPropagation()} dir={isAr ? 'rtl' : 'ltr'}>
             <div className="ados-modal-header">
-              <h3>{isAr ? 'اختر صورة من المكتبة أو ارفع صورة جديدة' : 'Select or Upload Image'}</h3>
+              <h3>{isAr ? 'اختيار صورة أو رفع ملف جديد' : 'Choose Photo Asset or Upload'}</h3>
               <button className="ados-modal-close-btn" onClick={() => setIsImagePickerOpen(false)}>
                 <X size={18} />
               </button>
             </div>
 
-            <div className="ados-picker-upload-bar">
-              <label className="ados-upload-file-label">
-                <Upload size={16} />
-                <span>{isAr ? 'رفع صورة من جهازك' : 'Upload File from Device'}</span>
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  onChange={handleFileUpload} 
-                  style={{ display: 'none' }}
-                />
-              </label>
-              <span className="ados-upload-or">{isAr ? 'أو اختر من صور المطعم الجاهزة أدناه:' : 'Or choose from project assets below:'}</span>
-            </div>
-
-            <div className="ados-gallery-grid">
-              {LOCAL_RESTAURANT_GALLERY.map((asset, idx) => (
-                <div 
-                  key={idx} 
-                  className="ados-gallery-item"
-                  onClick={() => handleSelectImage(asset.path)}
-                >
-                  <img src={asset.path} alt={asset.name} />
-                  <div className="ados-gallery-item-name">{asset.name}</div>
+            <div className="ados-modal-body">
+              {/* File upload prompt */}
+              <div style={{
+                border: '2px dashed #93c5fd',
+                borderRadius: 12,
+                padding: '16px 20px',
+                backgroundColor: '#f0f9ff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div>
+                  <div style={{ fontWeight: 700, color: '#002830', fontSize: 14 }}>
+                    {isAr ? 'رفع صورة جديدة من جهاز الكمبيوتر' : 'Upload a new photo from your PC'}
+                  </div>
+                  <div style={{ color: '#64748b', fontSize: 12, marginTop: 2 }}>
+                    {isAr ? 'يدعم ملفات PNG أو JPG أو WEBP' : 'PNG, JPG or WEBP formats supported'}
+                  </div>
                 </div>
-              ))}
+                <label style={{
+                  backgroundColor: '#00a8cc',
+                  color: 'white',
+                  padding: '8px 18px',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6
+                }}>
+                  <Upload size={14} />
+                  <span>{isAr ? 'استعراض الملفات' : 'Browse File'}</span>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    style={{ display: 'none' }} 
+                    ref={fileInputRef}
+                    onChange={handleFileUpload} 
+                  />
+                </label>
+              </div>
+
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 10, color: '#334155' }}>
+                  {isAr ? 'أو اختر من مكتبة صور المشروع:' : 'Or select from project media library:'}
+                </div>
+                <div className="ados-image-picker-grid">
+                  {ALL_PROJECT_ASSETS.map((asset, idx) => (
+                    <div 
+                      key={idx} 
+                      className="ados-image-picker-item"
+                      title={asset.name}
+                      onClick={() => handleSelectImage(asset.path)}
+                    >
+                      <img src={asset.path} alt={asset.name} />
+                      <div style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        insetInline: 0,
+                        backgroundColor: 'rgba(0,0,0,0.65)',
+                        color: 'white',
+                        fontSize: 10,
+                        padding: '2px 4px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}>
+                        {asset.name}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="ados-modal-footer">
-              <button className="ados-modal-cancel-btn" onClick={() => setIsImagePickerOpen(false)}>
+              <div></div>
+              <button className="ados-btn-secondary" onClick={() => setIsImagePickerOpen(false)}>
                 {isAr ? 'إغلاق' : 'Close'}
               </button>
             </div>
