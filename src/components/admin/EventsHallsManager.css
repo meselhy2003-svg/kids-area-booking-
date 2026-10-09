@@ -1,0 +1,249 @@
+/* ==========================================================================
+   EVENTS & HALLS DASHBOARD EDITOR CSS
+   Exact match to Play Zone structure with event & ballroom styling
+   ========================================================================== */
+
+.events-editor-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #eef2f6;
+}
+
+/* Topbar Mode Switch Buttons (Halls Editor vs Orders) */
+.events-topbar-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #e2e8f0;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+}
+
+.events-topbar-mode-btn:hover {
+  background-color: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.events-topbar-mode-btn.active {
+  background-color: #f59e0b;
+  border-color: #f59e0b;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+}
+
+/* Category Navigation Pills */
+.events-category-nav {
+  margin-top: 8px;
+  gap: 10px;
+}
+
+.events-category-nav .ados-zone-pill {
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 20px;
+}
+
+/* Hero Card Tweaks */
+.events-hero-card {
+  min-height: 310px;
+}
+
+.events-hero-edit-texts-btn {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.events-hero-edit-texts-btn:hover {
+  background: #efa31d;
+  border-color: #efa31d;
+  transform: scale(1.08);
+}
+
+.events-stamp-badge {
+  border-color: rgba(245, 158, 11, 0.8) !important;
+  color: #fcd34d !important;
+}
+
+/* Search Bar in Section Header */
+.events-search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.events-search-icon {
+  position: absolute;
+  left: 10px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.events-editor-wrapper.lang-ar .events-search-icon {
+  left: auto;
+  right: 10px;
+}
+
+.events-search-input {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 30px 8px 32px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #0f172a;
+  outline: none;
+  width: 180px;
+  transition: all 0.2s ease;
+}
+
+.events-editor-wrapper.lang-ar .events-search-input {
+  padding: 8px 32px 8px 30px;
+}
+
+.events-search-input:focus {
+  width: 240px;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+}
+
+.events-search-clear {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.events-editor-wrapper.lang-ar .events-search-clear {
+  right: auto;
+  left: 8px;
+}
+
+.events-search-clear:hover {
+  color: #0f172a;
+}
+
+/* Combos Container & Wide Cards */
+.events-combos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.events-wide-card {
+  margin-bottom: 0;
+}
+
+/* Vertical Item Cards & Image Overlay Button */
+.events-cards-grid {
+  grid-template-columns: repeat(3, 1fr) !important;
+}
+
+@media (max-width: 1100px) {
+  .events-cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .events-cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.events-item-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.events-item-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.events-card-change-img-overlay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 5;
+}
+
+.events-item-card:hover .events-card-change-img-overlay {
+  opacity: 1;
+}
+
+.events-card-change-img-overlay:hover {
+  background: #efa31d;
+  border-color: #efa31d;
+  transform: scale(1.1);
+}
+
+.events-item-desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 4px 0 10px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 36px;
+}
+
+/* Empty States */
+.events-empty-state, .events-empty-state-full {
+  background: #ffffff;
+  border: 2px dashed #cbd5e1;
+  border-radius: 14px;
+  padding: 40px;
+  text-align: center;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  grid-column: 1 / -1;
+  margin: 12px 0;
+}
+
+.events-empty-state p, .events-empty-state-full p {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 500;
+}

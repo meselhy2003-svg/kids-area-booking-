@@ -38,6 +38,7 @@ import PlayZoneOrdersManager from './PlayZoneOrdersManager';
 import GuestsManager from '../../components/admin/GuestsManager';
 import AboutUsManager from '../../components/admin/AboutUsManager';
 import RestaurantMenuEditor from '../../components/admin/RestaurantMenuEditor';
+import EventsHallsManager from '../../components/admin/EventsHallsManager';
 import { authService } from '../../api/authService';
 
 // Custom Monitor with 2x2 grid icon matching the user's reference screenshots exactly
@@ -1539,13 +1540,11 @@ export default function DesktopDashboardPage({
         )}
 
         {adminSection === 'events-orders' && (
-          <PlayZoneOrdersManager 
-            initialView="events-orders"
-            isEmbedded={true}
-            onBackToDashboard={() => setAdminSection('play-zones')}
-            onGoHome={() => setActiveTab && setActiveTab('home')}
+          <EventsHallsManager 
             lang={lang}
             setLang={setLang}
+            onLogout={handleAdminLogout}
+            onOpenOrders={() => setAdminSection('orders')}
           />
         )}
 
