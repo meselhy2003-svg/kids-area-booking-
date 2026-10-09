@@ -1,0 +1,963 @@
+/* ========================================================================= */
+/* GUEST PROFILE & ACTIVITY DASHBOARD STYLES                                 */
+/* Modern, Responsive, RTL & LTR friendly styles for Admin Dashboard        */
+/* ========================================================================= */
+
+.gpd-dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  font-family: inherit;
+  color: #1e293b;
+  box-sizing: border-box;
+}
+
+.gpd-dashboard-wrapper.lang-ar {
+  font-family: 'Tajawal', 'Cairo', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ------------------------------------------------------------------------- */
+/* 1. GUEST IDENTITY CARD                                                    */
+/* ------------------------------------------------------------------------- */
+
+.gpd-identity-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.gpd-identity-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+}
+
+.gpd-identity-main {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex: 1;
+  min-width: 280px;
+}
+
+.gpd-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.gpd-avatar-circle {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  border: 3px solid #ffffff;
+}
+
+.gpd-avatar-circle.male {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.gpd-avatar-circle.female {
+  background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+}
+
+.gpd-avatar-badge {
+  position: absolute;
+  bottom: 0;
+  right: -2px;
+  background: #10b981;
+  color: #ffffff;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+}
+
+.gpd-identity-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.gpd-name-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.gpd-guest-name {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.gpd-tier-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #b45309;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid #fcd34d;
+}
+
+.gpd-id-tag {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  background: #f1f5f9;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+}
+
+.gpd-meta-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gpd-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.65rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: #475569;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.gpd-meta-chip:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.gpd-meta-chip.points {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+  font-weight: 600;
+}
+
+.gpd-meta-chip.date {
+  background: #faf5ff;
+  border-color: #f3e8ff;
+  color: #7e22ce;
+}
+
+.gpd-identity-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gpd-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gpd-btn-secondary:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.gpd-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gpd-close-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+  border-color: #fca5a5;
+}
+
+/* ------------------------------------------------------------------------- */
+/* 2. FINANCIAL SUMMARY GRID (METRIC CARDS)                                   */
+/* ------------------------------------------------------------------------- */
+
+.gpd-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.gpd-metric-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+}
+
+.gpd-metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.gpd-metric-card.highlight-emerald {
+  background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+  border-color: #a7f3d0;
+}
+
+.gpd-metric-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gpd-metric-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gpd-metric-icon.emerald { background: #d1fae5; color: #059669; }
+.gpd-metric-icon.blue { background: #dbeafe; color: #2563eb; }
+.gpd-metric-icon.cyan { background: #cffafe; color: #0891b2; }
+.gpd-metric-icon.amber { background: #fef3c7; color: #d97706; }
+.gpd-metric-icon.orange { background: #ffedd5; color: #ea580c; }
+
+.gpd-metric-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.gpd-metric-badge.emerald { background: #d1fae5; color: #065f46; }
+.gpd-metric-badge.blue { background: #dbeafe; color: #1e40af; }
+.gpd-metric-badge.cyan { background: #cffafe; color: #155e75; }
+.gpd-metric-badge.amber { background: #fef3c7; color: #92400e; }
+.gpd-metric-badge.orange { background: #ffedd5; color: #9a3412; }
+
+.gpd-metric-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.gpd-metric-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.gpd-metric-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.gpd-metric-value.emerald {
+  color: #059669;
+}
+
+.gpd-currency {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-inline-start: 0.2rem;
+}
+
+/* ------------------------------------------------------------------------- */
+/* 3. ACTIVITY TIMELINE (MAIN CONTENT)                                       */
+/* ------------------------------------------------------------------------- */
+
+.gpd-timeline-section {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.gpd-timeline-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.gpd-timeline-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.gpd-section-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gpd-timeline-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.gpd-timeline-subtitle {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.gpd-timeline-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.gpd-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 220px;
+}
+
+.gpd-search-icon {
+  position: absolute;
+  inset-inline-start: 10px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.gpd-search-box input {
+  width: 100%;
+  padding: 0.45rem 1.8rem 0.45rem 2rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  background: #f8fafc;
+  color: #0f172a;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.lang-ar .gpd-search-box input {
+  padding: 0.45rem 2rem 0.45rem 1.8rem;
+}
+
+.gpd-search-box input:focus {
+  border-color: #3b82f6;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.gpd-clear-search {
+  position: absolute;
+  inset-inline-end: 8px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.gpd-clear-search:hover {
+  color: #ef4444;
+}
+
+.gpd-category-pills {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.gpd-cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gpd-cat-pill:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.gpd-cat-pill.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+/* Timeline Track */
+.gpd-timeline-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.gpd-empty-timeline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.gpd-empty-icon {
+  margin-bottom: 0.75rem;
+  color: #cbd5e1;
+}
+
+.gpd-empty-timeline h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #475569;
+}
+
+.gpd-empty-timeline p {
+  margin: 0.3rem 0 0;
+  font-size: 0.85rem;
+}
+
+.gpd-timeline-track {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+.gpd-timeline-node {
+  display: flex;
+  gap: 1.25rem;
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+
+.gpd-timeline-node:last-child {
+  padding-bottom: 0;
+}
+
+/* Milestone Marker & Vertical Line */
+.gpd-node-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  position: relative;
+}
+
+.gpd-node-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 0 0 4px #ffffff, 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.cat-restaurant .gpd-node-icon { background: #ea580c; color: #ffffff; }
+.cat-trips .gpd-node-icon { background: #d97706; color: #ffffff; }
+.cat-playzone .gpd-node-icon { background: #0891b2; color: #ffffff; }
+.cat-events .gpd-node-icon { background: #8b5cf6; color: #ffffff; }
+.cat-general .gpd-node-icon { background: #64748b; color: #ffffff; }
+
+.gpd-node-line {
+  position: absolute;
+  top: 36px;
+  bottom: -4px;
+  width: 2px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.gpd-timeline-node:last-child .gpd-node-line {
+  display: none;
+}
+
+/* Timeline Card */
+.gpd-timeline-card {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.gpd-timeline-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.gpd-card-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.gpd-card-left-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.gpd-cat-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+}
+
+.gpd-cat-badge.cat-restaurant { background: #ffedd5; color: #c2410c; }
+.gpd-cat-badge.cat-trips { background: #fef3c7; color: #b45309; }
+.gpd-cat-badge.cat-playzone { background: #cffafe; color: #0e7490; }
+.gpd-cat-badge.cat-events { background: #ede9fe; color: #6d28d9; }
+.gpd-cat-badge.cat-general { background: #f1f5f9; color: #475569; }
+
+.gpd-code-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.gpd-copy-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.gpd-copy-btn:hover {
+  color: #2563eb;
+}
+
+.gpd-card-right-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.gpd-time-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.74rem;
+  color: #64748b;
+}
+
+/* Status Badges */
+.gpd-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+}
+
+.gpd-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.gpd-status-confirmed {
+  background: #dcfce7;
+  color: #15803d;
+}
+.gpd-status-confirmed .gpd-status-dot { background: #22c55e; }
+
+.gpd-status-delivering {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.gpd-status-delivering .gpd-status-dot { background: #3b82f6; }
+
+.gpd-status-pending {
+  background: #fef9c3;
+  color: #a16207;
+}
+.gpd-status-pending .gpd-status-dot { background: #eab308; }
+
+.gpd-status-cancelled {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.gpd-status-cancelled .gpd-status-dot { background: #ef4444; }
+
+.gpd-status-neutral {
+  background: #f1f5f9;
+  color: #475569;
+}
+.gpd-status-neutral .gpd-status-dot { background: #94a3b8; }
+
+/* Card Content Body */
+.gpd-card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.gpd-card-title-block {
+  flex: 1;
+}
+
+.gpd-item-title {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.4;
+}
+
+.gpd-item-desc {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.gpd-card-amount-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.lang-ar .gpd-card-amount-block {
+  align-items: flex-start;
+}
+
+.gpd-amount-label {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.gpd-amount-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.gpd-amount-currency {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* Card Footer */
+.gpd-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.65rem;
+  border-top: 1px dashed #e2e8f0;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.gpd-footer-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.gpd-footer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  color: #475569;
+  background: #f8fafc;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.gpd-footer-chip.chip-paid {
+  background: #f0fdf4;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+.gpd-footer-chip.chip-pending {
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+.gpd-expand-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.gpd-expand-btn:hover {
+  background: #eff6ff;
+}
+
+/* Collapsible Drawer */
+.gpd-expanded-drawer {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  animation: gpdFadeIn 0.25s ease-out;
+}
+
+@keyframes gpdFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.gpd-drawer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.gpd-drawer-heading {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.gpd-drawer-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.gpd-drawer-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.76rem;
+  background: #ffffff;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #f1f5f9;
+}
+
+.gpd-drawer-item-name {
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.gpd-drawer-qty {
+  color: #64748b;
+  font-weight: 600;
+  margin-inline-start: 0.3rem;
+}
+
+.gpd-drawer-item-price {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.gpd-drawer-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.4rem;
+  font-size: 0.76rem;
+  color: #475569;
+  background: #ffffff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #f1f5f9;
+}
+
+.gpd-drawer-meta-line {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: #475569;
+  background: #ffffff;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #f1f5f9;
+}
+
+/* ------------------------------------------------------------------------- */
+/* RESPONSIVE DESIGN                                                         */
+/* ------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .gpd-identity-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .gpd-identity-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .gpd-timeline-header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .gpd-timeline-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .gpd-search-box {
+    width: 100%;
+  }
+
+  .gpd-card-body {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .gpd-card-amount-block {
+    align-items: flex-start;
+  }
+
+  .gpd-card-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .gpd-node-marker {
+    width: 28px;
+  }
+
+  .gpd-node-icon {
+    width: 28px;
+    height: 28px;
+  }
+}

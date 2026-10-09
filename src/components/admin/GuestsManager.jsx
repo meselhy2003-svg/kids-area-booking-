@@ -32,6 +32,7 @@ import {
   BadgePercent
 } from 'lucide-react';
 import './GuestsManager.css';
+import GuestActivityDashboard, { SAMPLE_GUEST_API_RESPONSE } from './GuestActivityDashboard';
 
 // Default Transaction & Spending Records for Initial Guests
 const DEFAULT_GUEST_TRANSACTIONS = {
@@ -597,16 +598,103 @@ export default function GuestsManager({ lang = 'ar' }) {
     return Math.round(activeGuestTotalSpent / txs.length);
   }, [viewingGuest, activeGuestTotalSpent]);
 
-  // Category Icon helper for transactions
-  const renderTxCategoryIcon = (category) => {
-    switch (category) {
-      case 'playzone': return <Ticket size={15} />;
-      case 'restaurant': return <Utensils size={15} />;
-      case 'events': return <Building2 size={15} />;
-      case 'trips': return <Award size={15} />;
-      default: return <Sparkles size={15} />;
+  // Prepare comprehensive API data for GuestActivityDashboard
+  const guestDashboardData = useMemo(() => {
+    if (!viewingGuest) return null;
+    
+    // If viewing Ahmed Mahmoud or matching sample ID, return full sample API response
+    if (viewingGuest._id === '6ac7f3f2a6e9e1dde4cdead1' || viewingGuest.name === 'أحمد محمود') {
+      return SAMPLE_GUEST_API_RESPONSE;
     }
-  };
+
+    const txs = getGuestTransactions(viewingGuest);
+    const totalSpent = calculateGuestSpent(viewingGuest);
+    
+    const mappedTimeline = txs.map((t, idx) => {
+      let catTheme = 'passes';
+      let catAr = 'تذاكر وباقات PlayZone';
+      let catEn = 'PlayZone Pass & Packages';
+      if (t.category === 'restaurant') {
+        catTheme = 'restaurant';
+        catAr = 'طلب وجبات مطعم ودليفري';
+        catEn = 'Restaurant Food & Delivery Order';
+      } else if (t.category === 'trips') {
+        catTheme = 'trips';
+        catAr = 'حجز رحلة مدرسية / مجموعة';
+        catEn = 'School & Group Trip Booking';
+      } else if (t.category === 'events') {
+        catTheme = 'events';
+        catAr = 'حجز حفلات وقاعات';
+        catEn = 'Events & Halls Booking';
+      }
+
+      return {
+        id: t.id ? t.id.replace('#', '') : `tx-${idx}`,
+        category: catTheme,
+        categoryAr: t.categoryAr || catAr,
+        categoryEn: catEn,
+        code: t.id ? t.id.replace('#', '') : `AD-G-${1000 + idx}`,
+        date: t.date || viewingGuest.createdAt || new Date().toISOString(),
+        amount: t.amount || 0,
+        currency: 'EGP',
+        status: t.status === 'Completed' || t.status === 'confirmed' ? 'confirmed' : 'pending',
+        paymentMethod: t.paymentMethod || 'Cash',
+        paymentStatus: 'paid',
+        title: isAr ? (t.serviceAr || t.service) : t.service,
+        description: t.items || (isAr ? `معاملة بقيمة ${t.amount} ج.م` : `Transaction of ${t.amount} EGP`),
+        raw: {
+          orderCode: t.id ? t.id.replace('#', '') : `AD-G-${1000 + idx}`,
+          items: t.items ? [{ nameAr: t.items, nameEn: t.items, quantity: 1, lineTotal: t.amount }] : []
+        }
+      };
+    });
+
+    return {
+      success: true,
+      message: 'تم جلب ملف الضيف الشامل وسجل المعاملات بنجاح',
+      data: {
+        guest: {
+          _id: viewingGuest._id,
+          name: viewingGuest.name,
+          phone: viewingGuest.phone,
+          email: viewingGuest.email || `${viewingGuest.phone}@americandream.eg`,
+          age: viewingGuest.age,
+          gender: viewingGuest.gender,
+          role: 'guest',
+          points: viewingGuest.points || Math.floor(totalSpent * 0.05),
+          children: viewingGuest.children || [],
+          isRegistered: true,
+          createdAt: viewingGuest.createdAt || new Date().toISOString()
+        },
+        summary: {
+          totalSpent: totalSpent,
+          totalTransactionsCount: txs.length,
+          purchases: {
+            count: txs.filter(t => t.category === 'playzone').length,
+            totalAmount: txs.filter(t => t.category === 'playzone').reduce((s, t) => s + (t.amount || 0), 0)
+          },
+          trips: {
+            count: txs.filter(t => t.category === 'trips').length,
+            totalAmount: txs.filter(t => t.category === 'trips').reduce((s, t) => s + (t.amount || 0), 0)
+          },
+          events: {
+            count: txs.filter(t => t.category === 'events').length,
+            totalAmount: txs.filter(t => t.category === 'events').reduce((s, t) => s + (t.amount || 0), 0)
+          },
+          tableReservations: { count: 0 },
+          restaurantOrders: {
+            count: txs.filter(t => t.category === 'restaurant').length,
+            totalAmount: txs.filter(t => t.category === 'restaurant').reduce((s, t) => s + (t.amount || 0), 0)
+          },
+          pointsBalance: viewingGuest.points || Math.floor(totalSpent * 0.05),
+          firstActivityDate: txs[txs.length - 1]?.date || viewingGuest.createdAt,
+          lastActivityDate: txs[0]?.date || new Date().toISOString()
+        },
+        timeline: mappedTimeline.length > 0 ? mappedTimeline : SAMPLE_GUEST_API_RESPONSE.data.timeline
+      }
+    };
+  }, [viewingGuest, isAr]);
+
 
   return (
     <div className={`gm-container ${isAr ? 'lang-ar' : ''}`} dir={isAr ? 'rtl' : 'ltr'}>
@@ -1004,337 +1092,32 @@ export default function GuestsManager({ lang = 'ar' }) {
         </div>
       )}
 
-      {/* Modal: View Guest & Family Details + Spent & Transaction History */}
+      {/* Modal: Comprehensive Guest Profile & Activity Dashboard */}
       {viewingGuest && (
         <div className="gm-modal-overlay" onClick={() => setViewingGuest(null)}>
-          <div className="gm-modal-card gm-view-modal-card" onClick={e => e.stopPropagation()}>
-            {/* Modal Header */}
-            <div className="gm-modal-header gm-view-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div 
-                  className="gm-avatar gm-view-avatar" 
-                  style={{ 
-                    background: viewingGuest.gender === 'female' ? '#ec4899' : '#0284c7' 
-                  }}
-                >
-                  {viewingGuest.name
-                    .split(' ')
-                    .filter(Boolean)
-                    .map(w => w[0])
-                    .slice(0, 2)
-                    .join('')
-                    .toUpperCase() || 'G'}
-                </div>
-                <div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#003844', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span>{viewingGuest.name}</span>
-                    <span className="gm-loyalty-pill">
-                      <Award size={13} />
-                      <span>{activeGuestTotalSpent >= 2000 ? (isAr ? 'ضيف VIP ذهبي' : 'VIP Gold Guest') : (isAr ? 'عضو مميز' : 'Verified Guest')}</span>
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-                    <span style={{ fontSize: '12px', color: '#64748b' }}>#{viewingGuest._id}</span>
-                    <span className={`gm-gender-badge ${viewingGuest.gender}`}>
-                      {viewingGuest.gender === 'male' ? (isAr ? 'ذكر' : 'Male') : (isAr ? 'أنثى' : 'Female')}
-                    </span>
-                    <span className="gm-dot-sep">•</span>
-                    <span style={{ fontSize: '12px', color: '#059669', fontWeight: 700 }}>
-                      {isAr ? 'إجمالي الإنفاق:' : 'Spent:'} {activeGuestTotalSpent.toLocaleString()} {isAr ? 'ج.م' : 'EGP'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <button type="button" className="gm-modal-close" onClick={() => setViewingGuest(null)}>
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Financial & Activity KPI Banner */}
-            <div className="gm-view-spent-summary-bar">
-              <div className="gm-spent-kpi-card">
-                <div className="gm-spent-kpi-icon" style={{ background: '#ecfdf5', color: '#059669' }}>
-                  <Wallet size={18} />
-                </div>
-                <div>
-                  <div className="gm-spent-kpi-label">{isAr ? 'إجمالي الإنفاق التراكمي' : 'Total Spent History'}</div>
-                  <div className="gm-spent-kpi-val" style={{ color: '#059669' }}>
-                    {activeGuestTotalSpent.toLocaleString()} {isAr ? 'ج.م' : 'EGP'}
-                  </div>
-                </div>
-              </div>
-
-              <div className="gm-spent-kpi-card">
-                <div className="gm-spent-kpi-icon" style={{ background: '#e0f2fe', color: '#0284c7' }}>
-                  <Receipt size={18} />
-                </div>
-                <div>
-                  <div className="gm-spent-kpi-label">{isAr ? 'عدد المعاملات والطلبات' : 'Total Transactions'}</div>
-                  <div className="gm-spent-kpi-val">
-                    {getGuestTransactions(viewingGuest).length} {isAr ? 'معاملات' : 'Orders'}
-                  </div>
-                </div>
-              </div>
-
-              <div className="gm-spent-kpi-card">
-                <div className="gm-spent-kpi-icon" style={{ background: '#fef3c7', color: '#d97706' }}>
-                  <TrendingUp size={18} />
-                </div>
-                <div>
-                  <div className="gm-spent-kpi-label">{isAr ? 'متوسط قيمة المعاملة' : 'Avg Order Value'}</div>
-                  <div className="gm-spent-kpi-val">
-                    {activeGuestAvgSpent.toLocaleString()} {isAr ? 'ج.م' : 'EGP'}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Sub-Tab Navigation inside View Modal */}
-            <div className="gm-view-modal-tabs">
-              <button 
-                type="button" 
-                className={`gm-view-tab-btn ${viewModalTab === 'profile' ? 'active' : ''}`}
-                onClick={() => setViewModalTab('profile')}
-              >
-                <Baby size={15} />
-                <span>{isAr ? 'الملف والأسرة' : 'Profile & Family'}</span>
-                <span className="gm-view-tab-count">{viewingGuest.children?.length || 0}</span>
-              </button>
-
-              <button 
-                type="button" 
-                className={`gm-view-tab-btn ${viewModalTab === 'transactions' ? 'active' : ''}`}
-                onClick={() => setViewModalTab('transactions')}
-              >
-                <Receipt size={15} />
-                <span>{isAr ? 'سجل المعاملات والإنفاق' : 'Transaction & Spent History'}</span>
-                <span className="gm-view-tab-count active-green">{getGuestTransactions(viewingGuest).length}</span>
-              </button>
-            </div>
-
-            <div className="gm-view-modal-body">
-              {/* TAB 1: PROFILE & CHILDREN */}
-              {viewModalTab === 'profile' && (
-                <>
-                  {/* Basic Contact Info Grid */}
-                  <div className="gm-view-info-grid">
-                    <div className="gm-view-info-item">
-                      <div className="gm-view-info-icon" style={{ background: '#e0f2fe', color: '#0284c7' }}>
-                        <Phone size={16} />
-                      </div>
-                      <div>
-                        <div className="gm-view-info-label">{isAr ? 'رقم الهاتف' : 'Phone Number'}</div>
-                        <a href={`tel:${viewingGuest.phone}`} className="gm-view-info-value" style={{ color: '#0284c7', textDecoration: 'none' }}>
-                          {viewingGuest.phone}
-                        </a>
-                      </div>
-                    </div>
-
-                    <div className="gm-view-info-item">
-                      <div className="gm-view-info-icon" style={{ background: '#fef3c7', color: '#d97706' }}>
-                        <Calendar size={16} />
-                      </div>
-                      <div>
-                        <div className="gm-view-info-label">{isAr ? 'العمر' : 'Age'}</div>
-                        <div className="gm-view-info-value">{viewingGuest.age} {isAr ? 'سنة' : 'Years old'}</div>
-                      </div>
-                    </div>
-
-                    <div className="gm-view-info-item">
-                      <div className="gm-view-info-icon" style={{ background: '#f3e8ff', color: '#9333ea' }}>
-                        <Baby size={16} />
-                      </div>
-                      <div>
-                        <div className="gm-view-info-label">{isAr ? 'الأطفال المسجلين' : 'Children Count'}</div>
-                        <div className="gm-view-info-value">
-                          {viewingGuest.children?.length || 0} {isAr ? 'أطفال' : 'Children'}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="gm-view-info-item">
-                      <div className="gm-view-info-icon" style={{ background: '#ecfdf5', color: '#059669' }}>
-                        <Clock size={16} />
-                      </div>
-                      <div>
-                        <div className="gm-view-info-label">{isAr ? 'تاريخ التسجيل' : 'Registration Date'}</div>
-                        <div className="gm-view-info-value">
-                          {new Date(viewingGuest.createdAt || Date.now()).toLocaleDateString(isAr ? 'ar-EG' : 'en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Children List */}
-                  <div className="gm-view-section">
-                    <h4 className="gm-view-section-title">
-                      <Baby size={16} color="#00a8cc" />
-                      <span>{isAr ? 'الأطفال المسجلين في الملف العائلي' : 'Registered Family Children'}</span>
-                      <span className="gm-view-badge-count">{viewingGuest.children?.length || 0}</span>
-                    </h4>
-
-                    {viewingGuest.children && viewingGuest.children.length > 0 ? (
-                      <div className="gm-view-children-grid">
-                        {viewingGuest.children.map((child, cIdx) => (
-                          <div key={cIdx} className="gm-view-child-card">
-                            <div className="gm-view-child-avatar">
-                              {child.gender === 'female' ? '👧' : '👦'}
-                            </div>
-                            <div className="gm-view-child-info">
-                              <div className="gm-view-child-name">{child.name}</div>
-                              <div className="gm-view-child-meta">
-                                <span>{child.age} {isAr ? 'سنوات' : 'years'}</span>
-                                <span className="gm-dot-sep">•</span>
-                                <span style={{ color: child.gender === 'female' ? '#db2777' : '#0284c7', fontWeight: 600 }}>
-                                  {child.gender === 'female' ? (isAr ? 'بنت' : 'Girl') : (isAr ? 'ولد' : 'Boy')}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="gm-view-no-kids">
-                        <p>{isAr ? 'لا يوجد أطفال مسجلين لهذا الضيف حالياً.' : 'No registered children for this guest profile.'}</p>
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-
-              {/* TAB 2: TRANSACTION & SPENT HISTORY */}
-              {viewModalTab === 'transactions' && (
-                <div className="gm-view-tx-container">
-                  {/* Category Filter & Search Bar */}
-                  <div className="gm-view-tx-filters">
-                    <div className="gm-view-tx-pills">
-                      <button 
-                        type="button" 
-                        className={`gm-tx-filter-pill ${txCategoryFilter === 'all' ? 'active' : ''}`}
-                        onClick={() => setTxCategoryFilter('all')}
-                      >
-                        {isAr ? 'الكل' : 'All'}
-                      </button>
-                      <button 
-                        type="button" 
-                        className={`gm-tx-filter-pill ${txCategoryFilter === 'playzone' ? 'active' : ''}`}
-                        onClick={() => setTxCategoryFilter('playzone')}
-                      >
-                        <Ticket size={12} />
-                        <span>{isAr ? 'الألعاب' : 'Play Zone'}</span>
-                      </button>
-                      <button 
-                        type="button" 
-                        className={`gm-tx-filter-pill ${txCategoryFilter === 'restaurant' ? 'active' : ''}`}
-                        onClick={() => setTxCategoryFilter('restaurant')}
-                      >
-                        <Utensils size={12} />
-                        <span>{isAr ? 'المطعم' : 'Restaurant'}</span>
-                      </button>
-                      <button 
-                        type="button" 
-                        className={`gm-tx-filter-pill ${txCategoryFilter === 'events' ? 'active' : ''}`}
-                        onClick={() => setTxCategoryFilter('events')}
-                      >
-                        <Building2 size={12} />
-                        <span>{isAr ? 'القاعات' : 'Events'}</span>
-                      </button>
-                    </div>
-
-                    <div className="gm-view-tx-search">
-                      <Search size={13} className="gm-tx-search-icon" />
-                      <input 
-                        type="text" 
-                        placeholder={isAr ? 'بحث في المعاملات...' : 'Search transactions...'}
-                        value={txSearchQuery}
-                        onChange={(e) => setTxSearchQuery(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Transactions List */}
-                  <div className="gm-view-tx-list">
-                    {activeGuestTransactions.length > 0 ? (
-                      activeGuestTransactions.map((tx, txIdx) => (
-                        <div key={tx.id || txIdx} className="gm-tx-card">
-                          <div className="gm-tx-left">
-                            <div className={`gm-tx-category-icon ${tx.category}`}>
-                              {renderTxCategoryIcon(tx.category)}
-                            </div>
-                            <div className="gm-tx-details">
-                              <div className="gm-tx-title-row">
-                                <span className="gm-tx-id">{tx.id}</span>
-                                <h5 className="gm-tx-title">
-                                  {isAr ? (tx.serviceAr || tx.service) : tx.service}
-                                </h5>
-                              </div>
-                              <div className="gm-tx-items-desc">{tx.items}</div>
-                              <div className="gm-tx-meta-row">
-                                <span className="gm-tx-date">
-                                  <Clock size={12} />
-                                  {new Date(tx.date).toLocaleDateString(isAr ? 'ar-EG' : 'en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    year: 'numeric'
-                                  })}
-                                </span>
-                                <span className="gm-dot-sep">•</span>
-                                <span className="gm-tx-pay-method">
-                                  <CreditCard size={12} />
-                                  {isAr ? (tx.paymentMethodAr || tx.paymentMethod) : tx.paymentMethod}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="gm-tx-right">
-                            <div className="gm-tx-amount">
-                              +{tx.amount?.toLocaleString()} {isAr ? 'ج.م' : 'EGP'}
-                            </div>
-                            <span className="gm-tx-status-badge">
-                              <CheckCircle2 size={12} />
-                              <span>{isAr ? (tx.statusAr || tx.status) : tx.status}</span>
-                            </span>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="gm-view-no-kids" style={{ padding: '32px 20px' }}>
-                        <Receipt size={32} color="#94a3b8" style={{ marginBottom: 8 }} />
-                        <p>{isAr ? 'لا توجد معاملات مطابقة لمعايير البحث.' : 'No transactions match current filter.'}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="gm-modal-footer" style={{ borderTop: '1px solid #f1f5f9', background: '#f8fafc', padding: '14px 20px' }}>
-              <button 
-                type="button" 
-                className="gm-btn-cancel" 
-                onClick={() => setViewingGuest(null)}
-              >
-                {isAr ? 'إغلاق' : 'Close'}
-              </button>
-              <button 
-                type="button" 
-                className="gm-btn-submit"
-                onClick={() => {
-                  const toEdit = viewingGuest;
-                  setViewingGuest(null);
-                  handleOpenEdit(toEdit);
-                }}
-              >
-                <Edit3 size={14} style={{ marginInlineEnd: 6 }} />
-                <span>{isAr ? 'تعديل بيانات الضيف' : 'Edit Guest Profile'}</span>
-              </button>
-            </div>
+          <div 
+            className="gm-modal-card gm-view-dashboard-modal" 
+            onClick={e => e.stopPropagation()}
+            style={{ 
+              maxWidth: '1150px', 
+              width: '95vw', 
+              maxHeight: '92vh', 
+              overflowY: 'auto', 
+              padding: '1.25rem', 
+              borderRadius: '20px',
+              background: '#f8fafc'
+            }}
+          >
+            <GuestActivityDashboard
+              apiData={guestDashboardData || SAMPLE_GUEST_API_RESPONSE}
+              lang={lang}
+              onClose={() => setViewingGuest(null)}
+              onEditProfile={() => {
+                const toEdit = viewingGuest;
+                setViewingGuest(null);
+                handleOpenEdit(toEdit);
+              }}
+            />
           </div>
         </div>
       )}
