@@ -1620,63 +1620,12 @@ export default function DesktopDashboardPage({
         )}
 
         {adminSection === 'about' && (
-          <>
-            <header className="ados-topbar">
-              <div style={{ width: 140 }}></div>
-              <div className="ados-topbar-title-group">
-                <h1 className="ados-topbar-title">
-                  {isAr ? 'لوحة تحكم إدارة أمريكان دريم' : 'ADOS Management Dashboard'}
-                </h1>
-                <div className="ados-topbar-subtitle">
-                  {isAr ? 'مرح أكثر • قيمة أعلى • ذكريات تدوم' : 'More Fun. More Value. More Memories.'}
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div className="ados-topbar-lang-toggle">
-                  <button 
-                    type="button" 
-                    className={`ados-lang-btn ${isAr ? 'active' : ''}`}
-                    onClick={() => setLang && setLang('ar')}
-                    title="عربي"
-                  >
-                    عربي
-                  </button>
-                  <button 
-                    type="button" 
-                    className={`ados-lang-btn ${!isAr ? 'active' : ''}`}
-                    onClick={() => setLang && setLang('en')}
-                    title="English"
-                  >
-                    EN
-                  </button>
-                </div>
-                <button 
-                  type="button"
-                  className="ados-logout-topbar-btn"
-                  onClick={handleAdminLogout}
-                  title={isAr ? 'تسجيل الخروج' : 'Log Out'}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    background: 'rgba(239, 68, 68, 0.15)',
-                    border: '1.5px solid rgba(239, 68, 68, 0.4)',
-                    borderRadius: '8px',
-                    padding: '8px 14px',
-                    color: '#fca5a5',
-                    cursor: 'pointer',
-                    fontWeight: 700,
-                    fontSize: '12px',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <LogOut size={15} />
-                  <span>{isAr ? 'خروج' : 'Logout'}</span>
-                </button>
-              </div>
-            </header>
-            <AboutUsManager lang={lang} />
-          </>
+          <AboutUsManager 
+            lang={lang}
+            setLang={setLang}
+            onLogout={handleAdminLogout}
+            onOpenOrders={() => setAdminSection('orders')}
+          />
         )}
       </div>
 
