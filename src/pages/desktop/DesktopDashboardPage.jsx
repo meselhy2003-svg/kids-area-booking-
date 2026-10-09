@@ -27,6 +27,7 @@ import {
   ArrowRight,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
   Building2,
   Utensils,
   PartyPopper,
