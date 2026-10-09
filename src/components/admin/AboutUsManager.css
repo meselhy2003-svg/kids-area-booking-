@@ -1,0 +1,209 @@
+/* About Us Manager CSS */
+.aum-container {
+  padding: 24px 32px;
+  background-color: #f1f5f9;
+  min-height: calc(100vh - 68px);
+  color: #0f172a;
+}
+
+.aum-container.lang-ar {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Alexandria', 'Cairo', sans-serif;
+}
+
+.aum-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.aum-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #003844;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
+}
+
+.aum-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.aum-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.aum-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #64748b;
+  border: 1.5px solid #cbd5e1;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.aum-reset-btn:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.aum-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #efa31d;
+  color: #ffffff;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(239, 163, 29, 0.3);
+  transition: all 0.2s ease;
+}
+
+.aum-save-btn:hover {
+  background: #e59816;
+  transform: translateY(-1px);
+}
+
+.aum-save-btn.large {
+  padding: 12px 28px;
+  font-size: 14px;
+}
+
+.aum-form-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.aum-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 22px 24px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.aum-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.aum-card-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #003844;
+}
+
+.aum-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .aum-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.aum-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.aum-field label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.aum-field input,
+.aum-field textarea {
+  padding: 9px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #0f172a;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.aum-field input:focus,
+.aum-field textarea:focus {
+  border-color: #efa31d;
+  box-shadow: 0 0 0 3px rgba(239, 163, 29, 0.15);
+}
+
+.aum-stats-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.aum-stat-edit-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.aum-bottom-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 10px;
+  margin-bottom: 30px;
+}
+
+.aum-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #003844;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10000;
+  font-size: 13px;
+  font-weight: 600;
+  border-left: 4px solid #10b981;
+}
+
+.aum-container.lang-ar .aum-toast {
+  right: auto;
+  left: 24px;
+  border-left: none;
+  border-right: 4px solid #10b981;
+}

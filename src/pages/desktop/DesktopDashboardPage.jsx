@@ -34,7 +34,32 @@ import {
 } from 'lucide-react';
 import './DesktopDashboardPage.css';
 import PlayZoneOrdersManager from './PlayZoneOrdersManager';
+import GuestsManager from '../../components/admin/GuestsManager';
+import AboutUsManager from '../../components/admin/AboutUsManager';
 import { authService } from '../../api/authService';
+
+// Custom Monitor with 2x2 grid icon matching the user's reference screenshots exactly
+const MonitorWithGridIcon = ({ size = 18, color = 'currentColor' }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke={color} 
+    strokeWidth="1.9" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
+  >
+    <rect x="2" y="3" width="20" height="14" rx="2" />
+    <rect x="5.5" y="6" width="3" height="3" rx="0.5" fill={color} stroke="none" />
+    <rect x="9.5" y="6" width="3" height="3" rx="0.5" fill={color} stroke="none" />
+    <rect x="5.5" y="10" width="3" height="3" rx="0.5" fill={color} stroke="none" />
+    <rect x="9.5" y="10" width="3" height="3" rx="0.5" fill={color} stroke="none" />
+    <line x1="12" y1="17" x2="12" y2="21" />
+    <line x1="8" y1="21" x2="16" y2="21" />
+  </svg>
+);
 
 
 // Curated Local Assets for quick selection & fallback
@@ -455,31 +480,35 @@ export default function DesktopDashboardPage({
   // Current active zone tab: 'challenge' | 'kids-area' | 'fun-park' | 'adventure' | 'home' | 'packages'
   const [activeZone, setActiveZone] = useState('challenge');
 
-  // Modals & Orders Suite state
-  const [ordersInitialView, setOrdersInitialView] = useState(() => {
+  // Master Admin Section:
+  // 'play-zones' | 'restaurant-orders' | 'events-orders' | 'trips-orders' | 'guests' | 'orders' | 'about'
+  const [adminSection, setAdminSection] = useState(() => {
     if (typeof window !== 'undefined') {
       const h = window.location.hash;
       if (h.includes('restaurant')) return 'restaurant-orders';
       if (h.includes('event')) return 'events-orders';
       if (h.includes('trip')) return 'trips-orders';
+      if (h.includes('guest')) return 'guests';
+      if (h.includes('order')) return 'orders';
+      if (h.includes('about')) return 'about';
+      if (h.includes('play-zone')) return 'play-zones';
     }
-    return 'playzone-orders';
+    return 'play-zones';
   });
 
-  // Modals state
-  const [isOrdersViewOpen, setIsOrdersViewOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const h = window.location.hash;
-      return (
-        h === '#playzone-orders' ||
-        h === '#orders' ||
-        h === '#trips-orders' ||
-        h === '#restaurant-orders' ||
-        h === '#events-orders'
-      );
-    }
-    return false;
-  });
+  // Sidebar Accordion state: expanded by default (Image 2), collapsible to Image 1
+  const [isWebAdminExpanded, setIsWebAdminExpanded] = useState(true);
+
+  // Exact 7 items from Image 2
+  const sidebarItems = [
+    { key: 'play-zones', labelEn: 'Play Zones', labelAr: 'Play Zones' },
+    { key: 'restaurant-orders', labelEn: 'Restaurant & Cafe', labelAr: 'Restaurant & Cafe' },
+    { key: 'events-orders', labelEn: 'Event & Halls', labelAr: 'Event & Halls' },
+    { key: 'trips-orders', labelEn: 'Trips', labelAr: 'Trips' },
+    { key: 'guests', labelEn: 'Guests', labelAr: 'Guests' },
+    { key: 'orders', labelEn: 'Orders', labelAr: 'Orders' },
+    { key: 'about', labelEn: 'About us', labelAr: 'About us' }
+  ];
 
   // Live order counts from backend APIs
   const [counts, setCounts] = useState({ passes: 22, trips: 5, events: 5 });
@@ -514,17 +543,19 @@ export default function DesktopDashboardPage({
     const handleHash = () => {
       const h = window.location.hash;
       if (h === '#playzone-orders' || h === '#orders') {
-        setOrdersInitialView('playzone-orders');
-        setIsOrdersViewOpen(true);
-      } else if (h === '#trips-orders') {
-        setOrdersInitialView('trips-orders');
-        setIsOrdersViewOpen(true);
-      } else if (h === '#restaurant-orders') {
-        setOrdersInitialView('restaurant-orders');
-        setIsOrdersViewOpen(true);
-      } else if (h === '#events-orders') {
-        setOrdersInitialView('events-orders');
-        setIsOrdersViewOpen(true);
+        setAdminSection('orders');
+      } else if (h === '#trips-orders' || h === '#trips') {
+        setAdminSection('trips-orders');
+      } else if (h === '#restaurant-orders' || h === '#restaurant') {
+        setAdminSection('restaurant-orders');
+      } else if (h === '#events-orders' || h === '#events') {
+        setAdminSection('events-orders');
+      } else if (h === '#guests') {
+        setAdminSection('guests');
+      } else if (h === '#about') {
+        setAdminSection('about');
+      } else if (h === '#play-zones' || h === '#dashboard') {
+        setAdminSection('play-zones');
       }
     };
     window.addEventListener('hashchange', handleHash);
@@ -808,178 +839,75 @@ export default function DesktopDashboardPage({
     }
   };
 
-  // Render Full Play Zone, Trips, Restaurant & Events Orders Management Suite
-  if (isOrdersViewOpen) {
-    return (
-      <PlayZoneOrdersManager 
-        initialView={ordersInitialView}
-        onBackToDashboard={() => setIsOrdersViewOpen(false)} 
-        onGoHome={() => setActiveTab && setActiveTab('home')}
-        lang={lang} 
-        setLang={setLang}
-      />
-    );
-  }
-
   return (
     <div 
       className={`ados-dashboard-container ${isAr ? 'lang-ar' : ''}`}
       dir={isAr ? 'rtl' : 'ltr'}
     >
       {/* ------------------------------------------------------------------ */}
-      {/* 1. SIDEBAR                                                         */}
+      {/* 1. FIXED FULL-HEIGHT SIDEBAR (Exact Match to Image 1 & Image 2)    */}
       {/* ------------------------------------------------------------------ */}
       <aside className="ados-sidebar">
-        <div className="ados-sidebar-top">
-          {/* Logo */}
-          <button 
-            className="ados-sidebar-logo-btn" 
-            title={isAr ? 'العودة لموقع أمريكان دريم' : 'Return to American Dream Website'}
-            onClick={() => setActiveTab('home')}
-          >
-            <img 
-              src="/photo/logo/logo nav bar and footer.png" 
-              alt="American Dream Logo" 
-              className="ados-sidebar-logo" 
-            />
-          </button>
-
-          {/* Web Admin Dashboard Nav Link */}
-          <button 
-            className="ados-sidebar-nav-link"
-            onClick={() => setActiveTab('home')}
-            title={isAr ? 'الانتقال إلى الموقع العام' : 'Click to view the public website'}
-          >
-            <span>
-              <Globe size={15} color="#38bdf8" />
-              {isAr ? 'الموقع العام' : 'Visit Public Website'}
-            </span>
-            {isAr ? <ChevronLeft size={14} color="#94a3b8" /> : <ChevronRight size={14} color="#94a3b8" />}
-          </button>
-
-          {/* Play Zone Passes Nav Link */}
-          <button 
-            className="ados-sidebar-nav-link"
-            onClick={() => {
-              setOrdersInitialView('playzone-orders');
-              setIsOrdersViewOpen(true);
-            }}
-            title={isAr ? 'إدارة تذاكر وباقات البلاي زون' : 'Manage Play Zone Passes & Tickets'}
-          >
-            <span>
-              <Ticket size={15} color="#00d2ff" />
-              {isAr ? 'تذاكر البلاي زون' : 'Play Zone Passes'}
-            </span>
-            <span style={{ 
-              marginInlineStart: 'auto', 
-              background: '#00d2ff', 
-              color: '#002830', 
-              padding: '2px 8px', 
-              borderRadius: '10px', 
-              fontSize: '11px', 
-              fontWeight: 800 
-            }}>
-              {counts.passes}
-            </span>
-          </button>
-
-          {/* School & Group Trips Nav Link */}
-          <button 
-            className="ados-sidebar-nav-link"
-            onClick={() => {
-              setOrdersInitialView('trips-orders');
-              setIsOrdersViewOpen(true);
-            }}
-            title={isAr ? 'إدارة حجوزات الرحلات المدرسية' : 'Manage School & Group Trips'}
-          >
-            <span>
-              <Building2 size={15} color="#38bdf8" />
-              {isAr ? 'طلبات الرحلات' : 'Trips Bookings'}
-            </span>
-            <span style={{ 
-              marginInlineStart: 'auto', 
-              background: '#0284c7', 
-              color: '#ffffff', 
-              padding: '2px 8px', 
-              borderRadius: '10px', 
-              fontSize: '11px', 
-              fontWeight: 800 
-            }}>
-              {counts.trips}
-            </span>
-          </button>
-
-          {/* Restaurant & Cafe Orders Nav Link */}
-          <button 
-            className="ados-sidebar-nav-link"
-            onClick={() => {
-              setOrdersInitialView('restaurant-orders');
-              setIsOrdersViewOpen(true);
-            }}
-            title={isAr ? 'إدارة طلبات المطعم والكافيه وحجوزات الطاولات' : 'Manage Restaurant Orders & Table Bookings'}
-          >
-            <span>
-              <Utensils size={15} color="#10b981" />
-              {isAr ? 'طلبات المطعم والكافيه' : 'Restaurant & Cafe'}
-            </span>
-            <span style={{ 
-              marginInlineStart: 'auto', 
-              background: '#10b981', 
-              color: '#ffffff', 
-              padding: '2px 8px', 
-              borderRadius: '10px', 
-              fontSize: '11px', 
-              fontWeight: 800 
-            }}>
-              34
-            </span>
-          </button>
-
-          {/* Event Halls & Birthdays Nav Link */}
-          <button 
-            className="ados-sidebar-nav-link"
-            onClick={() => {
-              setOrdersInitialView('events-orders');
-              setIsOrdersViewOpen(true);
-            }}
-            title={isAr ? 'إدارة حجوزات القاعات وأعياد الميلاد' : 'Manage Event Halls & Celebrations'}
-          >
-            <span>
-              <Sparkles size={15} color="#ec4899" />
-              {isAr ? 'القاعات والمناسبات' : 'Events & Halls'}
-            </span>
-            <span style={{ 
-              marginInlineStart: 'auto', 
-              background: '#ec4899', 
-              color: '#ffffff', 
-              padding: '2px 8px', 
-              borderRadius: '10px', 
-              fontSize: '11px', 
-              fontWeight: 800 
-            }}>
-              {counts.events}
-            </span>
-          </button>
-        </div>
-
-        {/* Sidebar Footer */}
-        <div className="ados-sidebar-footer">
-          <div className="ados-sidebar-brand-script">
-            {isAr ? 'العب، استكشف، معاً!' : 'Play, Explore, Together!'}
+        <div className="ados-sidebar-content">
+          {/* Centered Logo at the top */}
+          <div className="ados-sidebar-logo-wrap">
+            <button 
+              type="button" 
+              className="ados-sidebar-logo-btn" 
+              title={isAr ? 'العودة لموقع أمريكان دريم' : 'Return to American Dream Website'}
+              onClick={() => setActiveTab && setActiveTab('home')}
+            >
+              <img 
+                src="/photo/logo/logo nav bar and footer.png" 
+                alt="American Dream Logo" 
+                className="ados-sidebar-logo-img" 
+              />
+            </button>
           </div>
-          <div className="ados-sidebar-brand-subtitle">
-            {isAr ? 'منتجع الإسماعيلية للمرح' : 'ISMAILIA FUN RESORT'}
-          </div>
-          <div className="ados-sidebar-socials">
-            <button className="ados-sidebar-social-icon" onClick={() => window.open('https://facebook.com', '_blank')}>
-              <Facebook size={14} />
+
+          {/* Web Admin Dashboard Accordion Item */}
+          <div className="ados-sidebar-accordion">
+            <button 
+              type="button"
+              className={`ados-accordion-btn ${isWebAdminExpanded ? 'expanded' : ''}`}
+              onClick={() => setIsWebAdminExpanded(prev => !prev)}
+              title={isAr ? 'لوحة تحكم الموقع' : 'Web Admin Dashboard'}
+            >
+              <div className="ados-accordion-left">
+                <span className="ados-accordion-icon">
+                  <MonitorWithGridIcon size={19} color="#ffffff" />
+                </span>
+                <span className="ados-accordion-title">
+                  Web Admin Dashboard
+                </span>
+              </div>
+              <span className="ados-accordion-chevron">
+                {isWebAdminExpanded ? (
+                  <ChevronDown size={18} strokeWidth={2.4} />
+                ) : (
+                  isAr ? <ChevronLeft size={18} strokeWidth={2.4} /> : <ChevronRight size={18} strokeWidth={2.4} />
+                )}
+              </span>
             </button>
-            <button className="ados-sidebar-social-icon" onClick={() => window.open('https://instagram.com', '_blank')}>
-              <Instagram size={14} />
-            </button>
-            <button className="ados-sidebar-social-icon" onClick={() => setActiveTab('home')}>
-              <Globe size={14} />
-            </button>
+
+            {/* Submenu List (7 items matching Image 2) */}
+            {isWebAdminExpanded && (
+              <div className="ados-submenu-container">
+                {sidebarItems.map(item => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    className={`ados-submenu-item ${adminSection === item.key ? 'active' : ''}`}
+                    onClick={() => {
+                      setAdminSection(item.key);
+                      window.location.hash = '#' + item.key;
+                    }}
+                  >
+                    <span>{isAr ? item.labelAr : item.labelEn}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </aside>
@@ -988,46 +916,48 @@ export default function DesktopDashboardPage({
       {/* 2. MAIN BODY AREA                                                 */}
       {/* ------------------------------------------------------------------ */}
       <div className="ados-main-area">
-        {/* Topbar */}
-        <header className="ados-topbar">
-          <div style={{ width: 140 }}></div>
-          <div className="ados-topbar-title-group">
-            <h1 className="ados-topbar-title">
-              {isAr ? 'لوحة تحكم إدارة أمريكان دريم' : 'ADOS Management Dashboard'}
-            </h1>
-            <div className="ados-topbar-subtitle">
-              {isAr ? 'مرح أكثر • قيمة أعلى • ذكريات تدوم' : 'More Fun. More Value. More Memories.'}
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {/* Language Toggle */}
-            <div className="ados-topbar-lang-toggle">
-              <button 
-                type="button" 
-                className={`ados-lang-btn ${isAr ? 'active' : ''}`}
-                onClick={() => setLang && setLang('ar')}
-                title="عربي"
-              >
-                عربي
-              </button>
-              <button 
-                type="button" 
-                className={`ados-lang-btn ${!isAr ? 'active' : ''}`}
-                onClick={() => setLang && setLang('en')}
-                title="English"
-              >
-                EN
-              </button>
-            </div>
+        {adminSection === 'play-zones' && (
+          <>
+            {/* Topbar */}
+            <header className="ados-topbar">
+              <div style={{ width: 140 }}></div>
+              <div className="ados-topbar-title-group">
+                <h1 className="ados-topbar-title">
+                  {isAr ? 'لوحة تحكم إدارة أمريكان دريم' : 'ADOS Management Dashboard'}
+                </h1>
+                <div className="ados-topbar-subtitle">
+                  {isAr ? 'مرح أكثر • قيمة أعلى • ذكريات تدوم' : 'More Fun. More Value. More Memories.'}
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {/* Language Toggle */}
+                <div className="ados-topbar-lang-toggle">
+                  <button 
+                    type="button" 
+                    className={`ados-lang-btn ${isAr ? 'active' : ''}`}
+                    onClick={() => setLang && setLang('ar')}
+                    title="عربي"
+                  >
+                    عربي
+                  </button>
+                  <button 
+                    type="button" 
+                    className={`ados-lang-btn ${!isAr ? 'active' : ''}`}
+                    onClick={() => setLang && setLang('en')}
+                    title="English"
+                  >
+                    EN
+                  </button>
+                </div>
 
-            <button 
-              className="ados-orders-btn"
-              onClick={() => setIsOrdersViewOpen(true)}
-              title={isAr ? 'فتح إدارة طلبات البلاي زون' : 'Open Play Zone & Trips Orders Management'}
-            >
-              <span>{isAr ? 'طلبات البلاي زون' : 'PLAY ZONE ORDERS'}</span>
-              <span className="ados-orders-count-badge">86</span>
-            </button>
+                <button 
+                  className="ados-orders-btn"
+                  onClick={() => setAdminSection('orders')}
+                  title={isAr ? 'فتح إدارة طلبات البلاي زون' : 'Open Play Zone & Trips Orders Management'}
+                >
+                  <span>{isAr ? 'طلبات البلاي زون' : 'PLAY ZONE ORDERS'}</span>
+                  <span className="ados-orders-count-badge">86</span>
+                </button>
 
             <button 
               type="button"
@@ -1584,6 +1514,192 @@ export default function DesktopDashboardPage({
             </button>
           </div>
         </div>
+        </>
+        )}
+
+        {adminSection === 'orders' && (
+          <PlayZoneOrdersManager 
+            initialView="playzone-orders"
+            isEmbedded={true}
+            onBackToDashboard={() => setAdminSection('play-zones')}
+            onGoHome={() => setActiveTab && setActiveTab('home')}
+            onViewChange={(view) => {
+              if (view === 'trips-orders') setAdminSection('trips-orders');
+              else if (view === 'restaurant-orders') setAdminSection('restaurant-orders');
+              else if (view === 'events-orders') setAdminSection('events-orders');
+            }}
+            lang={lang}
+            setLang={setLang}
+          />
+        )}
+
+        {adminSection === 'restaurant-orders' && (
+          <PlayZoneOrdersManager 
+            initialView="restaurant-orders"
+            isEmbedded={true}
+            onBackToDashboard={() => setAdminSection('play-zones')}
+            onGoHome={() => setActiveTab && setActiveTab('home')}
+            onViewChange={(view) => {
+              if (view === 'playzone-orders') setAdminSection('orders');
+              else if (view === 'trips-orders') setAdminSection('trips-orders');
+              else if (view === 'events-orders') setAdminSection('events-orders');
+            }}
+            lang={lang}
+            setLang={setLang}
+          />
+        )}
+
+        {adminSection === 'events-orders' && (
+          <PlayZoneOrdersManager 
+            initialView="events-orders"
+            isEmbedded={true}
+            onBackToDashboard={() => setAdminSection('play-zones')}
+            onGoHome={() => setActiveTab && setActiveTab('home')}
+            onViewChange={(view) => {
+              if (view === 'playzone-orders') setAdminSection('orders');
+              else if (view === 'trips-orders') setAdminSection('trips-orders');
+              else if (view === 'restaurant-orders') setAdminSection('restaurant-orders');
+            }}
+            lang={lang}
+            setLang={setLang}
+          />
+        )}
+
+        {adminSection === 'trips-orders' && (
+          <PlayZoneOrdersManager 
+            initialView="trips-orders"
+            isEmbedded={true}
+            onBackToDashboard={() => setAdminSection('play-zones')}
+            onGoHome={() => setActiveTab && setActiveTab('home')}
+            onViewChange={(view) => {
+              if (view === 'playzone-orders') setAdminSection('orders');
+              else if (view === 'restaurant-orders') setAdminSection('restaurant-orders');
+              else if (view === 'events-orders') setAdminSection('events-orders');
+            }}
+            lang={lang}
+            setLang={setLang}
+          />
+        )}
+
+        {adminSection === 'guests' && (
+          <>
+            <header className="ados-topbar">
+              <div style={{ width: 140 }}></div>
+              <div className="ados-topbar-title-group">
+                <h1 className="ados-topbar-title">
+                  {isAr ? 'لوحة تحكم إدارة أمريكان دريم' : 'ADOS Management Dashboard'}
+                </h1>
+                <div className="ados-topbar-subtitle">
+                  {isAr ? 'مرح أكثر • قيمة أعلى • ذكريات تدوم' : 'More Fun. More Value. More Memories.'}
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div className="ados-topbar-lang-toggle">
+                  <button 
+                    type="button" 
+                    className={`ados-lang-btn ${isAr ? 'active' : ''}`}
+                    onClick={() => setLang && setLang('ar')}
+                    title="عربي"
+                  >
+                    عربي
+                  </button>
+                  <button 
+                    type="button" 
+                    className={`ados-lang-btn ${!isAr ? 'active' : ''}`}
+                    onClick={() => setLang && setLang('en')}
+                    title="English"
+                  >
+                    EN
+                  </button>
+                </div>
+                <button 
+                  type="button"
+                  className="ados-logout-topbar-btn"
+                  onClick={handleAdminLogout}
+                  title={isAr ? 'تسجيل الخروج' : 'Log Out'}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    border: '1.5px solid rgba(239, 68, 68, 0.4)',
+                    borderRadius: '8px',
+                    padding: '8px 14px',
+                    color: '#fca5a5',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                    fontSize: '12px',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <LogOut size={15} />
+                  <span>{isAr ? 'خروج' : 'Logout'}</span>
+                </button>
+              </div>
+            </header>
+            <GuestsManager lang={lang} />
+          </>
+        )}
+
+        {adminSection === 'about' && (
+          <>
+            <header className="ados-topbar">
+              <div style={{ width: 140 }}></div>
+              <div className="ados-topbar-title-group">
+                <h1 className="ados-topbar-title">
+                  {isAr ? 'لوحة تحكم إدارة أمريكان دريم' : 'ADOS Management Dashboard'}
+                </h1>
+                <div className="ados-topbar-subtitle">
+                  {isAr ? 'مرح أكثر • قيمة أعلى • ذكريات تدوم' : 'More Fun. More Value. More Memories.'}
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div className="ados-topbar-lang-toggle">
+                  <button 
+                    type="button" 
+                    className={`ados-lang-btn ${isAr ? 'active' : ''}`}
+                    onClick={() => setLang && setLang('ar')}
+                    title="عربي"
+                  >
+                    عربي
+                  </button>
+                  <button 
+                    type="button" 
+                    className={`ados-lang-btn ${!isAr ? 'active' : ''}`}
+                    onClick={() => setLang && setLang('en')}
+                    title="English"
+                  >
+                    EN
+                  </button>
+                </div>
+                <button 
+                  type="button"
+                  className="ados-logout-topbar-btn"
+                  onClick={handleAdminLogout}
+                  title={isAr ? 'تسجيل الخروج' : 'Log Out'}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    border: '1.5px solid rgba(239, 68, 68, 0.4)',
+                    borderRadius: '8px',
+                    padding: '8px 14px',
+                    color: '#fca5a5',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                    fontSize: '12px',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <LogOut size={15} />
+                  <span>{isAr ? 'خروج' : 'Logout'}</span>
+                </button>
+              </div>
+            </header>
+            <AboutUsManager lang={lang} />
+          </>
+        )}
       </div>
 
       {/* ------------------------------------------------------------------ */}

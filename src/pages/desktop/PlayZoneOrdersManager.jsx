@@ -283,7 +283,9 @@ export default function PlayZoneOrdersManager({
   onGoHome,
   lang = 'ar',
   setLang,
-  initialView = 'playzone-orders'
+  initialView = 'playzone-orders',
+  isEmbedded = false,
+  onViewChange
 }) {
   const isAr = lang === 'ar';
 
@@ -294,6 +296,12 @@ export default function PlayZoneOrdersManager({
       setCurrentView(initialView);
     }
   }, [initialView]);
+
+  useEffect(() => {
+    if (onViewChange) {
+      onViewChange(currentView);
+    }
+  }, [currentView, onViewChange]);
   
   // Live Purchases Data States (ADOS Buying API)
   const [orders, setOrders] = useState([]);
@@ -1015,22 +1023,26 @@ export default function PlayZoneOrdersManager({
       {/* ========================================================================= */}
       <header className="pz-orders-topbar">
         <div className="pz-topbar-left">
-          <img 
-            src="/photo/logo/logo nav bar and footer.png" 
-            alt="American Dream Logo" 
-            className="pz-topbar-brand-logo" 
-            onClick={onGoHome || onBackToDashboard}
-            title={isAr ? 'موقع أمريكان دريم بالإسماعيلية' : 'American Dream Ismailia Website'}
-          />
-          <button 
-            type="button" 
-            className="pz-back-to-editor-btn"
-            onClick={onBackToDashboard}
-            title={isAr ? 'العودة إلى لوحة تحكم المحتوى' : 'Return to ADOS Content Editor'}
-          >
-            {isAr ? <ArrowRight size={16} /> : <ArrowLeft size={16} />}
-            <span>{isAr ? 'لوحة تحكم المحتوى' : 'Web Admin Dashboard'}</span>
-          </button>
+          {!isEmbedded && (
+            <img 
+              src="/photo/logo/logo nav bar and footer.png" 
+              alt="American Dream Logo" 
+              className="pz-topbar-brand-logo" 
+              onClick={onGoHome || onBackToDashboard}
+              title={isAr ? 'موقع أمريكان دريم بالإسماعيلية' : 'American Dream Ismailia Website'}
+            />
+          )}
+          {!isEmbedded && (
+            <button 
+              type="button" 
+              className="pz-back-to-editor-btn"
+              onClick={onBackToDashboard}
+              title={isAr ? 'العودة إلى لوحة تحكم المحتوى' : 'Return to ADOS Content Editor'}
+            >
+              {isAr ? <ArrowRight size={16} /> : <ArrowLeft size={16} />}
+              <span>{isAr ? 'لوحة تحكم المحتوى' : 'Web Admin Dashboard'}</span>
+            </button>
+          )}
         </div>
 
         <div className="pz-topbar-center">

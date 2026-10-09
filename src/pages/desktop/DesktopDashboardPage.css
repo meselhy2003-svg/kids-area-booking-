@@ -10,7 +10,7 @@
   min-height: 100vh;
   width: 100%;
   background-color: #eef2f6;
-  background-image: linear-gradient(to right, #002830 230px, #eef2f6 230px);
+  background-image: linear-gradient(to right, #013745 250px, #eef2f6 250px);
   background-repeat: repeat-y;
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: #0f172a;
@@ -21,41 +21,53 @@
 }
 
 /* --------------------------------------------------------------------------
-   1. FIXED FULL-HEIGHT LEFT SIDEBAR (EXPANDS TILL THE END)
+   1. FIXED FULL-HEIGHT LEFT SIDEBAR (Exact Match to Image 1 & Image 2)
    -------------------------------------------------------------------------- */
 .ados-sidebar {
-  width: 230px;
-  min-width: 230px;
-  background-color: #002830;
+  width: 250px;
+  min-width: 250px;
+  background-color: #013745;
   color: #ffffff;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px 16px;
+  padding: 24px 14px 20px 14px;
   position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
   height: 100vh;
   box-sizing: border-box;
-  z-index: 40;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 1000;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 .ados-sidebar::-webkit-scrollbar {
-  display: none;
+  width: 5px;
 }
 
-.ados-sidebar-top {
+.ados-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.ados-sidebar-content {
   display: flex;
   flex-direction: column;
+  width: 100%;
+}
+
+/* Top Centered Logo */
+.ados-sidebar-logo-wrap {
+  display: flex;
+  justify-content: center;
   align-items: center;
   width: 100%;
+  margin-bottom: 24px;
+  padding: 4px 0;
 }
 
 .ados-sidebar-logo-btn {
@@ -63,104 +75,168 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  margin-bottom: 28px;
-  transition: transform 0.2s ease;
   display: flex;
   justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease;
 }
 
 .ados-sidebar-logo-btn:hover {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
-.ados-sidebar-logo {
-  width: 84px;
+.ados-sidebar-logo-img {
+  width: 105px;
+  max-width: 100%;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.28));
 }
 
-.ados-sidebar-nav-link {
+/* Accordion Menu */
+.ados-sidebar-accordion {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Collapsed Header (Image 1) */
+.ados-accordion-btn {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  color: #cbd5e1;
-  font-size: 12px;
-  font-weight: 500;
+  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  color: #ffffff;
   cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  border-radius: 8px;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.ados-accordion-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ados-accordion-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+}
+
+.ados-accordion-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.ados-accordion-title {
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  color: #ffffff;
   white-space: nowrap;
 }
 
-.ados-sidebar-nav-link:hover {
-  background: rgba(0, 168, 204, 0.15);
-  border-color: rgba(0, 168, 204, 0.4);
-  color: #38bdf8;
-  transform: translateX(2px);
-}
-
-.ados-sidebar-nav-link span {
+.ados-accordion-chevron {
+  color: #ffffff;
   display: flex;
   align-items: center;
-  gap: 8px;
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  transition: transform 0.2s ease;
 }
 
-/* Sidebar Footer / Branding */
-.ados-sidebar-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  width: 100%;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+/* Expanded Header (Image 2) */
+.ados-accordion-btn.expanded {
+  background-color: #efa31d;
+  color: #ffffff;
+  border-radius: 8px 8px 0 0;
+  padding: 12px 14px;
 }
 
-.ados-sidebar-brand-script {
-  font-family: 'Brush Script MT', 'Dancing Script', cursive, sans-serif;
-  color: #f3c448;
-  font-size: 20px;
-  line-height: 1.2;
-  margin-bottom: 4px;
-  letter-spacing: 0.5px;
-}
-
-.ados-sidebar-brand-subtitle {
-  color: #5eead4;
-  font-size: 9px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  margin-bottom: 12px;
+.ados-accordion-btn.expanded .ados-accordion-title {
   font-weight: 600;
 }
 
-.ados-sidebar-socials {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.ados-accordion-btn.expanded:hover {
+  background-color: #e59816;
 }
 
-.ados-sidebar-social-icon {
-  color: #2dd4bf;
-  font-size: 14px;
-  transition: color 0.2s, transform 0.2s;
-  cursor: pointer;
-  background: none;
+/* Submenu container (Image 2) */
+.ados-submenu-container {
+  width: 100%;
+  background-color: #dde6ed;
+  border-radius: 0 0 8px 8px;
+  border-bottom: 3.5px solid #efa31d;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* Submenu items */
+.ados-submenu-item {
+  width: 100%;
+  padding: 11px 16px;
+  background: transparent;
   border: none;
-  padding: 0;
+  border-bottom: 1px solid #b8cad8;
+  color: #013745;
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  line-height: 1.3;
+  box-sizing: border-box;
 }
 
-.ados-sidebar-social-icon:hover {
-  color: #ffffff;
-  transform: translateY(-2px);
+.ados-dashboard-container.lang-ar .ados-submenu-item {
+  text-align: right;
+}
+
+.ados-submenu-item:last-child {
+  border-bottom: none;
+}
+
+.ados-submenu-item:hover {
+  background-color: #cfdce6;
+  color: #001f27;
+}
+
+.ados-submenu-item.active {
+  background-color: #c4d7e5;
+  color: #012833;
+  font-weight: 700;
+  position: relative;
+}
+
+.ados-submenu-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #efa31d;
+}
+
+.ados-dashboard-container.lang-ar .ados-submenu-item.active::before {
+  left: auto;
+  right: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -171,8 +247,8 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  margin-left: 230px;
-  width: calc(100% - 230px);
+  margin-left: 250px;
+  width: calc(100% - 250px);
   min-height: 100vh;
 }
 
@@ -1465,19 +1541,20 @@
   direction: rtl !important;
   text-align: right !important;
   font-family: 'Alexandria', 'Cairo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-image: linear-gradient(to left, #002830 230px, #eef2f6 230px);
+  background-image: linear-gradient(to left, #013745 250px, #eef2f6 250px);
 }
 
 .ados-dashboard-container.lang-ar .ados-sidebar {
   left: auto;
   right: 0;
   border-right: none;
-  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .ados-dashboard-container.lang-ar .ados-main-area {
   margin-left: 0;
-  margin-right: 230px;
+  margin-right: 250px;
+  width: calc(100% - 250px);
 }
 
 .ados-dashboard-container.lang-ar .ados-toast {
