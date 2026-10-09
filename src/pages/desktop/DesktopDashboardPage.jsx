@@ -960,17 +960,8 @@ export default function DesktopDashboardPage({
                 </div>
 
                 <button 
-                  className="ados-orders-btn"
-                  onClick={() => setAdminSection('orders')}
-                  title={isAr ? 'فتح إدارة طلبات البلاي زون' : 'Open Play Zone & Trips Orders Management'}
-                >
-                  <span>{isAr ? 'طلبات البلاي زون' : 'PLAY ZONE ORDERS'}</span>
-                  <span className="ados-orders-count-badge">86</span>
-                </button>
-
-            <button 
-              type="button"
-              className="ados-logout-topbar-btn"
+                  type="button"
+                  className="ados-logout-topbar-btn"
               onClick={handleAdminLogout}
               title={isAr ? 'تسجيل الخروج' : 'Log Out'}
               style={{
