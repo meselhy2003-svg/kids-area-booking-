@@ -38,7 +38,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 10px 16px;
-  background: rgba(11, 23, 34, 0.94);
+  background: rgba(11, 23, 34, 0.96);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -277,12 +277,10 @@
 .pdf-pages-scroll-container {
   flex: 1;
   overflow-y: auto;
-  overflow-x: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   background: #060e15;
-  padding: 14px 10px 90px 10px;
-  display: flex;
-  justify-content: center;
+  padding: 14px 10px 100px 10px;
   position: relative;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
@@ -290,10 +288,10 @@
 
 .pdf-pages-feed {
   width: 100%;
-  max-width: 1080px;
+  max-width: 960px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
   align-items: center;
   margin: 0 auto;
 }
@@ -301,19 +299,18 @@
 /* Page Card Item */
 .pdf-page-card {
   width: 100%;
-  max-width: 1000px;
   background: #0f1c29;
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
   position: relative;
-  scroll-margin-top: 10px;
+  scroll-margin-top: 14px;
 }
 
 .pdf-page-card.is-active-page {
-  border-color: rgba(2, 128, 144, 0.5);
+  border-color: rgba(2, 128, 144, 0.6);
   box-shadow: 0 10px 35px rgba(2, 128, 144, 0.25), 0 4px 12px rgba(0, 0, 0, 0.6);
 }
 
@@ -322,30 +319,30 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 14px;
-  background: rgba(8, 18, 28, 0.85);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  font-size: 0.85rem;
+  padding: 10px 16px;
+  background: rgba(8, 18, 28, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.88rem;
 }
 
 .pdf-page-badge-icon {
-  font-size: 1rem;
-  margin-inline-end: 6px;
+  font-size: 1.05rem;
+  margin-inline-end: 8px;
 }
 
 .pdf-page-badge-title {
   font-weight: 700;
-  color: #e2e8f0;
+  color: #f1f5f9;
   flex: 1;
 }
 
 .pdf-page-badge-num {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: #ffd15c;
   background: rgba(255, 209, 92, 0.12);
-  border: 1px solid rgba(255, 209, 92, 0.25);
-  padding: 2px 8px;
+  border: 1px solid rgba(255, 209, 92, 0.28);
+  padding: 2px 9px;
   border-radius: 9999px;
 }
 
@@ -353,22 +350,26 @@
 .pdf-page-image-wrapper {
   width: 100%;
   position: relative;
-  background: #071019;
+  background: #08131e;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   display: flex;
   justify-content: center;
-  overflow: auto;
-  cursor: zoom-in;
+  align-items: center;
 }
 
+/* Crisp Menu Page Image */
 .pdf-page-image {
   display: block;
-  width: 100%;
+  width: calc(100% * var(--pdf-zoom, 1));
+  min-width: 100%;
   height: auto;
-  max-width: none;
-  transform-origin: top center;
-  transform: scale(var(--pdf-zoom, 1));
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  image-rendering: auto;
+  aspect-ratio: 1755 / 1240;
+  object-fit: contain;
+  flex-shrink: 0;
+  transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  background: #08131e;
 }
 
 /* --------------------------------------------------------------------------
@@ -603,7 +604,7 @@
   }
 
   .pdf-pages-scroll-container {
-    padding: 8px 6px 70px 6px;
+    padding: 8px 6px 85px 6px;
   }
 
   .pdf-page-card {
@@ -612,8 +613,8 @@
   }
 
   .pdf-page-header-badge {
-    padding: 6px 10px;
-    font-size: 0.78rem;
+    padding: 6px 12px;
+    font-size: 0.8rem;
   }
 
   .pdf-page-badge-num {
@@ -638,7 +639,7 @@
   }
 
   .pdf-pages-scroll-container {
-    padding: 6px 4px 65px 4px;
+    padding: 6px 4px 80px 4px;
   }
 
   .pdf-page-card {

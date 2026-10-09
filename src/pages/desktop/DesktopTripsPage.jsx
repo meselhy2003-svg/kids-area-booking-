@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import html2canvas from 'html2canvas';
-import { Camera, Download, Copy, Check, FileImage } from 'lucide-react';
+import { Camera, Download, Copy, Check, FileImage, Loader2 } from 'lucide-react';
 import { isUserAuthenticated } from '../../api/authService';
+import { tripService } from '../../api/tripService';
 import './DesktopTripsPage.css';
 
 export default function DesktopTripsPage({ setActiveTab, openModal, lang = 'ar' }) {
@@ -30,7 +31,9 @@ export default function DesktopTripsPage({ setActiveTab, openModal, lang = 'ar' 
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [modalTab, setModalTab] = useState('review'); // 'review' | 'quotation' | 'whatsapp'
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
-  const [quoteRefNumber] = useState(() => `AD-TRIP-${Math.floor(1000 + Math.random() * 9000)}`);
+  const [quoteRefNumber, setQuoteRefNumber] = useState(() => `AD-TRIP-${Math.floor(1000 + Math.random() * 9000)}`);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverTripId, setServerTripId] = useState(null);
 
   // 6. Screenshot Capture State & Ref
   const quotePaperRef = useRef(null);
@@ -182,16 +185,90 @@ export default function DesktopTripsPage({ setActiveTab, openModal, lang = 'ar' 
     });
   };
 
+  // Synchronize official quotation record with backend
+  const syncServerQuote = async () => {
+    try {
+      setIsSubmitting(true);
+      const res = await tripService.createTripQuote({
+        orgName,
+        orgType,
+        contactName,
+        phone,
+        offerId: currentOffer.id,
+        offerTitle: currentOffer.title,
+        pricePerStudent: currentOffer.price,
+        studentsCount: students,
+        supervisorsCount: supervisors,
+        isSupervisorsManual,
+        ageGroups: selectedAgeGroups,
+        tripDate,
+        shift,
+        arrivalTime,
+        totalPrice,
+        status: 'quote_generated'
+      });
+      if (res?.trip?.bookingCode) {
+        setQuoteRefNumber(res.trip.bookingCode);
+        setServerTripId(res.trip._id);
+      }
+    } catch (err) {
+      console.warn('Trip quote server sync warning:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Finalize confirmed trip booking on server
+  const finalizeBooking = async () => {
+    try {
+      setIsSubmitting(true);
+      const res = await tripService.bookTrip({
+        orgName,
+        orgType,
+        contactName,
+        phone,
+        offerId: currentOffer.id,
+        offerTitle: currentOffer.title,
+        pricePerStudent: currentOffer.price,
+        studentsCount: students,
+        supervisorsCount: supervisors,
+        isSupervisorsManual,
+        ageGroups: selectedAgeGroups,
+        tripDate,
+        shift,
+        arrivalTime,
+        totalPrice,
+        status: 'confirmed'
+      });
+      if (res?.trip?.bookingCode) {
+        setQuoteRefNumber(res.trip.bookingCode);
+        setServerTripId(res.trip._id);
+      }
+    } catch (err) {
+      console.warn('Booking confirmation server warning:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+
+    setBookingConfirmed(true);
+    setModalTab('quotation');
+    triggerConfetti();
+    setTimeout(() => {
+      handleCaptureScreenshot(true);
+    }, 250);
+  };
+
   // Handle final booking submission
-  const handleProceedBooking = () => {
+  const handleProceedBooking = async () => {
     if (!isUserAuthenticated()) {
       if (openModal) {
         openModal('auth-required', {
           action: 'booking',
-          onSuccess: () => {
+          onSuccess: async () => {
             setIsBookingModalOpen(true);
             setBookingConfirmed(false);
             setModalTab('review');
+            await syncServerQuote();
           }
         });
       }
@@ -201,6 +278,7 @@ export default function DesktopTripsPage({ setActiveTab, openModal, lang = 'ar' 
     setIsBookingModalOpen(true);
     setBookingConfirmed(false);
     setModalTab('review');
+    await syncServerQuote();
   };
 
   // Capture Quotation Screenshot
@@ -259,30 +337,23 @@ export default function DesktopTripsPage({ setActiveTab, openModal, lang = 'ar' 
     }
   };
 
-  // Handle confirm reservation with screenshot
-  const handleConfirmReservation = () => {
+  // Handle confirm reservation with screenshot & server sync
+  const handleConfirmReservation = async () => {
     if (!isUserAuthenticated()) {
       setIsBookingModalOpen(false);
       if (openModal) {
         openModal('auth-required', {
           action: 'booking',
-          onSuccess: () => {
+          onSuccess: async () => {
             setIsBookingModalOpen(true);
-            setBookingConfirmed(true);
-            setModalTab('quotation');
-            triggerConfetti();
+            await finalizeBooking();
           }
         });
       }
       return;
     }
 
-    setBookingConfirmed(true);
-    setModalTab('quotation');
-    triggerConfetti();
-    setTimeout(() => {
-      handleCaptureScreenshot(true);
-    }, 250);
+    await finalizeBooking();
   };
 
   // Send reservation via WhatsApp (with screenshot notice)

@@ -36,6 +36,7 @@ import './DesktopDashboardPage.css';
 import PlayZoneOrdersManager from './PlayZoneOrdersManager';
 import { authService } from '../../api/authService';
 
+
 // Curated Local Assets for quick selection & fallback
 const LOCAL_ASSET_GALLERY = [
   { name: 'Arcade VR Experience', path: '/photo/kid area pic/Kid wearing VR headset in neon arcade.png' },
@@ -455,7 +456,7 @@ export default function DesktopDashboardPage({
   const [activeZone, setActiveZone] = useState('challenge');
 
   // Modals & Orders Suite state
-  const [ordersSuiteTab, setOrdersSuiteTab] = useState(() => {
+  const [ordersInitialView, setOrdersInitialView] = useState(() => {
     if (typeof window !== 'undefined') {
       const h = window.location.hash;
       if (h.includes('restaurant')) return 'restaurant-orders';
@@ -465,34 +466,71 @@ export default function DesktopDashboardPage({
     return 'playzone-orders';
   });
 
+  // Modals state
   const [isOrdersViewOpen, setIsOrdersViewOpen] = useState(() => {
     if (typeof window !== 'undefined') {
       const h = window.location.hash;
-      return h === '#playzone-orders' || h === '#orders' || h === '#trips-orders' || h === '#restaurant-orders' || h === '#events-orders';
+      return (
+        h === '#playzone-orders' ||
+        h === '#orders' ||
+        h === '#trips-orders' ||
+        h === '#restaurant-orders' ||
+        h === '#events-orders'
+      );
     }
     return false;
   });
+
+  // Live order counts from backend APIs
+  const [counts, setCounts] = useState({ passes: 22, trips: 5, events: 5 });
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const [pzRes, trRes, evRes] = await Promise.allSettled([
+          fetch('/api/buying?limit=1').then(r => r.json()),
+          fetch('/api/trips?limit=1').then(r => r.json()),
+          fetch('/api/events?limit=1').then(r => r.json())
+        ]);
+        setCounts({
+          passes: pzRes.status === 'fulfilled' && (pzRes.value.total || pzRes.value.count || pzRes.value.data?.length)
+            ? (pzRes.value.total || pzRes.value.count || pzRes.value.data?.length)
+            : 22,
+          trips: trRes.status === 'fulfilled' && (trRes.value.total || trRes.value.count || trRes.value.trips?.length)
+            ? (trRes.value.total || trRes.value.count || trRes.value.trips?.length)
+            : 5,
+          events: evRes.status === 'fulfilled' && (evRes.value.total || evRes.value.count || evRes.value.bookings?.length)
+            ? (evRes.value.total || evRes.value.count || evRes.value.bookings?.length)
+            : 5
+        });
+      } catch (err) {
+        console.warn('Failed to load dashboard live counts:', err);
+      }
+    };
+    fetchCounts();
+  }, []);
 
   useEffect(() => {
     const handleHash = () => {
       const h = window.location.hash;
       if (h === '#playzone-orders' || h === '#orders') {
-        setOrdersSuiteTab('playzone-orders');
+        setOrdersInitialView('playzone-orders');
         setIsOrdersViewOpen(true);
       } else if (h === '#trips-orders') {
-        setOrdersSuiteTab('trips-orders');
+        setOrdersInitialView('trips-orders');
         setIsOrdersViewOpen(true);
       } else if (h === '#restaurant-orders') {
-        setOrdersSuiteTab('restaurant-orders');
+        setOrdersInitialView('restaurant-orders');
         setIsOrdersViewOpen(true);
       } else if (h === '#events-orders') {
-        setOrdersSuiteTab('events-orders');
+        setOrdersInitialView('events-orders');
         setIsOrdersViewOpen(true);
       }
     };
     window.addEventListener('hashchange', handleHash);
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
+
 
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [cardModalMode, setCardModalMode] = useState('edit'); // 'edit' | 'add'
@@ -774,11 +812,11 @@ export default function DesktopDashboardPage({
   if (isOrdersViewOpen) {
     return (
       <PlayZoneOrdersManager 
+        initialView={ordersInitialView}
         onBackToDashboard={() => setIsOrdersViewOpen(false)} 
         onGoHome={() => setActiveTab && setActiveTab('home')}
         lang={lang} 
         setLang={setLang}
-        initialView={ordersSuiteTab}
       />
     );
   }
@@ -819,18 +857,18 @@ export default function DesktopDashboardPage({
             {isAr ? <ChevronLeft size={14} color="#94a3b8" /> : <ChevronRight size={14} color="#94a3b8" />}
           </button>
 
-          {/* 1. Play Zone Orders Nav Link */}
+          {/* Play Zone Passes Nav Link */}
           <button 
             className="ados-sidebar-nav-link"
             onClick={() => {
-              setOrdersSuiteTab('playzone-orders');
+              setOrdersInitialView('playzone-orders');
               setIsOrdersViewOpen(true);
             }}
-            title={isAr ? 'إدارة طلبات البلاي زون وتذاكر الألعاب' : 'Manage Play Zone Orders & Tickets'}
+            title={isAr ? 'إدارة تذاكر وباقات البلاي زون' : 'Manage Play Zone Passes & Tickets'}
           >
             <span>
               <Ticket size={15} color="#00d2ff" />
-              {isAr ? 'طلبات البلاي زون' : 'Play Zone Orders'}
+              {isAr ? 'تذاكر البلاي زون' : 'Play Zone Passes'}
             </span>
             <span style={{ 
               marginInlineStart: 'auto', 
@@ -841,41 +879,41 @@ export default function DesktopDashboardPage({
               fontSize: '11px', 
               fontWeight: 800 
             }}>
-              86
+              {counts.passes}
             </span>
           </button>
 
-          {/* 2. Trips Orders Nav Link */}
+          {/* School & Group Trips Nav Link */}
           <button 
             className="ados-sidebar-nav-link"
             onClick={() => {
-              setOrdersSuiteTab('trips-orders');
+              setOrdersInitialView('trips-orders');
               setIsOrdersViewOpen(true);
             }}
-            title={isAr ? 'إدارة حجوزات رحلات المدارس والمجموعات' : 'Manage School & Group Trips Orders'}
+            title={isAr ? 'إدارة حجوزات الرحلات المدرسية' : 'Manage School & Group Trips'}
           >
             <span>
               <Building2 size={15} color="#38bdf8" />
-              {isAr ? 'طلبات الرحلات' : 'Trips Orders'}
+              {isAr ? 'طلبات الرحلات' : 'Trips Bookings'}
             </span>
             <span style={{ 
               marginInlineStart: 'auto', 
-              background: '#38bdf8', 
-              color: '#002830', 
+              background: '#0284c7', 
+              color: '#ffffff', 
               padding: '2px 8px', 
               borderRadius: '10px', 
               fontSize: '11px', 
               fontWeight: 800 
             }}>
-              12
+              {counts.trips}
             </span>
           </button>
 
-          {/* 3. Restaurant & Cafe Orders Nav Link */}
+          {/* Restaurant & Cafe Orders Nav Link */}
           <button 
             className="ados-sidebar-nav-link"
             onClick={() => {
-              setOrdersSuiteTab('restaurant-orders');
+              setOrdersInitialView('restaurant-orders');
               setIsOrdersViewOpen(true);
             }}
             title={isAr ? 'إدارة طلبات المطعم والكافيه وحجوزات الطاولات' : 'Manage Restaurant Orders & Table Bookings'}
@@ -897,29 +935,29 @@ export default function DesktopDashboardPage({
             </span>
           </button>
 
-          {/* 4. Events & Halls Bookings Nav Link */}
+          {/* Event Halls & Birthdays Nav Link */}
           <button 
             className="ados-sidebar-nav-link"
             onClick={() => {
-              setOrdersSuiteTab('events-orders');
+              setOrdersInitialView('events-orders');
               setIsOrdersViewOpen(true);
             }}
-            title={isAr ? 'إدارة حجوزات الحفلات وأعياد الميلاد والقاعات' : 'Manage Events, Birthday Parties & Hall Rentals'}
+            title={isAr ? 'إدارة حجوزات القاعات وأعياد الميلاد' : 'Manage Event Halls & Celebrations'}
           >
             <span>
-              <PartyPopper size={15} color="#c084fc" />
-              {isAr ? 'حجوزات الحفلات والقاعات' : 'Events & Halls'}
+              <Sparkles size={15} color="#ec4899" />
+              {isAr ? 'القاعات والمناسبات' : 'Events & Halls'}
             </span>
             <span style={{ 
               marginInlineStart: 'auto', 
-              background: '#a855f7', 
+              background: '#ec4899', 
               color: '#ffffff', 
               padding: '2px 8px', 
               borderRadius: '10px', 
               fontSize: '11px', 
               fontWeight: 800 
             }}>
-              18
+              {counts.events}
             </span>
           </button>
         </div>

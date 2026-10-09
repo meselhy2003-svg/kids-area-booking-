@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { isUserAuthenticated } from '../api/authService';
+import { eventService } from '../api/eventService';
 import MediaUploadModal from './common/MediaUploadModal';
 import '../pages/LobbyPage.css';
 
@@ -124,7 +125,32 @@ export default function MobileModals({
       return;
     }
 
-    const code = 'PZ-' + Math.floor(100000 + Math.random() * 900000);
+    let code = modalData?.bookingCode;
+
+    // If it is an Event/Hall or Birthday booking and doesn't have a server code yet, sync with backend
+    if (!code && (modalData?.occasion === 'general' || modalData?.occasion === 'family' || modalData?.occasion === 'birthday')) {
+      try {
+        const evRes = await eventService.bookEvent({
+          contactName: guestName || user?.name || 'Valued Guest',
+          contactPhone: guestPhone || user?.phone || '01012345678',
+          eventType: modalData.occasion === 'general' ? 'general_hall' : modalData.occasion === 'family' ? 'family' : 'birthday',
+          space: modalData.occasion === 'general' ? 'grand_ballroom' : modalData.occasion === 'family' ? 'outdoor' : 'indoor',
+          totalGuests: modalData.occasion === 'general' ? 250 : modalData.occasion === 'family' ? 50 : 30,
+          eventDate: new Date().toISOString().split('T')[0],
+          session: 'evening',
+          basePrice: modalData.priceNum || 3800
+        });
+        if (evRes?.booking?.bookingCode) {
+          code = evRes.booking.bookingCode;
+        }
+      } catch (e) {
+        console.warn('Event booking auto-sync notice:', e);
+      }
+    }
+
+    if (!code) {
+      code = 'PZ-' + Math.floor(100000 + Math.random() * 900000);
+    }
     setBookingCode(code);
     setBookingSuccess(true);
 

@@ -1898,3 +1898,134 @@
   box-shadow: 0 2px 6px rgba(0, 169, 195, 0.4);
 }
 
+/* ==========================================================================
+   EVENTS & HALLS SPECIFIC STYLES
+   ========================================================================== */
+.events-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.events-kpi-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.events-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.08);
+}
+
+.events-kpi-card.highlight {
+  background: linear-gradient(135deg, #052026 0%, #002830 100%);
+  color: #ffffff;
+  border-color: rgba(0, 169, 195, 0.3);
+}
+
+.events-kpi-card.highlight .kpi-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.events-kpi-card.highlight .kpi-value {
+  color: #38bdf8;
+}
+
+.kpi-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpi-icon-wrap.cyan {
+  background: rgba(0, 169, 195, 0.12);
+  color: #00a9c3;
+}
+
+.kpi-icon-wrap.green {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+.kpi-icon-wrap.amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+}
+
+.kpi-icon-wrap.purple {
+  background: rgba(139, 92, 246, 0.12);
+  color: #8b5cf6;
+}
+
+.kpi-icon-wrap.blue {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+}
+
+.kpi-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kpi-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.kpi-value {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.event-celebrant-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(236, 72, 153, 0.08);
+  border: 1px solid rgba(236, 72, 153, 0.25);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #be185d;
+  width: fit-content;
+}
+
+.status-pill.status-pending-deposit {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-pill.status-pending-deposit .status-dot {
+  background: #f59e0b;
+}
+
+.status-pill.status-quote-generated {
+  background: rgba(56, 189, 248, 0.12);
+  color: #0284c7;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.status-pill.status-quote-generated .status-dot {
+  background: #38bdf8;
+}
+
+

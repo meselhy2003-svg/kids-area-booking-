@@ -416,7 +416,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
           <p className="restaurant-hero-subtitle">
             {r.heroDesc || (
               lang === 'ar'
-                ? 'استمتع بأشهى المأكولات، ومشروباتك المفضلة، وأجواء الواجهة المائية الهادئة في أمريكان دريم الإسماعيلية'
+                ? 'استمتع بأشهى المأكولات، ومشروباتك المفضلة، والاجواء الهادئة في أمريكان دريم الإسماعيلية'
                 : 'Enjoy delicious food, your favorite drinks, and a relaxing waterfront atmosphere at American Dream Ismailia'
             )}
           </p>
