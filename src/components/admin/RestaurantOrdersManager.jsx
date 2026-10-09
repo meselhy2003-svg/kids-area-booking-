@@ -7,6 +7,7 @@ import {
 import RestaurantAnalyticsPanel from './RestaurantAnalyticsPanel';
 import '../../pages/desktop/PlayZoneOrdersManager.css';
 import './OrderDetailsUpdateForm.css';
+import './RestaurantOrdersManager.css';
 import { 
   Utensils, 
   Coffee, 

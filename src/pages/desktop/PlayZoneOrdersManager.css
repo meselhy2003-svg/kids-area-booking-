@@ -2028,4 +2028,24 @@
   background: #38bdf8;
 }
 
+/* --------------------------------------------------------------------------
+   SHARED ORDER DETAILS MODAL CONTAINER (SOLID BACKGROUND)
+   -------------------------------------------------------------------------- */
+.pz-order-details-modal-wrapper {
+  background: #08252d !important;
+  border: 1px solid rgba(0, 169, 195, 0.35) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+  overflow: hidden !important;
+  color: #ffffff !important;
+}
+
+.order-details-card {
+  background: #08252d !important;
+  color: #ffffff !important;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 

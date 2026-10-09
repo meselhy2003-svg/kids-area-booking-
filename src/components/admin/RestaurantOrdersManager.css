@@ -1,0 +1,335 @@
+/* ==========================================================================
+   RESTAURANT & CAFE ORDERS MANAGER STYLES
+   Fix modal transparency & provide solid, high-contrast dark dashboard theme
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   MODAL BACKDROP & CONTAINER
+   -------------------------------------------------------------------------- */
+.pz-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 14, 18, 0.78) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: pzModalFadeIn 0.2s ease-out;
+}
+
+@keyframes pzModalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   SOLID MODAL CARD (NO TRANSPARENCY BUG)
+   -------------------------------------------------------------------------- */
+.pz-order-details-modal-wrapper {
+  background: #08252d !important;
+  background-color: #08252d !important;
+  border: 1px solid rgba(0, 169, 195, 0.35) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+  overflow: hidden !important;
+  color: #ffffff !important;
+  animation: pzModalZoomIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pzModalZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.order-details-card {
+  background: #08252d !important;
+  background-color: #08252d !important;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   MODAL HEADER
+   -------------------------------------------------------------------------- */
+.order-details-header {
+  background: linear-gradient(135deg, #051a20 0%, #0c333e 100%) !important;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 16px;
+}
+
+.order-details-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.order-details-header p {
+  margin: 4px 0 0 0;
+  font-size: 0.82rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.order-details-header .close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.order-details-header .close-btn:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #ffffff;
+  transform: rotate(90deg);
+}
+
+/* --------------------------------------------------------------------------
+   MODAL BODY
+   -------------------------------------------------------------------------- */
+.order-details-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: #08252d;
+}
+
+/* --------------------------------------------------------------------------
+   SUMMARY SECTION (CARD 1)
+   -------------------------------------------------------------------------- */
+.summary-section {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.section-title {
+  margin: 0 0 16px 0;
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 20px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-item .label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.summary-item .value {
+  font-size: 0.92rem;
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+.summary-item .value.bold {
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.summary-item .value.price-highlight {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #00d2ff;
+}
+
+/* --------------------------------------------------------------------------
+   UPDATE FORM SECTION (CARD 2)
+   -------------------------------------------------------------------------- */
+.update-form-section {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.form-select,
+.form-textarea {
+  background: #04171d !important;
+  border: 1.5px solid #144955 !important;
+  color: #ffffff !important;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-select:focus,
+.form-textarea:focus {
+  border-color: #00d2ff !important;
+  background: #05212a !important;
+  box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.2) !important;
+}
+
+.form-select option {
+  background: #08252d;
+  color: #ffffff;
+  padding: 8px;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* --------------------------------------------------------------------------
+   FORM ACTIONS (FOOTER)
+   -------------------------------------------------------------------------- */
+.form-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-cancel {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #00a9c3 0%, #007f94 100%);
+  border: none;
+  color: #ffffff;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(0, 169, 195, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-save:hover:not(:disabled) {
+  background: linear-gradient(135deg, #02b6d1 0%, #0093ab 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 169, 195, 0.55);
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE MODAL
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .summary-grid,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .order-details-header {
+    padding: 16px 18px;
+  }
+  
+  .order-details-body {
+    padding: 18px;
+    gap: 16px;
+  }
+  
+  .form-actions-row {
+    flex-direction: column-reverse;
+  }
+  
+  .btn-cancel,
+  .btn-save {
+    width: 100%;
+    justify-content: center;
+  }
+}
