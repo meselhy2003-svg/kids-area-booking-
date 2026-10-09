@@ -928,7 +928,6 @@ export default function RestaurantOrdersManager({
           <div 
             className="pz-order-details-modal-wrapper" 
             onClick={e => e.stopPropagation()} 
-            style={{ maxWidth: '840px', width: '95%', maxHeight: '90vh', overflowY: 'auto', borderRadius: '20px' }}
           >
             <div className="order-details-card">
               {/* Header */}
