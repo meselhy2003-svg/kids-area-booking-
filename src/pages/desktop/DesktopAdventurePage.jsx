@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAdventureMedia } from '../../hooks';
+import { useTickets } from '../../hooks/useTickets';
+import { usePackages } from '../../hooks/usePackages';
+import { useData } from '../../context/DataContext';
 import { getTranslations } from '../../data/translations';
 
 export default function DesktopAdventurePage({ setActiveTab, openModal, lang = 'ar', searchQuery }) {
   const t = getTranslations(lang);
   const isArabic = lang === 'ar';
+  const { addToCart } = useData();
 
   const {
     heroBanners,
@@ -14,6 +18,8 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang = '
     currentHero
   } = useAdventureMedia();
   const [viewType, setViewType] = useState('packages'); // 'packages' | 'tickets'
+  const { tickets: serverTickets } = useTickets('adventure');
+  const { currentPackage: adventurePkg } = usePackages('adventure');
 
   // Individual ticket adventure attractions
   const ticketGames = [
@@ -50,29 +56,55 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang = '
   ];
 
   // Filter games based on search query
-  const filteredGames = ticketGames.filter(g => {
-    if (!searchQuery) return true;
+  const filteredGames = useMemo(() => {
+    const list = serverTickets && serverTickets.length > 0 ? serverTickets : ticketGames;
+    if (!searchQuery) return list;
     const q = searchQuery.toLowerCase();
-    return g.title.toLowerCase().includes(q) || g.titleAr.includes(q) || g.priceText.toLowerCase().includes(q);
-  });
+    return list.filter(g =>
+      (g.title && g.title.toLowerCase().includes(q)) ||
+      (g.titleAr && g.titleAr.includes(q)) ||
+      (g.priceText && g.priceText.toLowerCase().includes(q))
+    );
+  }, [serverTickets, searchQuery]);
 
-  const handleBooking = (title, price, details) => {
-    const curr = isArabic ? 'ج.م' : 'EGP';
-    openModal('booking', {
-      name: title,
-      price: `${price} ${curr}`,
-      priceNum: price,
-      discount: isArabic ? 'حجز مباشر' : 'Direct Booking',
-      details: details || (isArabic ? 'تذكرة دخول كاملة إلى لعبة المغامرة' : 'Full access adventure ticket')
+  const handleBooking = (title, price, details, id, isPackage = false, item = null) => {
+    const pkgDoc = isPackage ? (adventurePkg || item) : item;
+    const finalId = pkgDoc?._id || pkgDoc?.id || id || `adventure-${Date.now()}`;
+    const finalPrice = pkgDoc?.priceNum ?? price;
+    const finalOldPrice = pkgDoc?.oldPrice ?? (isPackage ? finalPrice : (item?.oldPrice || item?.origPrice));
+    const finalTitle = pkgDoc?.title || title;
+    const finalThumb = pkgDoc?.image || pkgDoc?.img || item?.image || item?.thumb || (isPackage ? '/photo/kid-area-pic/family-bumper-cars.png' : '/photo/kid-area-pic/Laser & Tactical Arena.png');
+    const finalBadge = pkgDoc?.saveBadge || (isPackage ? '' : (item?.saveBadge || ''));
+
+    addToCart({
+      id: finalId,
+      ticket: isPackage ? undefined : finalId,
+      package: isPackage ? finalId : undefined,
+      type: isPackage ? 'package' : 'ticket',
+      title: finalTitle,
+      titleAr: finalTitle,
+      titleEn: finalTitle,
+      zone: 'adventure',
+      zoneLabel: isArabic ? 'منطقة المغامرات' : 'Adventure Zone',
+      age: item?.age || (isPackage ? 'Ages 6+' : 'All Ages'),
+      inclusions: details || pkgDoc?.description || pkgDoc?.details || (isArabic ? 'تذكرة دخول كاملة إلى لعبة المغامرة' : 'Full access adventure ticket'),
+      priceEgp: finalPrice,
+      oldPriceEgp: finalOldPrice > finalPrice ? finalOldPrice : null,
+      pointsGets: pkgDoc?.pointsGets || 0,
+      thumb: finalThumb,
+      saveBadge: finalBadge
     });
+    if (typeof setActiveTab === 'function') {
+      setActiveTab('cart');
+    }
   };
 
   return (
     <div className={`desktop-page desktop-zone-page ${isArabic ? 'lang-ar' : 'lang-en'}`}>
       <div className="desktop-page-container">
-        
+
         {/* 1. HERO ZONE BANNER WITH TILTED BADGE */}
-        <div 
+        <div
           className="desktop-zone-hero-banner adventure-hero-banner"
           style={{
             backgroundImage: (currentHero?.image || currentHero?.src)
@@ -95,7 +127,7 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang = '
                 <h2 className="desktop-zone-hero-tagline">{currentHero?.subtitleEn || t.zones.adventure.subtitle}</h2>
               </>
             )}
-            
+
             {/* Carousel Dots */}
             <div className="desktop-zone-hero-dots">
               {heroBanners.map((_, i) => (
@@ -132,7 +164,7 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang = '
           {/* TOGGLE SWITCH: Packages vs Tickets */}
           <div className="desktop-zone-view-toggle-wrap">
             <div className="desktop-zone-view-toggle">
-              <button 
+              <button
                 className={`toggle-tab-btn ${viewType === 'packages' ? 'active' : ''}`}
                 onClick={() => setViewType('packages')}
               >
@@ -145,7 +177,7 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang = '
                 </div>
               </button>
 
-              <button 
+              <button
                 className={`toggle-tab-btn ${viewType === 'tickets' ? 'active' : ''}`}
                 onClick={() => setViewType('tickets')}
               >
@@ -162,19 +194,19 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang = '
           </div>
 
           {/* VIEW A: PACKAGES VIEW */}
-          {viewType === 'packages' && (
+          {viewType === 'packages' && adventurePkg && (
             <div className="desktop-horizontal-pass-container">
               <div className="desktop-horizontal-pass-card">
-                {/* Left 4-split composite image */}
+                {/* Left image */}
                 <div className="pass-card-left-img-wrap">
-                  <img 
-                    src="/photo/kid-area-pic/Graphic Composition.png" 
-                    alt={isArabic ? 'باقة ألعاب المغامرة' : 'Adventure Pass Games'} 
+                  <img
+                    src={adventurePkg.image || adventurePkg.img || '/photo/kid-area-pic/family-bumper-cars.png'}
+                    alt={adventurePkg.title || (isArabic ? 'باقة المغامرة' : 'Adventure Pass')}
                     className="pass-card-composite-img"
-                    onError={(e) => { e.target.src = '/photo/mobile-challenge/offer-collage.png'; }}
+                    onError={(e) => { e.target.src = '/photo/kid-area-pic/family-bumper-cars.png'; }}
                   />
                   <div className="pass-card-ribbon-badge">
-                    <span>{isArabic ? '★ باقة المغامرة الشاملة ★' : '★ ALL-INCLUSIVE ADVENTURE ★'}</span>
+                    <span>{isArabic ? '★ تجربة شاملة ★' : '★ ALL EXPERIENCE ★'}</span>
                   </div>
                 </div>
 
@@ -182,49 +214,47 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang = '
                 <div className="pass-card-right-body">
                   <div className="pass-card-header-row">
                     <div>
-                      <h3 className="pass-card-main-title">{isArabic ? 'باقة المغامرة' : 'Adventure Pass'}</h3>
-                      <span className="pass-card-subtitle-cyan">{isArabic ? 'تجربة شاملة لجميع الألعاب' : 'All Game Experience'}</span>
+                      <h3 className="pass-card-main-title">{adventurePkg.title || (isArabic ? 'باقة المغامرة' : 'Adventure Pass')}</h3>
+                      <span className="pass-card-subtitle-cyan">{adventurePkg.subtitle || (isArabic ? 'تجربة شاملة لجميع الألعاب' : 'All Game Experience')}</span>
                     </div>
-                    <span className="pass-card-save-badge">{isArabic ? 'وفر ٦٠ ج.م' : 'Save 60 EGP'}</span>
+                    {adventurePkg.saveBadge && <span className="pass-card-save-badge">{adventurePkg.saveBadge}</span>}
                   </div>
 
                   {/* Adventure Perks Checklist */}
                   <div className="pass-card-checklist">
-                    <div className="pass-check-item">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="#00a9c3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="pass-check-svg">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      <span className="pass-check-bold">{isArabic ? 'سيارات التصادم' : 'BUMPER CARS'}</span>
-                    </div>
-
-                    <div className="pass-check-item">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="#00a9c3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="pass-check-svg">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      <span className="pass-check-bold">{isArabic ? 'حلبة ببجي' : 'PUBG'}</span>
-                    </div>
-
-                    <div className="pass-check-item">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="#00a9c3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="pass-check-svg">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      <span className="pass-check-bold">{isArabic ? 'كرات البامبر الدائرية' : 'Bubble Ball'}</span>
-                    </div>
+                    {(Array.isArray(adventurePkg.features) && adventurePkg.features.length > 0 ? adventurePkg.features : [
+                      isArabic ? 'سيارات التصادم الكهربائية' : 'Bumper Cars',
+                      isArabic ? 'حلبة ببجي التكتيكية' : 'PUBG Simulator',
+                      isArabic ? 'كرات البامبر الدائرية' : 'Bubble Ball'
+                    ]).map((feat, idx) => (
+                      <div key={idx} className="pass-check-item">
+                        <svg viewBox="0 0 20 20" fill="none" className="pass-check-svg">
+                          <circle cx="10" cy="10" r="8.5" stroke="#00bcd4" strokeWidth="1.8" />
+                          <path d="M6 10.2L8.6 12.8L14 7.5" stroke="#00bcd4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <span className="pass-check-bold">{feat}</span>
+                      </div>
+                    ))}
                   </div>
 
                   {/* Price & Action Button */}
                   <div className="pass-card-price-action-row">
                     <div className="pass-price-group">
-                      <strong className="pass-current-price">{isArabic ? '١٠٠ ج.م' : 'EGP 100'}</strong>
-                      <span className="pass-old-price">{isArabic ? '١٦٠ ج.م' : 'EGP 160'}</span>
+                      <strong className="pass-current-price">{isArabic ? `${adventurePkg.priceNum} ج.م` : `EGP ${adventurePkg.priceNum}`}</strong>
+                      {adventurePkg.oldPrice && adventurePkg.oldPrice > adventurePkg.priceNum && (
+                        <span className="pass-old-price">{isArabic ? `${adventurePkg.oldPrice} ج.م` : `EGP ${adventurePkg.oldPrice}`}</span>
+                      )}
                     </div>
 
-                    <button 
+                    <button
                       className="pass-get-offer-btn"
                       onClick={() => handleBooking(
-                        isArabic ? 'باقة المغامرة الشاملة' : 'Adventure Pass', 
-                        100, 
-                        isArabic ? 'تجربة شاملة: سيارات التصادم، حلبة ببجي، كرات البامبر' : 'All Game Experience: Bumper Cars, PUBG, Bubble Ball'
+                        adventurePkg.title,
+                        adventurePkg.priceNum,
+                        adventurePkg.description || (adventurePkg.features ? adventurePkg.features.join(' • ') : ''),
+                        adventurePkg._id,
+                        true,
+                        adventurePkg
                       )}
                     >
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="btn-ticket-icon">
@@ -242,36 +272,60 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang = '
           {viewType === 'tickets' && (
             <div className="desktop-ticket-games-grid">
               {filteredGames.map((game) => {
-                const gameTitle = isArabic ? game.titleAr : game.title;
-                const priceLabel = isArabic ? game.priceTextAr : game.priceText;
+                const gameTitle = game.title || (isArabic ? game.titleAr : game.titleEn) || game.titleAr || game.title;
+                const currentPrice = game.priceAfterDiscount ?? game.priceNum ?? game.price ?? 40;
+                const origPrice = (game.price && game.price > currentPrice) ? game.price : (game.oldPrice || game.origPrice);
+                const priceDisplay = isArabic ? `${currentPrice} ج.م` : `EGP ${currentPrice}`;
+                const oldPriceDisplay = (origPrice && origPrice > currentPrice)
+                  ? (isArabic ? `${origPrice} ج.م` : `EGP ${origPrice}`)
+                  : null;
 
                 return (
-                  <div key={game.id} className="desktop-ticket-game-card">
+                  <div key={game._id || game.id} className="desktop-ticket-game-card">
                     <div className="ticket-game-img-box">
-                      <img 
-                        src={game.image} 
-                        alt={gameTitle} 
+                      <img
+                        src={game.image || game.thumb || '/photo/kid-area-pic/Laser & Tactical Arena.png'}
+                        alt={gameTitle}
                         className="ticket-game-img"
-                        onError={(e) => { e.target.src = game.fallback; }}
+                        onError={(e) => { e.target.src = game.fallback || '/photo/kid-area-pic/Laser & Tactical Arena.png'; }}
                       />
+                      {(game.saveBadge || game.badge) && (
+                        <span className="ticket-game-badge">{game.saveBadge || game.badge}</span>
+                      )}
                     </div>
 
                     <div className="ticket-game-info-body">
                       <h4 className="ticket-game-title">{gameTitle}</h4>
-                      <span className="ticket-game-price-label">{priceLabel}</span>
+                      {game.age && (
+                        <div className="desktop-spec-row" style={{ fontSize: '0.78rem', color: '#64748b', marginBottom: '4px' }}>
+                          <span>{game.age}</span>
+                        </div>
+                      )}
+                      {(game.description || (Array.isArray(game.features) && game.features.length > 0)) && (
+                        <div style={{ fontSize: '0.75rem', color: '#8899a6', marginBottom: '6px', lineHeight: 1.3 }}>
+                          {game.description || game.features.join(' • ')}
+                        </div>
+                      )}
+                      <div className="ticket-game-price-label">
+                        <span>{priceDisplay}</span>
+                        {oldPriceDisplay && <span style={{ marginLeft: 6, textDecoration: 'line-through', opacity: 0.6, fontSize: '0.85em' }}>{oldPriceDisplay}</span>}
+                      </div>
 
-                      <button 
+                      <button
                         className="ticket-game-play-btn"
                         onClick={() => handleBooking(
-                          isArabic ? `تذكرة ${gameTitle}` : `${game.title} Ticket`, 
-                          game.price, 
-                          priceLabel
+                          isArabic ? `تذكرة ${gameTitle}` : `${gameTitle} Ticket`,
+                          currentPrice,
+                          game.description || game.bundle || (Array.isArray(game.features) ? game.features.join(', ') : ''),
+                          game._id || game.id,
+                          false,
+                          game
                         )}
                       >
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="play-btn-ticket-icon">
                           <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
                         </svg>
-                        <span>{t.zones.playNow}</span>
+                        <span>{t.zones.getOffer || (isArabic ? 'احجز العرض' : 'Book Offer')}</span>
                       </button>
                     </div>
                   </div>
@@ -306,8 +360,8 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang = '
               const imgSrc = item.image || item.src || item.img || item.url;
               const fallbackImg = item.fallback || item.fallbackSrc || item.fallbackImg;
               return (
-                <div 
-                  key={item.id} 
+                <div
+                  key={item.id}
                   className="desktop-explore-card"
                   onClick={() => openModal('image-only', {
                     img: imgSrc,
@@ -317,12 +371,12 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang = '
                   role="button"
                   tabIndex={0}
                 >
-                  <img 
-                    src={item.image || item.src || item.img || item.url} 
-                    alt={itemTitle} 
+                  <img
+                    src={item.image || item.src || item.img || item.url}
+                    alt={itemTitle}
                     className="desktop-explore-img"
                     loading="lazy"
-                    onError={(e) => { 
+                    onError={(e) => {
                       const fb = item.fallback || item.fallbackSrc || item.fallbackImg;
                       if (fb && !e.currentTarget.src.includes(fb)) {
                         e.currentTarget.src = fb;
@@ -340,7 +394,7 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang = '
 
         {/* 4. EXPLORE 360° CENTER BUTTON */}
         <div className="desktop-360-btn-wrap">
-          <button 
+          <button
             className="desktop-360-pill-btn"
             onClick={() => openModal('virtual-tour')}
           >

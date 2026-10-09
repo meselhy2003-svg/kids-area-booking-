@@ -30,11 +30,11 @@ export function AuthProvider({ children }) {
     return () => { isMounted = false; };
   }, []);
 
-  const login = useCallback(async ({ identifier, password }) => {
+  const login = useCallback(async ({ phone, identifier, email, password }) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await authService.login({ identifier, password });
+      const res = await authService.login({ phone, identifier, email, password });
       setUser(res.user);
       return res;
     } catch (err) {
@@ -45,11 +45,11 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const register = useCallback(async ({ name, phone, email, password }) => {
+  const register = useCallback(async ({ name, phone, email, password, age, gender, children }) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await authService.register({ name, phone, email, password });
+      const res = await authService.register({ name, phone, email, password, age, gender, children });
       setUser(res.user);
       return res;
     } catch (err) {

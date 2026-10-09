@@ -18,6 +18,7 @@ import {
   Users
 } from 'lucide-react';
 import './LobbyPage.css';
+import { authService } from '../api/authService';
 
 // 4 Hanging Attraction Signs (Corrected file paths matching public/photo/lobby/)
 const LOBBY_NAV_SIGNS = [
@@ -370,7 +371,7 @@ export default function LobbyPage({
   };
 
   // Sign In submit handler (Authenticates by phone & password)
-  const handleAuthLogin = (e) => {
+  const handleAuthLogin = async (e) => {
     e.preventDefault();
     setAuthError('');
 
@@ -410,6 +411,45 @@ export default function LobbyPage({
       if (onEnterApp) onEnterApp();
       return;
     }
+    // 2. BACKEND API AUTHENTICATION: Phone + Password
+    try {
+      const res = await authService.login({
+        phone: cleanPhone,
+        password: loginPassword.trim()
+      });
+
+      const guestData = res.user || {};
+
+      playCoinSound();
+      try {
+        confetti({
+          particleCount: 90,
+          spread: 80,
+          origin: { y: 0.5 },
+          colors: ['#fde047', '#f59e0b', '#00a9c3', '#ffffff']
+        });
+      } catch {}
+
+      const targetTitle = pendingSign ? (lang === 'ar' ? pendingSign.titleAr : pendingSign.titleEn) : (lang === 'ar' ? 'الحديقة' : 'the park');
+      setAuthSuccessMsg(lang === 'ar' ? `مرحباً بك ${guestData.name || ''}! تم تسجيل الدخول بنجاح، جاري نقلك إلى ${targetTitle}...` : `Welcome ${guestData.name || ''}! Signed in successfully, redirecting to ${targetTitle}...`);
+
+      setTimeout(() => {
+        setShowAuthModal(false);
+        if (setActiveTab) {
+          setActiveTab(pendingSign ? pendingSign.tab : 'home');
+        }
+      }, 450);
+      return;
+    } catch (apiErr) {
+      console.warn('Backend login response:', apiErr.message);
+      // Check if it's an explicit authentication error from server
+      const status = apiErr.response?.status || apiErr.status;
+      if (status === 400 || status === 401 || status === 404) {
+        setAuthError(apiErr.message || (lang === 'ar' ? 'بيانات تسجيل الدخول غير صحيحة، يرجى التأكد من رقم الهاتف أو كلمة المرور' : 'Invalid phone number or password'));
+        return;
+      }
+    }
+
     let guestFound = null;
     try {
       const registered = JSON.parse(localStorage.getItem('american_dream_registered_guests') || '[]');

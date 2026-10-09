@@ -10,7 +10,14 @@ export const menuService = {
    * Get all menu items or filter by category
    */
   async getMenuItems(category = 'all') {
-    await apiClient.get(`/api/menu?category=${category}`);
+    try {
+      const res = await apiClient.get(`/api/menu?category=${category}`);
+      if (res && res.data) {
+        return res.data;
+      }
+    } catch {
+      // Fallback to local mock data if server is unreachable
+    }
     if (!category || category === 'all') {
       return mockMenuItems;
     }
@@ -18,10 +25,17 @@ export const menuService = {
   },
 
   /**
-   * Submit an order for snacks/meals
+   * Submit an order for snacks/meals/delivery
    */
-  async placeOrder(cartItems) {
-    await apiClient.post('/api/menu/order', { items: cartItems });
+  async placeOrder(orderData) {
+    try {
+      const payload = Array.isArray(orderData) ? { items: orderData } : orderData;
+      const res = await apiClient.post('/api/menu/order', payload);
+      if (res) return res;
+    } catch {
+      // Fallback
+    }
+    const cartItems = Array.isArray(orderData) ? orderData : (orderData.items || []);
     return {
       success: true,
       orderId: 'ORD-' + Math.floor(1000 + Math.random() * 9000),

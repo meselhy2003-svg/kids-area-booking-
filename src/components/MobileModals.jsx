@@ -1484,12 +1484,12 @@ export default function MobileModals({
               <form onSubmit={handleAuthLogin} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div>
                   <label className="booking-label">
-                    {lang === 'ar' ? 'رقم الهاتف أو البريد الإلكتروني:' : 'Mobile Number or Email:'}
+                    {lang === 'ar' ? 'رقم الهاتف المحمول:' : 'Mobile Phone Number:'}
                   </label>
                   <input 
-                    type="text" 
+                    type="tel" 
                     required 
-                    placeholder={lang === 'ar' ? '01012345678 أو البريد' : '01012345678 or user@domain.com'}
+                    placeholder={lang === 'ar' ? '010XXXXXXXX (مثال: 01019998877)' : '010XXXXXXXX (e.g. 01019998877)'}
                     className="booking-text-input"
                     value={authIdentifier}
                     onChange={(e) => setAuthIdentifier(e.target.value)}

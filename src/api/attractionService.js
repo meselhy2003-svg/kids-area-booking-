@@ -11,7 +11,6 @@ export const attractionService = {
    * Get all attractions for a specific play zone
    */
   async getAttractions(zone = 'kids-area') {
-    await apiClient.get(`/api/attractions?zone=${zone}`);
     return zoneAttractions[zone] || [];
   },
 
@@ -19,7 +18,6 @@ export const attractionService = {
    * Find an attraction by its ID
    */
   async getAttractionById(id) {
-    await apiClient.get(`/api/attractions/${id}`);
     for (const zone of Object.values(zoneAttractions)) {
       const found = zone.find(a => a.id === id);
       if (found) return found;
@@ -31,7 +29,6 @@ export const attractionService = {
    * Get live park capacity, wait time, and opening status
    */
   async getParkStatus() {
-    await apiClient.get('/api/park/status');
     return liveParkStatus;
   },
 
@@ -39,7 +36,7 @@ export const attractionService = {
    * Get 360 virtual tour assets
    */
   async getVirtualTour() {
-    await apiClient.get('/api/park/virtual-tour');
     return virtualTourData;
   }
 };
+

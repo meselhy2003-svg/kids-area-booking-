@@ -48,41 +48,105 @@ export function extractErrorMessage(errOrRes, fallbackMsg = 'Request failed. Ple
 // ============================================================================
 // 1. CREATE PURCHASE: POST /api/buying
 // ============================================================================
+// 0. GET PAYMENT ACCOUNTS: GET /api/buying/payment-accounts
+// ============================================================================
+/**
+ * Retrieves official payment accounts for InstaPay and Vodafone Cash
+ * @returns {Promise<{ success: boolean, data: object }>}
+ */
+export async function getPaymentAccounts() {
+  try {
+    const res = await apiClient.get('/api/buying/payment-accounts');
+    if (!res.success) {
+      throw new Error(extractErrorMessage(res, 'Failed to fetch payment accounts.'));
+    }
+    return {
+      success: true,
+      data: res.data?.data || res.data
+    };
+  } catch (error) {
+    console.warn('[buyingService.getPaymentAccounts] Using fallback accounts:', error.message);
+    return {
+      success: true,
+      data: {
+        instapay: {
+          address: 'americandream@instapay',
+          accountName: 'أمريكان دريم كيدز إيريا',
+          active: true
+        },
+        vodafoneCash: {
+          walletNumber: '01023456789',
+          accountName: 'أمريكان دريم كيدز إيريا',
+          active: true
+        },
+        cash: {
+          available: true,
+          instructionsAr: 'الدفع نقداً عند الوصول واستلام إسورة الدخول عند الوصول.'
+        }
+      }
+    };
+  }
+}
+
+// ============================================================================
+// 1. CREATE PURCHASE: POST /api/buying
+// ============================================================================
 /**
  * Creates a purchase for tickets and/or packages.
  * Automatically handles dynamic combinations of guest info, tickets, packages, payment, and notes.
+ * Supports multipart/form-data upload when paymentProofFile is provided.
  * 
  * @param {object} payload
  * @param {string} [payload.guest] - Registered Guest MongoDB ObjectId
  * @param {string} [payload.guestName] - Guest full name
  * @param {string} [payload.guestPhone] - Guest phone number
+ * @param {string} [payload.senderAccount] - Transfer sender phone / account
  * @param {Array<{ ticket: string, quantity: number }>} [payload.tickets] - Array of ticket objects
  * @param {Array<{ package: string, quantity: number }>} [payload.packages] - Array of package objects
  * @param {string} [payload.paymentMethod='cash'] - 'cash' | 'card' | 'instapay' | 'vodafone_cash' | 'points'
- * @param {string} [payload.paymentStatus='pending'] - 'pending' | 'paid' | 'failed' | 'refunded'
- * @param {string} [payload.paymentProof] - Receipt image path/URL (e.g. for InstaPay / Vodafone Cash)
+ * @param {string} [payload.paymentStatus='pending'] - 'pending' | 'pending_verification' | 'paid' | 'failed'
+ * @param {File} [payload.paymentProofFile] - File object for transfer screenshot/receipt
+ * @param {string} [payload.paymentProof] - Relative path if already uploaded
  * @param {string} [payload.notes] - Optional order or booking notes
  * @returns {Promise<{ success: boolean, data: object, message?: string }>}
  */
 export async function createPurchase(payload = {}) {
   try {
-    // Sanitize and format payload according to ADOS backend specification
-    const body = {
-      ...(payload.guest ? { guest: payload.guest } : {}),
-      ...(payload.guestName ? { guestName: payload.guestName.trim() } : {}),
-      ...(payload.guestPhone ? { guestPhone: payload.guestPhone.trim() } : {}),
-      ...(Array.isArray(payload.tickets) && payload.tickets.length > 0 ? { tickets: payload.tickets } : {}),
-      ...(Array.isArray(payload.packages) && payload.packages.length > 0 ? { packages: payload.packages } : {}),
-      paymentMethod: payload.paymentMethod || 'cash',
-      paymentStatus: payload.paymentStatus || 'pending',
-      ...(payload.paymentProof ? { paymentProof: payload.paymentProof } : {}),
-      ...(payload.notes ? { notes: payload.notes.trim() } : {})
-    };
+    let body;
+    if (typeof FormData !== 'undefined' && payload instanceof FormData) {
+      body = payload;
+    } else if (payload.paymentProofFile) {
+      const formData = new FormData();
+      formData.append('paymentProof', payload.paymentProofFile);
+      if (payload.guest) formData.append('guest', payload.guest);
+      if (payload.guestName) formData.append('guestName', payload.guestName.trim());
+      if (payload.guestPhone) formData.append('guestPhone', payload.guestPhone.trim());
+      if (payload.senderAccount) formData.append('senderAccount', payload.senderAccount.trim());
+      if (payload.tickets) formData.append('tickets', JSON.stringify(payload.tickets));
+      if (payload.packages) formData.append('packages', JSON.stringify(payload.packages));
+      formData.append('paymentMethod', payload.paymentMethod || 'cash');
+      formData.append('paymentStatus', payload.paymentStatus || (payload.paymentMethod === 'cash' ? 'pending' : 'pending_verification'));
+      if (payload.notes) formData.append('notes', payload.notes.trim());
+      body = formData;
+    } else {
+      body = {
+        ...(payload.guest ? { guest: payload.guest } : {}),
+        ...(payload.guestName ? { guestName: payload.guestName.trim() } : {}),
+        ...(payload.guestPhone ? { guestPhone: payload.guestPhone.trim() } : {}),
+        ...(payload.senderAccount ? { senderAccount: payload.senderAccount.trim() } : {}),
+        ...(Array.isArray(payload.tickets) && payload.tickets.length > 0 ? { tickets: payload.tickets } : {}),
+        ...(Array.isArray(payload.packages) && payload.packages.length > 0 ? { packages: payload.packages } : {}),
+        paymentMethod: payload.paymentMethod || 'cash',
+        paymentStatus: payload.paymentStatus || (payload.paymentMethod === 'cash' ? 'pending' : (payload.paymentProof ? 'pending_verification' : 'pending')),
+        ...(payload.paymentProof ? { paymentProof: payload.paymentProof } : {}),
+        ...(payload.notes ? { notes: payload.notes.trim() } : {})
+      };
+    }
 
     const res = await apiClient.post('/api/buying', body);
 
     if (!res.success) {
-      const errorMsg = extractErrorMessage(res, 'Failed to create purchase.');
+      const errorMsg = extractErrorMessage(res, 'فشل إنشاء عملية الشراء، يرجى مراجعة البيانات.');
       const err = new Error(errorMsg);
       err.response = { status: res.status, data: res.data };
       err.status = res.status;
@@ -92,11 +156,11 @@ export async function createPurchase(payload = {}) {
     return {
       success: true,
       data: res.data?.data || res.data,
-      message: res.data?.message || 'Purchase created successfully.'
+      message: res.data?.message || 'تم إنشاء الحجز بنجاح.'
     };
   } catch (error) {
     console.error('[buyingService.createPurchase] Error:', error.message);
-    const err = new Error(extractErrorMessage(error, 'Could not create purchase. Please check your data.'));
+    const err = new Error(extractErrorMessage(error, 'تعذر إتمام عملية الشراء. يرجى التأكد من البيانات المدخلة.'));
     err.response = error.response || { status: error.status || 500, data: error.data || { message: error.message } };
     err.status = error.status || error.response?.status || 500;
     throw err;
@@ -140,8 +204,8 @@ export async function getAllPurchases(params = {}) {
     }
 
     const payload = res.data;
-    const purchases = Array.isArray(payload?.data) 
-      ? payload.data 
+    const purchases = Array.isArray(payload?.data)
+      ? payload.data
       : (Array.isArray(payload) ? payload : (payload?.purchases || []));
 
     return {
@@ -459,6 +523,9 @@ export async function deletePurchase(buyingId) {
 // DEFAULT EXPORT & ALIAS OBJECT
 // ============================================================================
 export const buyingService = {
+  // Method 0: Get Payment Accounts
+  getPaymentAccounts,
+
   // Method 1: Create Purchase
   createPurchase,
   create: createPurchase,

@@ -1,0 +1,648 @@
+/* ==========================================================================
+   AMERICAN DREAM - PDF MENU MODAL (MOBILE-FIRST LUXURY DESIGN)
+   ========================================================================== */
+
+/* Fullscreen Overlay Backdrop */
+.pdf-menu-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background-color: #050b11;
+  display: flex;
+  flex-direction: column;
+  color: #f8fafc;
+  font-family: inherit;
+  overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  animation: pdfModalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pdfModalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   1. TOP CONTROL BAR
+   -------------------------------------------------------------------------- */
+.pdf-menu-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: rgba(11, 23, 34, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+.pdf-menu-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pdf-btn-close {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.pdf-btn-close:hover {
+  background: rgba(239, 68, 68, 0.85);
+  border-color: rgba(239, 68, 68, 0.9);
+  transform: rotate(90deg);
+}
+
+.pdf-btn-close:active {
+  transform: scale(0.92);
+}
+
+.pdf-menu-title-block {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pdf-menu-main-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.3px;
+}
+
+.pdf-menu-page-indicator {
+  font-size: 0.78rem;
+  color: #00c49f;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdf-menu-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Control buttons general */
+.pdf-control-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pdf-control-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.pdf-control-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Zoom widget */
+.pdf-zoom-group {
+  display: flex;
+  align-items: center;
+  background: rgba(18, 32, 47, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 2px 4px;
+  gap: 2px;
+}
+
+.pdf-zoom-group .pdf-control-btn {
+  border: none;
+  background: transparent;
+  width: 30px;
+  height: 30px;
+}
+
+.pdf-zoom-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  padding: 0 6px;
+  min-width: 42px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.pdf-zoom-label:hover {
+  color: #38bdf8;
+}
+
+/* Download button */
+.pdf-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #028090 0%, #00a896 100%);
+  color: #ffffff !important;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 9px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(2, 128, 144, 0.35);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.pdf-download-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(2, 128, 144, 0.5);
+  background: linear-gradient(135deg, #0294a7 0%, #00baa6 100%);
+}
+
+.pdf-download-btn:active {
+  transform: translateY(1px);
+}
+
+/* --------------------------------------------------------------------------
+   2. CATEGORIES HORIZONTAL NAVIGATION BAR
+   -------------------------------------------------------------------------- */
+.pdf-categories-scroll-bar {
+  background: rgba(8, 18, 28, 0.96);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  z-index: 15;
+  flex-shrink: 0;
+  padding: 8px 12px;
+}
+
+.pdf-categories-scroll-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.pdf-categories-track {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.pdf-cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #94a3b8;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.pdf-cat-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.pdf-cat-pill.active {
+  background: linear-gradient(135deg, #028090 0%, #00a896 100%);
+  color: #ffffff;
+  border-color: #028090;
+  box-shadow: 0 4px 14px rgba(2, 128, 144, 0.4);
+  font-weight: 700;
+  transform: scale(1.02);
+}
+
+.pdf-cat-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.pdf-cat-num {
+  font-size: 0.68rem;
+  padding: 1px 5px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  opacity: 0.8;
+}
+
+.pdf-cat-pill.active .pdf-cat-num {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   3. PAGES SCROLL CONTAINER
+   -------------------------------------------------------------------------- */
+.pdf-pages-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #060e15;
+  padding: 14px 10px 90px 10px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.pdf-pages-feed {
+  width: 100%;
+  max-width: 1080px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  margin: 0 auto;
+}
+
+/* Page Card Item */
+.pdf-page-card {
+  width: 100%;
+  max-width: 1000px;
+  background: #0f1c29;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  scroll-margin-top: 10px;
+}
+
+.pdf-page-card.is-active-page {
+  border-color: rgba(2, 128, 144, 0.5);
+  box-shadow: 0 10px 35px rgba(2, 128, 144, 0.25), 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Page Header Badge */
+.pdf-page-header-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(8, 18, 28, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.85rem;
+}
+
+.pdf-page-badge-icon {
+  font-size: 1rem;
+  margin-inline-end: 6px;
+}
+
+.pdf-page-badge-title {
+  font-weight: 700;
+  color: #e2e8f0;
+  flex: 1;
+}
+
+.pdf-page-badge-num {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffd15c;
+  background: rgba(255, 209, 92, 0.12);
+  border: 1px solid rgba(255, 209, 92, 0.25);
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+/* Page Image Wrapper */
+.pdf-page-image-wrapper {
+  width: 100%;
+  position: relative;
+  background: #071019;
+  display: flex;
+  justify-content: center;
+  overflow: auto;
+  cursor: zoom-in;
+}
+
+.pdf-page-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  transform-origin: top center;
+  transform: scale(var(--pdf-zoom, 1));
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  image-rendering: auto;
+}
+
+/* --------------------------------------------------------------------------
+   4. END OF MENU BANNER
+   -------------------------------------------------------------------------- */
+.pdf-menu-footer-card {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  padding: 30px 20px;
+  margin-top: 10px;
+  background: linear-gradient(180deg, rgba(15, 28, 41, 0.8) 0%, rgba(8, 18, 28, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.pdf-footer-sparkle {
+  margin-bottom: 2px;
+}
+
+.pdf-menu-footer-card h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.pdf-menu-footer-card p {
+  font-size: 0.88rem;
+  color: #94a3b8;
+  margin: 0;
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+.pdf-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pdf-footer-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #028090 0%, #00a896 100%);
+  color: #ffffff !important;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(2, 128, 144, 0.4);
+}
+
+.pdf-footer-top-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pdf-footer-top-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   5. FLOATING MOBILE BOTTOM BAR (MOBILE-SPECIFIC)
+   -------------------------------------------------------------------------- */
+.pdf-mobile-bottom-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(9, 20, 31, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  z-index: 25;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.pdf-nav-arrow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f1f5f9;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pdf-nav-arrow-btn:active:not(:disabled) {
+  transform: scale(0.94);
+  background: rgba(2, 128, 144, 0.4);
+}
+
+.pdf-nav-arrow-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pdf-mobile-middle-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pdf-mobile-page-txt {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pdf-mobile-quick-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #028090 0%, #00a896 100%);
+  color: #ffffff !important;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+/* Toast message */
+.pdf-toast-bubble {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(2, 128, 144, 0.95);
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  animation: pdfToastUp 0.25s ease-out;
+}
+
+@keyframes pdfToastUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 15px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. RESPONSIVENESS (MOBILE-FIRST BREAKPOINTS)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .pdf-mobile-bottom-bar {
+    display: flex;
+  }
+
+  .pdf-menu-topbar {
+    padding: 8px 12px;
+  }
+
+  .pdf-menu-main-title {
+    font-size: 0.92rem;
+  }
+
+  .pdf-menu-page-indicator {
+    font-size: 0.72rem;
+  }
+
+  /* Hide download text on narrow header to avoid crowding, icon remains */
+  .pdf-download-text {
+    display: none;
+  }
+
+  .pdf-download-btn {
+    padding: 8px 10px;
+  }
+
+  /* Make zoom widget compact on mobile */
+  .pdf-zoom-group {
+    padding: 1px 2px;
+  }
+
+  .pdf-zoom-label {
+    min-width: 34px;
+    font-size: 0.7rem;
+    padding: 0 2px;
+  }
+
+  .pdf-fullscreen-btn,
+  .pdf-share-btn {
+    display: none; /* Keep top bar clean on mobile */
+  }
+
+  .pdf-pages-scroll-container {
+    padding: 8px 6px 70px 6px;
+  }
+
+  .pdf-page-card {
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  .pdf-page-header-badge {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+
+  .pdf-page-badge-num {
+    font-size: 0.68rem;
+    padding: 1px 6px;
+  }
+
+  .pdf-cat-pill {
+    padding: 5px 10px;
+    font-size: 0.76rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pdf-btn-close {
+    width: 36px;
+    height: 36px;
+  }
+
+  .pdf-menu-main-title {
+    max-width: 140px;
+  }
+
+  .pdf-pages-scroll-container {
+    padding: 6px 4px 65px 4px;
+  }
+
+  .pdf-page-card {
+    border-radius: 8px;
+    border-width: 0.5px;
+  }
+}

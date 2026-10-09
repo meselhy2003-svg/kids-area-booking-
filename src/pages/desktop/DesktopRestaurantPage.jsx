@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
-import { 
-  Calendar, 
-  Clock, 
-  Users, 
-  MapPin, 
-  Phone, 
-  Check, 
-  ShoppingBag, 
-  Utensils, 
-  Coffee, 
-  ChevronRight, 
-  Share2, 
-  X, 
+import {
+  Calendar,
+  Clock,
+  Users,
+  MapPin,
+  Phone,
+  Check,
+  ShoppingBag,
+  Utensils,
+  Coffee,
+  ChevronRight,
+  Share2,
+  X,
   Sparkles,
   ArrowRight,
   Flame,
@@ -22,6 +22,7 @@ import { getTranslations } from '../../data/translations';
 import { mockMenuItems } from '../../data/mock/menu.mock';
 import OrderForDeliveryPage from './OrderForDeliveryPage';
 import BookTablePage from './BookTablePage';
+import PdfMenuModal from '../../components/PdfMenuModal';
 import './DesktopRestaurantPage.css';
 
 export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 'ar' }) {
@@ -341,7 +342,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
 
   if (currentView === 'book-table') {
     return (
-      <BookTablePage 
+      <BookTablePage
         onBack={() => {
           setCurrentView('overview');
           if (typeof window !== 'undefined') {
@@ -358,7 +359,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
 
   if (currentView === 'delivery') {
     return (
-      <OrderForDeliveryPage 
+      <OrderForDeliveryPage
         onBack={() => {
           setCurrentView('overview');
           if (typeof window !== 'undefined') {
@@ -373,11 +374,11 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
 
   return (
     <div className={`restaurant-page ${lang === 'ar' ? 'font-alexandria' : ''}`}>
-      
+
       {/* ========================================================================= */}
       {/* 1. HERO BANNER SECTION */}
       {/* ========================================================================= */}
-      <section 
+      <section
         className="restaurant-hero"
         style={{
           backgroundImage: `url('/photo/kid area pic/Canal-side sunset dinner terrace with warm string lights, dining tables, grilled meats, salads, and sparkling water.png')`
@@ -388,10 +389,10 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
         <div className="restaurant-hero-content">
           {/* Badge Pill */}
           <div className="restaurant-hero-badge">
-            <img 
-              src="/photo/kid area pic/icon/Icon (12)dadd.png" 
-              alt="Restaurant" 
-              className="restaurant-hero-badge-icon" 
+            <img
+              src="/photo/kid area pic/icon/Icon (12)dadd.png"
+              alt="Restaurant"
+              className="restaurant-hero-badge-icon"
             />
             <span>{lang === 'ar' ? 'المطعم والكافيه' : 'RESTAURANT & CAFE'}</span>
           </div>
@@ -414,7 +415,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
           {/* Subtitle */}
           <p className="restaurant-hero-subtitle">
             {r.heroDesc || (
-              lang === 'ar' 
+              lang === 'ar'
                 ? 'استمتع بأشهى المأكولات، ومشروباتك المفضلة، وأجواء الواجهة المائية الهادئة في أمريكان دريم الإسماعيلية'
                 : 'Enjoy delicious food, your favorite drinks, and a relaxing waterfront atmosphere at American Dream Ismailia'
             )}
@@ -422,20 +423,20 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
 
           {/* Action Buttons */}
           <div className="restaurant-hero-buttons">
-            <button 
+            <button
               className="btn-primary-teal"
               onClick={handleScrollToExperiences}
             >
               <span>{r.exploreBtn || (lang === 'ar' ? 'استكشف خيارات الطعام ↓' : 'Explore Dining Options ↓')}</span>
             </button>
 
-            <button 
+            <button
               className="btn-glass-outline"
               onClick={handleOpenBooking}
             >
-              <img 
-                src="/photo/kid area pic/icon/Icon (26).png" 
-                alt="Book a Table" 
+              <img
+                src="/photo/kid area pic/icon/Icon (26).png"
+                alt="Book a Table"
                 className="btn-icon-table"
               />
               <span>{r.bookTableBtn || (lang === 'ar' ? 'احجز طاولة' : 'Book a Table')}</span>
@@ -445,18 +446,18 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
           {/* Feature Badges below buttons */}
           <div className="restaurant-hero-features">
             <div className="hero-feature-item">
-              <img 
-                src="/photo/kid area pic/icon/Icon (25).png" 
-                alt="Artisanal Kitchen" 
-                className="hero-feature-icon" 
+              <img
+                src="/photo/kid area pic/icon/Icon (25).png"
+                alt="Artisanal Kitchen"
+                className="hero-feature-icon"
               />
               <span>{lang === 'ar' ? 'مطبخ حرفي فاخر' : 'Artisanal Kitchen'}</span>
             </div>
             <div className="hero-feature-item">
-              <img 
-                src="/photo/kid area pic/icon/222222481.png" 
-                alt="Family & Group Friendly" 
-                className="hero-feature-icon" 
+              <img
+                src="/photo/kid area pic/icon/222222481.png"
+                alt="Family & Group Friendly"
+                className="hero-feature-icon"
               />
               <span>{lang === 'ar' ? 'مناسب للعائلات والمجموعات' : 'Family & Group Friendly'}</span>
             </div>
@@ -469,7 +470,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
       {/* ========================================================================= */}
       <section id="dining-experiences" className="restaurant-experiences-section">
         <div className="experiences-container">
-          
+
           {/* Section Header */}
           <div className="experiences-header">
             <span className="experiences-eyebrow">
@@ -512,17 +513,16 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
             ref={cardsScrollRef}
             onScroll={handleCardsScroll}
           >
-            
             {/* CARD 1: DELIVERY */}
             <div className="experience-card">
               <div className="card-image-wrapper">
-                <img 
+                <img
                   src="/photo/kid area pic/Freshly grilled brioche cheeseburger with crispy shoestring fries and artisanal dip in craft takeaway presentation.png"
                   alt={lang === 'ar' ? 'خدمة التوصيل' : 'Delivery'}
                   className="card-image"
                 />
                 <span className="card-badge badge-dark">
-                  {lang === 'ar' ? 'توصيل / سفري' : 'DELIVERY/TAKEAWAY'}
+                  {lang === 'ar' ? 'توصيل' : 'DELIVERY/TAKEAWAY'}
                 </span>
               </div>
 
@@ -534,11 +534,11 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                   {lang === 'ar' ? 'خدمة التوصيل' : 'DELIVERY'}
                 </h3>
                 <p className="card-description">
-                  {lang === 'ar' 
-                    ? 'اطلب طعامك المفضل واستمتع به أينما كنت على طول واجهة الإسماعيلية المائية أو في منزلك مباشرة.'
-                    : 'Order your favorite food and enjoy it wherever you are along the Ismailia waterfront or right at home.'}
+                  {lang === 'ar'
+                    ? 'اطلب طعامك المفضل واستمتع به أينما كنت.'
+                    : 'Order your favorite food and enjoy it wherever you are.'}
                 </p>
-                <button 
+                <button
                   className="card-btn card-btn-teal"
                   onClick={handleOpenDelivery}
                 >
@@ -550,7 +550,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
             {/* CARD 2: ORDER AT AMERICAN DREAM */}
             <div className="experience-card">
               <div className="card-image-wrapper">
-                <img 
+                <img
                   src="/photo/kid area pic/vibe_family_pizza.png"
                   alt={lang === 'ar' ? 'الطلب داخل الحديقة' : 'Order at American Dream'}
                   className="card-image"
@@ -572,7 +572,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                     ? 'استعرض أشهى المأكولات الطازجة والمشروبات والحلويات مع كافة الأسعار والتفاصيل.'
                     : "Browse our full gourmet menu featuring fresh dishes, stone-baked pizzas, drinks & desserts with prices."}
                 </p>
-                <button 
+                <button
                   className="card-btn card-btn-darkteal"
                   onClick={() => setIsMenuModalOpen(true)}
                 >
@@ -585,29 +585,27 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
             {/* CARD 3: BOOK A TABLE */}
             <div className="experience-card">
               <div className="card-image-wrapper">
-                <img 
+                <img
                   src="/photo/kid area pic/vibe_sunset_candle_table.png"
                   alt={lang === 'ar' ? 'حجز طاولة' : 'Book a Table'}
                   className="card-image"
                 />
                 <span className="card-badge badge-gold">
-                  {lang === 'ar' ? 'جلسات VIP' : 'VIP Seating'}
+                  {lang === 'ar' ? 'VIP' : 'VIP Seating'}
                 </span>
               </div>
 
               <div className="card-body">
-                <span className="card-category-tag tag-gold">
-                  {lang === 'ar' ? 'تراس الواجهة المائية' : 'WATERFRONT TERRACE'}
-                </span>
+
                 <h3 className="card-title">
                   {lang === 'ar' ? 'حجز طاولة' : 'BOOK A TABLE'}
                 </h3>
                 <p className="card-description">
                   {lang === 'ar'
-                    ? 'احجز طاولتك بجوار القناة مباشرة لمشاهدة السفن العابرة وعيش تجربة استثنائية لا تُنسى.'
-                    : 'Reserve your seaside table overlooking passing canal ships and indulge in an unforgettable culinary experience.'}
+                    ? 'احجز طاولتك واستمتع بوجبتك بسلاسة وبدون انتظار أثناء زيارتك.'
+                    : 'Reserve your table and enjoy your meal seamlessly during your visit without waiting.'}
                 </p>
-                <button 
+                <button
                   className="card-btn card-btn-gold"
                   onClick={handleOpenBooking}
                 >
@@ -637,7 +635,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
       {/* ========================================================================= */}
       <section className="restaurant-vibes-section">
         <div className="vibes-container">
-          
+
           {/* Header Row */}
           <div className="vibes-header-row">
             <div className="vibes-header-left">
@@ -657,17 +655,17 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
 
           {/* Mosaic Gallery Layout */}
           <div className="vibes-mosaic-grid">
-            
+
             {/* ROW 1: Large Wide Left (60%) + Medium Right (40%) */}
             <div className="vibes-mosaic-row-1">
               {/* Photo 1 (Large Sunset Terrace) */}
-              <div 
+              <div
                 className="vibe-item-card row1-large"
                 onClick={() => setLightboxItem(vibesGallery[0])}
               >
-                <img 
-                  src={vibesGallery[0].src} 
-                  alt={lang === 'ar' ? vibesGallery[0].titleAr : vibesGallery[0].titleEn} 
+                <img
+                  src={vibesGallery[0].src}
+                  alt={lang === 'ar' ? vibesGallery[0].titleAr : vibesGallery[0].titleEn}
                   className="vibe-img"
                   loading="lazy"
                 />
@@ -679,13 +677,13 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
               </div>
 
               {/* Photo 2 (Seaside Candlelit Table) */}
-              <div 
+              <div
                 className="vibe-item-card row1-medium"
                 onClick={() => setLightboxItem(vibesGallery[1])}
               >
-                <img 
-                  src={vibesGallery[1].src} 
-                  alt={lang === 'ar' ? vibesGallery[1].titleAr : vibesGallery[1].titleEn} 
+                <img
+                  src={vibesGallery[1].src}
+                  alt={lang === 'ar' ? vibesGallery[1].titleAr : vibesGallery[1].titleEn}
                   className="vibe-img"
                   loading="lazy"
                 />
@@ -700,13 +698,13 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
             {/* ROW 2: Three Balanced Columns (Burger + Family + Coffee) */}
             <div className="vibes-mosaic-row-2">
               {/* Photo 3 (Cheeseburger Craft Box) */}
-              <div 
+              <div
                 className="vibe-item-card row2-card"
                 onClick={() => setLightboxItem(vibesGallery[2])}
               >
-                <img 
-                  src={vibesGallery[2].src} 
-                  alt={lang === 'ar' ? vibesGallery[2].titleAr : vibesGallery[2].titleEn} 
+                <img
+                  src={vibesGallery[2].src}
+                  alt={lang === 'ar' ? vibesGallery[2].titleAr : vibesGallery[2].titleEn}
                   className="vibe-img"
                   loading="lazy"
                 />
@@ -718,13 +716,13 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
               </div>
 
               {/* Photo 4 (Family Gathering Pizza) */}
-              <div 
+              <div
                 className="vibe-item-card row2-card"
                 onClick={() => setLightboxItem(vibesGallery[3])}
               >
-                <img 
-                  src={vibesGallery[3].src} 
-                  alt={lang === 'ar' ? vibesGallery[3].titleAr : vibesGallery[3].titleEn} 
+                <img
+                  src={vibesGallery[3].src}
+                  alt={lang === 'ar' ? vibesGallery[3].titleAr : vibesGallery[3].titleEn}
                   className="vibe-img"
                   loading="lazy"
                 />
@@ -736,13 +734,13 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
               </div>
 
               {/* Photo 5 (Seaside Coffee Cups & Sunset Drinks) */}
-              <div 
+              <div
                 className="vibe-item-card row2-card"
                 onClick={() => setLightboxItem(vibesGallery[4])}
               >
-                <img 
-                  src={vibesGallery[4].src} 
-                  alt={lang === 'ar' ? vibesGallery[4].titleAr : vibesGallery[4].titleEn} 
+                <img
+                  src={vibesGallery[4].src}
+                  alt={lang === 'ar' ? vibesGallery[4].titleAr : vibesGallery[4].titleEn}
                   className="vibe-img"
                   loading="lazy"
                 />
@@ -779,10 +777,10 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                   <div className="form-grid-2">
                     <div className="form-group">
                       <label>{lang === 'ar' ? 'الاسم بالكامل' : 'Full Name'} *</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         required
-                        className="form-input" 
+                        className="form-input"
                         placeholder={lang === 'ar' ? 'مثال: أحمد عبد الرحمن' : 'e.g. John Doe'}
                         value={guestName}
                         onChange={(e) => setGuestName(e.target.value)}
@@ -791,10 +789,10 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
 
                     <div className="form-group">
                       <label>{lang === 'ar' ? 'رقم الهاتف / واتساب' : 'Phone / WhatsApp'} *</label>
-                      <input 
-                        type="tel" 
+                      <input
+                        type="tel"
                         required
-                        className="form-input" 
+                        className="form-input"
                         placeholder={lang === 'ar' ? 'مثال: 01012345678' : '+20 101 234 5678'}
                         value={guestPhone}
                         onChange={(e) => setGuestPhone(e.target.value)}
@@ -805,10 +803,10 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                   <div className="form-grid-2">
                     <div className="form-group">
                       <label>{lang === 'ar' ? 'تاريخ الحجز' : 'Date'} *</label>
-                      <input 
-                        type="date" 
+                      <input
+                        type="date"
                         required
-                        className="form-input" 
+                        className="form-input"
                         value={bookingDate}
                         onChange={(e) => setBookingDate(e.target.value)}
                       />
@@ -816,7 +814,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
 
                     <div className="form-group">
                       <label>{lang === 'ar' ? 'الموعد المفضل' : 'Preferred Time'} *</label>
-                      <select 
+                      <select
                         className="form-select"
                         value={timeSlot}
                         onChange={(e) => setTimeSlot(e.target.value)}
@@ -833,16 +831,16 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                   <div className="form-group">
                     <label>{lang === 'ar' ? 'عدد الأفراد' : 'Number of Guests'}</label>
                     <div className="counter-control">
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="counter-btn"
                         onClick={() => setGuestCount(prev => Math.max(1, prev - 1))}
                       >
                         -
                       </button>
                       <span className="counter-val">{guestCount} {lang === 'ar' ? 'أفراد' : 'Guests'}</span>
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="counter-btn"
                         onClick={() => setGuestCount(prev => Math.min(25, prev + 1))}
                       >
@@ -854,28 +852,28 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                   <div className="form-group">
                     <label>{lang === 'ar' ? 'منطقة الجلوس المفضلة' : 'Preferred Seating Zone'}</label>
                     <div className="pill-radio-group">
-                      <button 
+                      <button
                         type="button"
                         className={`pill-radio-btn ${selectedZone === 'terrace' ? 'selected' : ''}`}
                         onClick={() => setSelectedZone('terrace')}
                       >
                         🌊 {lang === 'ar' ? 'تراس الواجهة المائية (VIP)' : 'Waterfront Terrace (VIP)'}
                       </button>
-                      <button 
+                      <button
                         type="button"
                         className={`pill-radio-btn ${selectedZone === 'promenade' ? 'selected' : ''}`}
                         onClick={() => setSelectedZone('promenade')}
                       >
                         🌴 {lang === 'ar' ? 'الممشى المفتوح' : 'Open-Air Promenade'}
                       </button>
-                      <button 
+                      <button
                         type="button"
                         className={`pill-radio-btn ${selectedZone === 'indoor' ? 'selected' : ''}`}
                         onClick={() => setSelectedZone('indoor')}
                       >
                         ❄️ {lang === 'ar' ? 'الصالة المكيفة الداخلية' : 'Indoor AC Lounge'}
                       </button>
-                      <button 
+                      <button
                         type="button"
                         className={`pill-radio-btn ${selectedZone === 'pergola' ? 'selected' : ''}`}
                         onClick={() => setSelectedZone('pergola')}
@@ -888,28 +886,28 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                   <div className="form-group">
                     <label>{lang === 'ar' ? 'المناسبة (اختياري)' : 'Occasion (Optional)'}</label>
                     <div className="pill-radio-group">
-                      <button 
+                      <button
                         type="button"
                         className={`pill-radio-btn ${occasion === 'birthday' ? 'selected' : ''}`}
                         onClick={() => setOccasion('birthday')}
                       >
                         🎂 {lang === 'ar' ? 'عيد ميلاد' : 'Birthday'}
                       </button>
-                      <button 
+                      <button
                         type="button"
                         className={`pill-radio-btn ${occasion === 'anniversary' ? 'selected' : ''}`}
                         onClick={() => setOccasion('anniversary')}
                       >
                         💐 {lang === 'ar' ? 'ذكرى سنوية' : 'Anniversary'}
                       </button>
-                      <button 
+                      <button
                         type="button"
                         className={`pill-radio-btn ${occasion === 'family' ? 'selected' : ''}`}
                         onClick={() => setOccasion('family')}
                       >
                         👨‍👩‍👧‍👦 {lang === 'ar' ? 'عائلة وأصدقاء' : 'Family & Friends'}
                       </button>
-                      <button 
+                      <button
                         type="button"
                         className={`pill-radio-btn ${occasion === 'casual' ? 'selected' : ''}`}
                         onClick={() => setOccasion('casual')}
@@ -931,7 +929,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                     {lang === 'ar' ? 'تم تأكيد حجز الطاولة بنجاح!' : 'Table Reserved Successfully!'}
                   </h3>
                   <p style={{ color: '#64748b', margin: '0' }}>
-                    {lang === 'ar' 
+                    {lang === 'ar'
                       ? `أهلاً بك يا ${guestName}، تم حفظ حجزك لـ ${guestCount} أفراد في ${selectedZone === 'terrace' ? 'تراس الواجهة المائية' : 'المطعم'} في موعد ${timeSlot}.`
                       : `Welcome ${guestName}, your reservation for ${guestCount} guests in ${selectedZone} at ${timeSlot} is confirmed.`}
                   </p>
@@ -946,7 +944,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                     <span>{lang === 'ar' ? 'إرسال تفاصيل الحجز للمطعم عبر واتساب' : 'Send Booking Details via WhatsApp'}</span>
                   </button>
 
-                  <button 
+                  <button
                     className="card-btn card-btn-teal"
                     style={{ maxWidth: '280px', marginTop: '8px' }}
                     onClick={() => setIsBookingModalOpen(false)}
@@ -980,10 +978,10 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                   <div className="form-grid-2">
                     <div className="form-group">
                       <label>{lang === 'ar' ? 'اسم العميل' : 'Customer Name'} *</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         required
-                        className="form-input" 
+                        className="form-input"
                         placeholder={lang === 'ar' ? 'أدخل اسمك' : 'Your Name'}
                         value={deliveryName}
                         onChange={(e) => setDeliveryName(e.target.value)}
@@ -991,10 +989,10 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                     </div>
                     <div className="form-group">
                       <label>{lang === 'ar' ? 'رقم الهاتف' : 'Phone Number'} *</label>
-                      <input 
-                        type="tel" 
+                      <input
+                        type="tel"
                         required
-                        className="form-input" 
+                        className="form-input"
                         placeholder={lang === 'ar' ? 'رقم الموبايل' : 'Mobile number'}
                         value={deliveryPhone}
                         onChange={(e) => setDeliveryPhone(e.target.value)}
@@ -1004,10 +1002,10 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
 
                   <div className="form-group">
                     <label>{lang === 'ar' ? 'عنوان التوصيل في الإسماعيلية' : 'Delivery Address'} *</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       required
-                      className="form-input" 
+                      className="form-input"
                       placeholder={lang === 'ar' ? 'الشارع / المنطقة / بوابة ممشى دريم' : 'Street / Area / Dream Promenade Gate'}
                       value={deliveryAddress}
                       onChange={(e) => setDeliveryAddress(e.target.value)}
@@ -1019,7 +1017,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                     <label>{lang === 'ar' ? 'الوجبات المختارة للطلب' : 'Selected Meals'}</label>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                       {orderItems.map(item => (
-                        <div 
+                        <div
                           key={item.id}
                           style={{
                             display: 'flex',
@@ -1078,7 +1076,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                     {lang === 'ar' ? 'تم استلام طلب التوصيل بنجاح!' : 'Order Placed Successfully!'}
                   </h3>
                   <p style={{ color: '#64748b', margin: '0' }}>
-                    {lang === 'ar' 
+                    {lang === 'ar'
                       ? `شكراً لك يا ${deliveryName}، طلبك بقيمة ${orderTotal} ج.م قيد التحضير وسيتواصل معك الطيار فور الانطلاق.`
                       : `Thank you ${deliveryName}, your order (${orderTotal} EGP) is being prepared and will be delivered shortly.`}
                   </p>
@@ -1093,7 +1091,7 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
                     <span>{lang === 'ar' ? 'إرسال الفاتورة والتفاصيل للمطعم عبر واتساب' : 'Send Order to WhatsApp'}</span>
                   </button>
 
-                  <button 
+                  <button
                     className="card-btn card-btn-teal"
                     style={{ maxWidth: '280px', marginTop: '8px' }}
                     onClick={() => setIsDeliveryModalOpen(false)}
@@ -1108,92 +1106,13 @@ export default function DesktopRestaurantPage({ setActiveTab, openModal, lang = 
       )}
 
       {/* ========================================================================= */}
-      {/* 6. DIGITAL MENU MODAL */}
+      {/* 6. PDF MENU BROWSING MODAL */}
       {/* ========================================================================= */}
-      {isMenuModalOpen && (
-        <div className="restaurant-modal-backdrop" onClick={() => setIsMenuModalOpen(false)}>
-          <div className="restaurant-modal-dialog wide" onClick={(e) => e.stopPropagation()}>
-            <div className="restaurant-modal-header">
-              <div className="modal-header-text">
-                <h3>{lang === 'ar' ? 'قائمة طعام ومشروبات أمريكان دريم' : 'American Dream Food & Drinks Menu'}</h3>
-                <p>{lang === 'ar' ? 'أشهى المأكولات الطازجة والمشروبات المنعشة' : 'Fresh gourmet meals, stone-baked pizzas & mocktails'}</p>
-              </div>
-              <button className="modal-close-btn" onClick={() => setIsMenuModalOpen(false)}>✕</button>
-            </div>
-
-            <div className="restaurant-modal-body">
-              {/* Categories Navigation Bar */}
-              <div className="menu-categories-bar">
-                <button 
-                  className={`menu-cat-btn ${activeMenuCategory === 'all' ? 'active' : ''}`}
-                  onClick={() => setActiveMenuCategory('all')}
-                >
-                  {lang === 'ar' ? '🍽️ الكل' : '🍽️ All'}
-                </button>
-                <button 
-                  className={`menu-cat-btn ${activeMenuCategory === 'burgers' ? 'active' : ''}`}
-                  onClick={() => setActiveMenuCategory('burgers')}
-                >
-                  {lang === 'ar' ? '🍔 البرجر والسندوتشات' : '🍔 Burgers'}
-                </button>
-                <button 
-                  className={`menu-cat-btn ${activeMenuCategory === 'pizza' ? 'active' : ''}`}
-                  onClick={() => setActiveMenuCategory('pizza')}
-                >
-                  {lang === 'ar' ? '🍕 البيتزا الإيطالية' : '🍕 Pizzas'}
-                </button>
-                <button 
-                  className={`menu-cat-btn ${activeMenuCategory === 'grills' ? 'active' : ''}`}
-                  onClick={() => setActiveMenuCategory('grills')}
-                >
-                  {lang === 'ar' ? '🥩 المشاوي' : '🥩 Grills'}
-                </button>
-                <button 
-                  className={`menu-cat-btn ${activeMenuCategory === 'drinks' ? 'active' : ''}`}
-                  onClick={() => setActiveMenuCategory('drinks')}
-                >
-                  {lang === 'ar' ? '🍹 العصائر والسموذي' : '🍹 Mocktails'}
-                </button>
-                <button 
-                  className={`menu-cat-btn ${activeMenuCategory === 'coffee' ? 'active' : ''}`}
-                  onClick={() => setActiveMenuCategory('coffee')}
-                >
-                  {lang === 'ar' ? '☕ القهوة والمشروبات الساخنة' : '☕ Coffee'}
-                </button>
-                <button 
-                  className={`menu-cat-btn ${activeMenuCategory === 'sweets' ? 'active' : ''}`}
-                  onClick={() => setActiveMenuCategory('sweets')}
-                >
-                  {lang === 'ar' ? '🍨 الحلويات والآيس كريم' : '🍨 Sweets'}
-                </button>
-              </div>
-
-              {/* Items Grid */}
-              <div className="menu-items-grid">
-                {filteredMenuItems.map(item => (
-                  <div key={item.id} className="menu-item-card">
-                    <img src={item.image} alt={lang === 'ar' ? item.nameAr : item.nameEn} className="menu-item-img" />
-                    <div className="menu-item-info">
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <h4 className="menu-item-name">{lang === 'ar' ? item.nameAr : item.nameEn}</h4>
-                          <span style={{ fontSize: '0.78rem', color: '#eab308', display: 'flex', alignItems: 'center', gap: '2px' }}>
-                            <Star size={12} fill="#eab308" /> {item.rating}
-                          </span>
-                        </div>
-                        <p className="menu-item-desc">{lang === 'ar' ? item.descAr : item.descEn}</p>
-                      </div>
-                      <div className="menu-item-bottom">
-                        <span className="menu-item-price">{item.price} {lang === 'ar' ? 'ج.م' : 'EGP'}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <PdfMenuModal
+        isOpen={isMenuModalOpen}
+        onClose={() => setIsMenuModalOpen(false)}
+        lang={lang}
+      />
 
       {/* ========================================================================= */}
       {/* 7. FULLSCREEN LIGHTBOX MODAL */}
