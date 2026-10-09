@@ -508,9 +508,9 @@ export default function DesktopDashboardPage({
     { key: 'restaurant-orders', labelEn: 'Restaurant & Cafe', labelAr: 'Restaurant & Cafe' },
     { key: 'events-orders', labelEn: 'Event & Halls', labelAr: 'Event & Halls' },
     { key: 'trips-orders', labelEn: 'Trips', labelAr: 'Trips' },
+    { key: 'about', labelEn: 'About us', labelAr: 'About us' },
     { key: 'guests', labelEn: 'Guests', labelAr: 'Guests' },
-    { key: 'orders', labelEn: 'Orders', labelAr: 'Orders' },
-    { key: 'about', labelEn: 'About us', labelAr: 'About us' }
+    { key: 'orders', labelEn: 'Orders', labelAr: 'Orders' }
   ];
 
   // Live order counts from backend APIs
