@@ -1204,33 +1204,43 @@ export default function RestaurantMenuEditor({
             </div>
 
             <div className="ados-modal-body">
-              {/* Image Preview & Quick Picker */}
-              <div className="ados-modal-thumb-preview-wrap">
-                <img src={editingItem.image} alt={editingItem.title} className="ados-modal-thumb-preview" />
-                <button 
-                  type="button"
-                  className="ados-modal-change-thumb-btn"
-                  onClick={() => openImagePicker({ type: 'item' })}
-                >
-                  <RotateCcw size={13} />
-                  <span>{isAr ? 'تغيير الصورة' : 'Change Image'}</span>
-                </button>
+              {/* Item Photo Row */}
+              <div className="ados-form-group">
+                <label>{isAr ? 'صورة الصنف' : 'Item Photo'}</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <img 
+                    src={editingItem.image} 
+                    alt="Preview" 
+                    style={{ width: 100, height: 75, objectFit: 'cover', borderRadius: 8, border: '1px solid #cbd5e1' }} 
+                  />
+                  <button 
+                    type="button"
+                    className="ados-btn-secondary"
+                    onClick={() => openImagePicker({ type: 'item' })}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                  >
+                    <RotateCcw size={13} />
+                    <span>{isAr ? 'تغيير أو اختيار صورة...' : 'Change Photo...'}</span>
+                  </button>
+                </div>
               </div>
 
               {/* Title EN & AR */}
-              <div className="ados-modal-field-row">
-                <div className="ados-modal-field">
+              <div className="ados-form-row">
+                <div className="ados-form-group">
                   <label>{isAr ? 'اسم الصنف (بالإنجليزية)' : 'Item Title (English)'}</label>
                   <input 
                     type="text" 
+                    className="ados-form-input"
                     value={editingItem.title || ''} 
                     onChange={e => setEditingItem({ ...editingItem, title: e.target.value })}
                   />
                 </div>
-                <div className="ados-modal-field">
+                <div className="ados-form-group">
                   <label>{isAr ? 'اسم الصنف (بالعربية)' : 'Item Title (Arabic)'}</label>
                   <input 
                     type="text" 
+                    className="ados-form-input"
                     value={editingItem.titleAr || ''} 
                     onChange={e => setEditingItem({ ...editingItem, titleAr: e.target.value })}
                     dir="rtl"
@@ -1238,35 +1248,14 @@ export default function RestaurantMenuEditor({
                 </div>
               </div>
 
-              {/* Subtitle / Description EN & AR */}
-              <div className="ados-modal-field-row">
-                <div className="ados-modal-field">
-                  <label>{isAr ? 'الوصف / المكونات (بالإنجليزية)' : 'Description / Features (EN)'}</label>
-                  <textarea 
-                    rows={2}
-                    value={editingItem.subtitle || ''} 
-                    onChange={e => setEditingItem({ ...editingItem, subtitle: e.target.value })}
-                  />
-                </div>
-                <div className="ados-modal-field">
-                  <label>{isAr ? 'الوصف / المكونات (بالعربية)' : 'Description / Features (AR)'}</label>
-                  <textarea 
-                    rows={2}
-                    value={editingItem.subtitleAr || ''} 
-                    onChange={e => setEditingItem({ ...editingItem, subtitleAr: e.target.value })}
-                    dir="rtl"
-                  />
-                </div>
-              </div>
-
               {/* Category & Badge */}
-              <div className="ados-modal-field-row">
-                <div className="ados-modal-field">
+              <div className="ados-form-row">
+                <div className="ados-form-group">
                   <label>{isAr ? 'التصنيف' : 'Category'}</label>
                   <select 
                     value={editingItem.category || 'meals'} 
                     onChange={e => setEditingItem({ ...editingItem, category: e.target.value })}
-                    className="rest-modal-select"
+                    className="ados-form-select"
                   >
                     <option value="meals">{isAr ? 'الوجبات والبرجر' : 'Meals & Burgers'}</option>
                     <option value="grills">{isAr ? 'المشاوي والأطباق' : 'Grills & Specialties'}</option>
@@ -1277,10 +1266,11 @@ export default function RestaurantMenuEditor({
                     <option value="combos">{isAr ? 'العروض والكومبو' : 'Family Combos'}</option>
                   </select>
                 </div>
-                <div className="ados-modal-field">
+                <div className="ados-form-group">
                   <label>{isAr ? 'شارة التميز (Badge)' : 'Badge Label'}</label>
                   <input 
                     type="text" 
+                    className="ados-form-input"
                     value={editingItem.badge || ''} 
                     placeholder="e.g. Chef Special / SAVE 50 EGP"
                     onChange={e => setEditingItem({ ...editingItem, badge: e.target.value })}
@@ -1289,30 +1279,76 @@ export default function RestaurantMenuEditor({
               </div>
 
               {/* Price & Original Price */}
-              <div className="ados-modal-field-row">
-                <div className="ados-modal-field">
+              <div className="ados-form-row">
+                <div className="ados-form-group">
                   <label>{isAr ? 'السعر الحالي (ج.م)' : 'Current Price (EGP)'}</label>
                   <input 
                     type="number" 
+                    className="ados-form-input"
                     value={editingItem.price ?? ''} 
-                    onChange={e => setEditingItem({ ...editingItem, price: Number(e.target.value) })}
+                    onChange={e => {
+                      const newPrice = Number(e.target.value);
+                      const orig = editingItem.originalPrice || newPrice;
+                      const diff = orig - newPrice;
+                      setEditingItem({
+                        ...editingItem,
+                        price: newPrice,
+                        badge: diff > 0 ? `SAVE ${diff} EGP` : (editingItem.badge || ''),
+                        badgeAr: diff > 0 ? `وفر ${diff} ج.م` : (editingItem.badgeAr || '')
+                      });
+                    }}
                   />
                 </div>
-                <div className="ados-modal-field">
-                  <label>{isAr ? 'السعر الأصلي / قبل الخصم (ج.م)' : 'Original Price (EGP)'}</label>
+                <div className="ados-form-group">
+                  <label>{isAr ? 'السعر الأصلي (ج.م - لحساب الخصم)' : 'Original Price (EGP - for discount)'}</label>
                   <input 
                     type="number" 
+                    className="ados-form-input"
                     value={editingItem.originalPrice ?? ''} 
-                    onChange={e => setEditingItem({ ...editingItem, originalPrice: Number(e.target.value) })}
+                    onChange={e => {
+                      const orig = Number(e.target.value);
+                      const cur = editingItem.price || 0;
+                      const diff = orig - cur;
+                      setEditingItem({
+                        ...editingItem,
+                        originalPrice: orig,
+                        badge: diff > 0 ? `SAVE ${diff} EGP` : (editingItem.badge || ''),
+                        badgeAr: diff > 0 ? `وفر ${diff} ج.م` : (editingItem.badgeAr || '')
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Subtitle / Description EN & AR */}
+              <div className="ados-form-row">
+                <div className="ados-form-group">
+                  <label>{isAr ? 'الوصف / المكونات (بالإنجليزية)' : 'Description / Features (EN)'}</label>
+                  <textarea 
+                    className="ados-form-textarea"
+                    rows={3}
+                    value={editingItem.subtitle || ''} 
+                    onChange={e => setEditingItem({ ...editingItem, subtitle: e.target.value })}
+                  />
+                </div>
+                <div className="ados-form-group">
+                  <label>{isAr ? 'الوصف / المكونات (بالعربية)' : 'Description / Features (AR)'}</label>
+                  <textarea 
+                    className="ados-form-textarea"
+                    rows={3}
+                    value={editingItem.subtitleAr || ''} 
+                    onChange={e => setEditingItem({ ...editingItem, subtitleAr: e.target.value })}
+                    dir="rtl"
                   />
                 </div>
               </div>
 
               {/* Combo Features (if combo) */}
               {(editingItem.isCombo || editingItem.category === 'combos') && (
-                <div className="ados-modal-field">
+                <div className="ados-form-group">
                   <label>{isAr ? 'عناصر الكومبو المشمولة (مفصولة بفاصلة)' : 'Included Combo Features (comma-separated)'}</label>
                   <textarea 
+                    className="ados-form-textarea"
                     rows={2}
                     value={editingItem.features?.join(', ') || ''} 
                     onChange={e => setEditingItem({ 
@@ -1326,19 +1362,20 @@ export default function RestaurantMenuEditor({
             </div>
 
             <div className="ados-modal-footer">
-              {itemModalMode === 'edit' && (
-                <button className="ados-modal-delete-btn" onClick={handleDeleteItem}>
-                  <Trash2 size={14} />
-                  <span>{isAr ? 'حذف العنصر' : 'Delete'}</span>
+              {itemModalMode === 'edit' ? (
+                <button className="ados-btn-danger" onClick={handleDeleteItem}>
+                  <Trash2 size={13} style={{ marginInlineEnd: 6, verticalAlign: 'middle' }} />
+                  <span>{isAr ? 'حذف العنصر' : 'Delete Item'}</span>
                 </button>
-              )}
-              <div className="ados-modal-actions-right">
-                <button className="ados-modal-cancel-btn" onClick={() => setIsItemModalOpen(false)}>
+              ) : <div></div>}
+
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button className="ados-btn-secondary" onClick={() => setIsItemModalOpen(false)}>
                   {isAr ? 'إلغاء' : 'Cancel'}
                 </button>
-                <button className="ados-modal-save-btn" onClick={handleSaveItem}>
-                  <Check size={14} />
-                  <span>{isAr ? 'حفظ التعديل' : 'Save'}</span>
+                <button className="ados-btn-primary" onClick={handleSaveItem}>
+                  <Check size={14} style={{ marginInlineEnd: 6, verticalAlign: 'middle' }} />
+                  <span>{isAr ? 'حفظ العنصر' : 'Save Item'}</span>
                 </button>
               </div>
             </div>
@@ -1360,19 +1397,21 @@ export default function RestaurantMenuEditor({
             </div>
 
             <div className="ados-modal-body">
-              <div className="ados-modal-field-row">
-                <div className="ados-modal-field">
+              <div className="ados-form-row">
+                <div className="ados-form-group">
                   <label>{isAr ? 'العنوان الرئيسي (EN)' : 'Main Title (EN)'}</label>
                   <input 
                     type="text" 
+                    className="ados-form-input"
                     value={editingHero.titleEn} 
                     onChange={e => setEditingHero({ ...editingHero, titleEn: e.target.value })}
                   />
                 </div>
-                <div className="ados-modal-field">
+                <div className="ados-form-group">
                   <label>{isAr ? 'العنوان الرئيسي (AR)' : 'Main Title (AR)'}</label>
                   <input 
                     type="text" 
+                    className="ados-form-input"
                     value={editingHero.titleAr} 
                     onChange={e => setEditingHero({ ...editingHero, titleAr: e.target.value })}
                     dir="rtl"
@@ -1380,18 +1419,20 @@ export default function RestaurantMenuEditor({
                 </div>
               </div>
 
-              <div className="ados-modal-field-row">
-                <div className="ados-modal-field">
+              <div className="ados-form-row">
+                <div className="ados-form-group">
                   <label>{isAr ? 'الوصف الترويجي (EN)' : 'Promo Subtitle (EN)'}</label>
                   <textarea 
+                    className="ados-form-textarea"
                     rows={2}
                     value={editingHero.subtitleEn} 
                     onChange={e => setEditingHero({ ...editingHero, subtitleEn: e.target.value })}
                   />
                 </div>
-                <div className="ados-modal-field">
+                <div className="ados-form-group">
                   <label>{isAr ? 'الوصف الترويجي (AR)' : 'Promo Subtitle (AR)'}</label>
                   <textarea 
+                    className="ados-form-textarea"
                     rows={2}
                     value={editingHero.subtitleAr} 
                     onChange={e => setEditingHero({ ...editingHero, subtitleAr: e.target.value })}
@@ -1402,12 +1443,13 @@ export default function RestaurantMenuEditor({
             </div>
 
             <div className="ados-modal-footer">
-              <div className="ados-modal-actions-right">
-                <button className="ados-modal-cancel-btn" onClick={() => setIsHeroModalOpen(false)}>
+              <div></div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button className="ados-btn-secondary" onClick={() => setIsHeroModalOpen(false)}>
                   {isAr ? 'إلغاء' : 'Cancel'}
                 </button>
-                <button className="ados-modal-save-btn" onClick={handleSaveHeroTexts}>
-                  <Check size={14} />
+                <button className="ados-btn-primary" onClick={handleSaveHeroTexts}>
+                  <Check size={14} style={{ marginInlineEnd: 6, verticalAlign: 'middle' }} />
                   <span>{isAr ? 'حفظ النصوص' : 'Save Texts'}</span>
                 </button>
               </div>
@@ -1529,10 +1571,11 @@ export default function RestaurantMenuEditor({
             </div>
 
             <div className="ados-modal-body">
-              <div className="ados-modal-field">
+              <div className="ados-form-group">
                 <label>{isAr ? 'عنوان الجولة (بالإنجليزية)' : 'Tour Title (EN)'}</label>
                 <input 
                   type="text" 
+                  className="ados-form-input"
                   value={data.explorer360?.title || ''} 
                   onChange={e => setData(prev => ({
                     ...prev,
@@ -1541,10 +1584,11 @@ export default function RestaurantMenuEditor({
                 />
               </div>
 
-              <div className="ados-modal-field">
+              <div className="ados-form-group">
                 <label>{isAr ? 'رابط الجولة 360° (Matterport أو YouTube 360)' : '360° Tour URL (Matterport, iStaging, etc.)'}</label>
                 <input 
                   type="url" 
+                  className="ados-form-input"
                   value={data.explorer360?.url || ''} 
                   onChange={e => setData(prev => ({
                     ...prev,
@@ -1556,11 +1600,12 @@ export default function RestaurantMenuEditor({
             </div>
 
             <div className="ados-modal-footer">
-              <button className="ados-modal-save-btn" onClick={() => {
+              <div></div>
+              <button className="ados-btn-primary" onClick={() => {
                 setIs360ModalOpen(false);
                 showToast(isAr ? 'تم تحديث رابط الجولة 360°.' : '360 tour updated.');
               }}>
-                <Check size={14} />
+                <Check size={14} style={{ marginInlineEnd: 6, verticalAlign: 'middle' }} />
                 <span>{isAr ? 'حفظ' : 'Done'}</span>
               </button>
             </div>
