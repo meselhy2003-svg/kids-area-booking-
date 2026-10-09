@@ -804,20 +804,24 @@ export default function AboutUsManager({ lang = 'ar', setLang, onLogout, onOpenO
 
           {/* Sub-Tab Navigation (Featured Highlights vs All Cards) */}
           <div className="ados-subtab-container">
-            <button 
-              className={`ados-subtab-pill ${activeSubTab === 'featured' ? 'active' : ''}`}
-              onClick={() => setActiveSubTab('featured')}
-            >
-              <BookmarkCheck size={14} />
-              <span>{isAr ? 'أبرز مميزات ورؤية المنتجع' : 'Featured Highlights & Vision'}</span>
-            </button>
-            <button 
-              className={`ados-subtab-pill ${activeSubTab === 'cards' ? 'active' : ''}`}
-              onClick={() => setActiveSubTab('cards')}
-            >
-              <Layers size={14} />
-              <span>{isAr ? 'جميع البطاقات والقيم والموقع' : 'All Story, Values & Contact Cards'}</span>
-            </button>
+            <div className="ados-subtab-group">
+              <button 
+                type="button"
+                className={`ados-subtab-btn ${activeSubTab === 'featured' ? 'active' : ''}`}
+                onClick={() => setActiveSubTab('featured')}
+              >
+                <BookmarkCheck size={14} />
+                <span>{isAr ? `أبرز مميزات ورؤية المنتجع (${data.featuredCards?.length || 0})` : `Featured Highlights & Vision (${data.featuredCards?.length || 0})`}</span>
+              </button>
+              <button 
+                type="button"
+                className={`ados-subtab-btn ${activeSubTab === 'cards' ? 'active' : ''}`}
+                onClick={() => setActiveSubTab('cards')}
+              >
+                <Layers size={14} />
+                <span>{isAr ? `جميع بطاقات وقيم المنتجع (${data.items?.length || 0})` : `All Story, Values & Contact Cards (${data.items?.length || 0})`}</span>
+              </button>
+            </div>
           </div>
 
           {/* 1. FEATURED WIDE CARDS */}
