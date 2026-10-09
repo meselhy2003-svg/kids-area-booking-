@@ -921,14 +921,13 @@ export default function RestaurantOrdersManager({
       </div>
 
       {/* ========================================================================= */}
-      {/* RESTAURANT ORDER DETAILS & UPDATE MODAL                                   */}
+      {/* RESTAURANT ORDER DETAILS & UPDATE SLIDE-OVER DRAWER (SLIDER PANEL)        */}
       {/* ========================================================================= */}
       {selectedOrder && (
-        <div className="pz-modal-backdrop" onClick={() => setSelectedOrder(null)}>
+        <div className="pz-modal-backdrop slide-over-backdrop" onClick={() => setSelectedOrder(null)}>
           <div 
-            className="pz-order-details-modal-wrapper" 
+            className="pz-order-details-modal-wrapper slide-over-panel" 
             onClick={e => e.stopPropagation()} 
-            style={{ maxWidth: '850px', width: '95%', maxHeight: '92vh', overflowY: 'auto', borderRadius: '18px' }}
           >
             <div className="order-details-card">
               {/* Header */}
