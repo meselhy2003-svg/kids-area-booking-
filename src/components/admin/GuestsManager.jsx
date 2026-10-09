@@ -496,6 +496,14 @@ export default function GuestsManager({ lang = 'ar' }) {
                       <div className="gm-actions-cell">
                         <button 
                           type="button" 
+                          className="gm-icon-action view"
+                          onClick={() => setViewingGuest(guest)}
+                          title={isAr ? 'عرض تفاصيل الضيف والأسرة' : 'View Guest & Family Profile'}
+                        >
+                          <Eye size={15} />
+                        </button>
+                        <button 
+                          type="button" 
                           className="gm-icon-action edit"
                           onClick={() => handleOpenEdit(guest)}
                           title={isAr ? 'تعديل بيانات الضيف' : 'Edit Guest'}
@@ -643,6 +651,161 @@ export default function GuestsManager({ lang = 'ar' }) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: View Guest & Family Details */}
+      {viewingGuest && (
+        <div className="gm-modal-overlay" onClick={() => setViewingGuest(null)}>
+          <div className="gm-modal-card gm-view-modal-card" onClick={e => e.stopPropagation()}>
+            <div className="gm-modal-header" style={{ borderBottom: '1px solid #e2e8f0', padding: '16px 20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div 
+                  className="gm-avatar" 
+                  style={{ 
+                    width: '42px', 
+                    height: '42px', 
+                    fontSize: '15px', 
+                    background: viewingGuest.gender === 'female' ? '#ec4899' : '#0284c7' 
+                  }}
+                >
+                  {viewingGuest.name
+                    .split(' ')
+                    .filter(Boolean)
+                    .map(w => w[0])
+                    .slice(0, 2)
+                    .join('')
+                    .toUpperCase() || 'G'}
+                </div>
+                <div>
+                  <div style={{ fontSize: '17px', fontWeight: 800, color: '#003844' }}>
+                    {viewingGuest.name}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                    <span style={{ fontSize: '12px', color: '#64748b' }}>#{viewingGuest._id}</span>
+                    <span className={`gm-gender-badge ${viewingGuest.gender}`}>
+                      {viewingGuest.gender === 'male' ? (isAr ? 'ذكر' : 'Male') : (isAr ? 'أنثى' : 'Female')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <button type="button" className="gm-modal-close" onClick={() => setViewingGuest(null)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="gm-view-modal-body">
+              {/* Info Stats Cards */}
+              <div className="gm-view-info-grid">
+                <div className="gm-view-info-item">
+                  <div className="gm-view-info-icon" style={{ background: '#e0f2fe', color: '#0284c7' }}>
+                    <Phone size={16} />
+                  </div>
+                  <div>
+                    <div className="gm-view-info-label">{isAr ? 'رقم الهاتف' : 'Phone Number'}</div>
+                    <a href={`tel:${viewingGuest.phone}`} className="gm-view-info-value" style={{ color: '#0284c7', textDecoration: 'none' }}>
+                      {viewingGuest.phone}
+                    </a>
+                  </div>
+                </div>
+
+                <div className="gm-view-info-item">
+                  <div className="gm-view-info-icon" style={{ background: '#fef3c7', color: '#d97706' }}>
+                    <Calendar size={16} />
+                  </div>
+                  <div>
+                    <div className="gm-view-info-label">{isAr ? 'العمر' : 'Age'}</div>
+                    <div className="gm-view-info-value">{viewingGuest.age} {isAr ? 'سنة' : 'Years old'}</div>
+                  </div>
+                </div>
+
+                <div className="gm-view-info-item">
+                  <div className="gm-view-info-icon" style={{ background: '#f3e8ff', color: '#9333ea' }}>
+                    <Baby size={16} />
+                  </div>
+                  <div>
+                    <div className="gm-view-info-label">{isAr ? 'الأطفال المسجلين' : 'Children Count'}</div>
+                    <div className="gm-view-info-value">
+                      {viewingGuest.children?.length || 0} {isAr ? 'أطفال' : 'Children'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="gm-view-info-item">
+                  <div className="gm-view-info-icon" style={{ background: '#ecfdf5', color: '#059669' }}>
+                    <Clock size={16} />
+                  </div>
+                  <div>
+                    <div className="gm-view-info-label">{isAr ? 'تاريخ التسجيل' : 'Registration Date'}</div>
+                    <div className="gm-view-info-value">
+                      {new Date(viewingGuest.createdAt || Date.now()).toLocaleDateString(isAr ? 'ar-EG' : 'en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Children List */}
+              <div className="gm-view-section">
+                <h4 className="gm-view-section-title">
+                  <Baby size={16} color="#00a8cc" />
+                  <span>{isAr ? 'الأطفال المسجلين في الملف العائلي' : 'Registered Family Children'}</span>
+                  <span className="gm-view-badge-count">{viewingGuest.children?.length || 0}</span>
+                </h4>
+
+                {viewingGuest.children && viewingGuest.children.length > 0 ? (
+                  <div className="gm-view-children-grid">
+                    {viewingGuest.children.map((child, cIdx) => (
+                      <div key={cIdx} className="gm-view-child-card">
+                        <div className="gm-view-child-avatar">
+                          {child.gender === 'female' ? '👧' : '👦'}
+                        </div>
+                        <div className="gm-view-child-info">
+                          <div className="gm-view-child-name">{child.name}</div>
+                          <div className="gm-view-child-meta">
+                            <span>{child.age} {isAr ? 'سنوات' : 'years'}</span>
+                            <span className="gm-dot-sep">•</span>
+                            <span style={{ color: child.gender === 'female' ? '#db2777' : '#0284c7', fontWeight: 600 }}>
+                              {child.gender === 'female' ? (isAr ? 'بنت' : 'Girl') : (isAr ? 'ولد' : 'Boy')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="gm-view-no-kids">
+                    <p>{isAr ? 'لا يوجد أطفال مسجلين لهذا الضيف حالياً.' : 'No registered children for this guest profile.'}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="gm-modal-footer" style={{ borderTop: '1px solid #f1f5f9', background: '#f8fafc', padding: '14px 20px' }}>
+              <button 
+                type="button" 
+                className="gm-btn-cancel" 
+                onClick={() => setViewingGuest(null)}
+              >
+                {isAr ? 'إغلاق' : 'Close'}
+              </button>
+              <button 
+                type="button" 
+                className="gm-btn-submit"
+                onClick={() => {
+                  const toEdit = viewingGuest;
+                  setViewingGuest(null);
+                  handleOpenEdit(toEdit);
+                }}
+              >
+                <Edit3 size={14} style={{ marginInlineEnd: 6 }} />
+                <span>{isAr ? 'تعديل بيانات الضيف' : 'Edit Guest Profile'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
