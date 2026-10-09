@@ -19,8 +19,13 @@ import {
   User,
   Phone,
   Building2,
-  ShieldCheck
+  ShieldCheck,
+  Banknote,
+  CreditCard,
+  Loader2
 } from 'lucide-react';
+import { menuService } from '../../api/menuService';
+import { authService } from '../../api/authService';
 import './OrderForDeliveryPage.css';
 
 // Initial dishes corresponding to the design screenshot + extended selections
@@ -113,36 +118,95 @@ const ISMAILIA_DELIVERY_ZONES = [
 export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
   const isAr = lang === 'ar';
 
+  // Dedicated Delivery Cart Storage Key (Independent from Tickets/Packages)
+  const DELIVERY_CART_STORAGE_KEY = 'ad_delivery_cart';
+
   // Category filter state
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Cart Quantities state: initialized with exact screenshot matching items
+  // Dynamic menu items loaded from backend API
+  const [menuItems, setMenuItems] = useState(INITIAL_MENU_ITEMS);
+  const [isLoadingMenu, setIsLoadingMenu] = useState(true);
+
+  // Cart Quantities state: initialized from dedicated localStorage key
   const [cartQuantities, setCartQuantities] = useState(() => {
-    const initial = {};
-    INITIAL_MENU_ITEMS.forEach(item => {
-      initial[item.id] = item.initialQty || 0;
-    });
-    return initial;
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(DELIVERY_CART_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && typeof parsed === 'object') return parsed;
+        }
+      } catch {}
+    }
+    return {};
   });
+
+  // Keep delivery cart persistent in dedicated localStorage key
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(DELIVERY_CART_STORAGE_KEY, JSON.stringify(cartQuantities));
+      } catch {}
+    }
+  }, [cartQuantities]);
 
   // Delivery destination state
   const [selectedZone, setSelectedZone] = useState(ISMAILIA_DELIVERY_ZONES[0]);
   const [customAddress, setCustomAddress] = useState('');
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
-  // Legacy modal fallback state
-  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('cod'); // 'cod' | 'card' | 'wallet'
+  // Payment method state
+  const [deliveryPaymentMethod, setDeliveryPaymentMethod] = useState('cod'); // 'cod' | 'instapay' | 'vodafone_cash'
+  const [senderPhoneOrAccount, setSenderPhoneOrAccount] = useState('');
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [confirmedOrderItems, setConfirmedOrderItems] = useState([]);
+
+  // Fetch dynamic menu items from Server on mount
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchMenu() {
+      try {
+        setIsLoadingMenu(true);
+        const data = await menuService.getMenuItems('all');
+        if (isMounted && Array.isArray(data) && data.length > 0) {
+          setMenuItems(data);
+        }
+      } catch (err) {
+        console.warn('Failed to load menu from server, using default items', err);
+      } finally {
+        if (isMounted) setIsLoadingMenu(false);
+      }
+    }
+    fetchMenu();
+    return () => { isMounted = false; };
+  }, []);
+
+  // Helper to extract active logged-in user profile
+  const getActiveUser = () => {
+    try {
+      const cur = authService.getCurrentUserSync ? authService.getCurrentUserSync() : null;
+      if (cur && (cur.phone || cur.name || cur._id)) return cur;
+
+      const prof = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
+      const usr = JSON.parse(localStorage.getItem('user') || '{}');
+      const legacy = JSON.parse(localStorage.getItem('kids_area_auth_user') || localStorage.getItem('american_dream_active_user') || '{}');
+
+      return { ...legacy, ...prof, ...usr };
+    } catch {
+      return {};
+    }
+  };
 
   // Cart calculations
   const cartItems = useMemo(() => {
-    return INITIAL_MENU_ITEMS.filter(item => (cartQuantities[item.id] || 0) > 0).map(item => ({
+    return menuItems.filter(item => (cartQuantities[item.id] || 0) > 0).map(item => ({
       ...item,
       qty: cartQuantities[item.id],
-      lineTotal: item.price * cartQuantities[item.id]
+      lineTotal: (Number(item.price) || 0) * cartQuantities[item.id]
     }));
-  }, [cartQuantities]);
+  }, [menuItems, cartQuantities]);
 
   const totalItemsCount = useMemo(() => {
     return Object.values(cartQuantities).reduce((sum, q) => sum + (q || 0), 0);
@@ -159,17 +223,17 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
 
   // Filtered dishes
   const filteredDishes = useMemo(() => {
-    return INITIAL_MENU_ITEMS.filter(dish => {
+    return menuItems.filter(dish => {
       // Category match
       let matchesCat = true;
       if (selectedCategory === 'food') {
-        matchesCat = dish.category === 'food';
+        matchesCat = ['food', 'burgers', 'pizza', 'grills', 'meals'].includes(dish.category);
       } else if (selectedCategory === 'drinks') {
-        matchesCat = dish.category === 'drinks' || dish.category === 'cafe';
+        matchesCat = ['drinks', 'cold_drinks', 'juices', 'shakes'].includes(dish.category);
       } else if (selectedCategory === 'desserts') {
-        matchesCat = dish.category === 'desserts';
+        matchesCat = ['desserts', 'sweets', 'cakes', 'waffles'].includes(dish.category);
       } else if (selectedCategory === 'cafe') {
-        matchesCat = dish.category === 'cafe';
+        matchesCat = ['cafe', 'coffee', 'hot_drinks'].includes(dish.category);
       }
 
       // Search query match
@@ -177,16 +241,16 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         matchesSearch = (
-          dish.nameEn.toLowerCase().includes(q) ||
-          dish.nameAr.includes(q) ||
-          dish.descEn.toLowerCase().includes(q) ||
-          dish.descAr.includes(q)
+          (dish.nameEn && dish.nameEn.toLowerCase().includes(q)) ||
+          (dish.nameAr && dish.nameAr.includes(q)) ||
+          (dish.descEn && dish.descEn.toLowerCase().includes(q)) ||
+          (dish.descAr && dish.descAr.includes(q))
         );
       }
 
       return matchesCat && matchesSearch;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [menuItems, selectedCategory, searchQuery]);
 
   // Quantity control helpers
   const handleUpdateQty = (dishId, delta) => {
@@ -215,28 +279,38 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
   // Page View: 'menu' | 'checkout' | 'success'
   const [pageView, setPageView] = useState('menu');
 
-  // Delivery Checkout Form State (Matching exact design screenshot)
+  // Delivery Checkout Form State - prefill from active logged-in user
   const [deliveryFullName, setDeliveryFullName] = useState(() => {
-    try {
-      const p = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
-      return p.name || '';
-    } catch { return ''; }
+    const user = getActiveUser();
+    return user.name || user.fullName || '';
   });
   const [deliveryPhone, setDeliveryPhone] = useState(() => {
-    try {
-      const p = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
-      return p.phone || '';
-    } catch { return ''; }
+    const user = getActiveUser();
+    return user.phone || user.telephone || '';
   });
   const [deliveryAddress, setDeliveryAddress] = useState(() => {
-    try {
-      const p = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
-      return p.address || '';
-    } catch { return ''; }
+    const user = getActiveUser();
+    return user.address || '';
   });
   const [deliveryNotes, setDeliveryNotes] = useState('');
   const [checkoutError, setCheckoutError] = useState('');
   const [orderTrackingCode, setOrderTrackingCode] = useState('');
+
+  // Auto-sync active user data if user logs in later
+  useEffect(() => {
+    const user = getActiveUser();
+    if (user) {
+      if (!deliveryFullName && (user.name || user.fullName)) {
+        setDeliveryFullName(user.name || user.fullName);
+      }
+      if (!deliveryPhone && (user.phone || user.telephone)) {
+        setDeliveryPhone(user.phone || user.telephone);
+      }
+      if (!deliveryAddress && user.address) {
+        setDeliveryAddress(user.address);
+      }
+    }
+  }, []);
 
   // Auto-sync initial delivery destination if customAddress or selectedZone changed
   useEffect(() => {
@@ -250,7 +324,7 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
   }, [customAddress, selectedZone, isAr]);
 
   // Confirm Delivery Order from Delivery Details Page
-  const handleConfirmDeliveryOrder = (e) => {
+  const handleConfirmDeliveryOrder = async (e) => {
     e.preventDefault();
     setCheckoutError('');
 
@@ -266,57 +340,104 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
       setCheckoutError(isAr ? 'يرجى إدخال عنوان التوصيل بالتفصيل' : 'Please enter your delivery address');
       return;
     }
+    if ((deliveryPaymentMethod === 'instapay' || deliveryPaymentMethod === 'vodafone_cash') && !senderPhoneOrAccount.trim()) {
+      setCheckoutError(isAr ? 'يرجى كتابة رقم الهاتف أو المحفظة المحول منها للتحقق من الدفع.' : 'Please enter your sender phone or wallet number for verification.');
+      return;
+    }
 
-    const code = `AD-DLV-${Math.floor(1000 + Math.random() * 9000)}`;
-    setOrderTrackingCode(code);
+    setIsSubmittingOrder(true);
 
-    // Save order in localStorage
     try {
-      const existingOrders = JSON.parse(localStorage.getItem('american_dream_orders') || '[]');
-      existingOrders.unshift({
-        orderId: code,
-        type: 'restaurant-delivery',
-        date: new Date().toLocaleDateString(isAr ? 'ar-EG' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
-        time: new Date().toLocaleTimeString(isAr ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' }),
-        customerName: deliveryFullName,
-        customerPhone: deliveryPhone,
-        address: deliveryAddress,
-        notes: deliveryNotes,
-        itemsCount: totalItemsCount,
-        items: cartItems.map(i => ({ name: isAr ? i.nameAr : i.nameEn, qty: i.qty, price: i.price, lineTotal: i.lineTotal })),
-        total: grandTotal,
-        status: 'preparing',
-        statusTextAr: 'قيد التحضير في مطبخ أمريكان دريم',
-        statusTextEn: 'Preparing in American Dream Kitchen',
-        eta: '35–45 MIN'
-      });
-      localStorage.setItem('american_dream_orders', JSON.stringify(existingOrders));
-    } catch {}
+      const user = getActiveUser();
+      const guestId = user?._id || user?.id || undefined;
 
-    // Confetti celebration
-    try {
-      confetti({
-        particleCount: 120,
-        spread: 90,
-        origin: { y: 0.5 },
-        colors: ['#f59e0b', '#00a9c3', '#fde047', '#ffffff']
-      });
-    } catch {}
+      const orderPayload = {
+        customerName: deliveryFullName.trim(),
+        customerPhone: deliveryPhone.trim(),
+        deliveryAddress: deliveryAddress.trim(),
+        deliveryNotes: deliveryNotes.trim(),
+        orderType: 'delivery',
+        paymentMethod: deliveryPaymentMethod,
+        senderAccount: senderPhoneOrAccount.trim() || undefined,
+        deliveryFee: deliveryFee,
+        vatAmount: Number(vatAmount.toFixed(2)),
+        guest: guestId,
+        items: cartItems.map(i => ({
+          menuItem: (i._id || i.id) && (i._id || i.id).length === 24 ? (i._id || i.id) : undefined,
+          nameEn: i.nameEn || i.nameAr || 'Menu Item',
+          nameAr: i.nameAr || i.nameEn || 'صنف من القائمة',
+          price: Number(i.price) || 0,
+          quantity: i.qty,
+          lineTotal: i.lineTotal
+        }))
+      };
 
-    setPageView('success');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+      const res = await menuService.placeOrder(orderPayload);
+      const realOrderCode = res.orderCode || res.orderId || res.data?.orderCode || `AD-DLV-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      setOrderTrackingCode(realOrderCode);
+      setConfirmedOrderItems([...cartItems]);
+
+      // Save order in localStorage history
+      try {
+        const existingOrders = JSON.parse(localStorage.getItem('american_dream_orders') || '[]');
+        existingOrders.unshift({
+          orderId: realOrderCode,
+          orderCode: realOrderCode,
+          type: 'restaurant-delivery',
+          date: new Date().toLocaleDateString(isAr ? 'ar-EG' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
+          time: new Date().toLocaleTimeString(isAr ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' }),
+          customerName: deliveryFullName,
+          customerPhone: deliveryPhone,
+          address: deliveryAddress,
+          notes: deliveryNotes,
+          itemsCount: totalItemsCount,
+          items: cartItems.map(i => ({ name: isAr ? i.nameAr : i.nameEn, qty: i.qty, price: i.price, lineTotal: i.lineTotal })),
+          total: grandTotal,
+          paymentMethod: deliveryPaymentMethod,
+          status: 'preparing',
+          statusTextAr: 'قيد التحضير في مطبخ أمريكان دريم',
+          statusTextEn: 'Preparing in American Dream Kitchen',
+          eta: '35–45 MIN'
+        });
+        localStorage.setItem('american_dream_orders', JSON.stringify(existingOrders));
+      } catch {}
+
+      // Clear delivery cart
+      setCartQuantities({});
+      localStorage.removeItem(DELIVERY_CART_STORAGE_KEY);
+
+      // Confetti celebration
+      try {
+        confetti({
+          particleCount: 120,
+          spread: 90,
+          origin: { y: 0.5 },
+          colors: ['#f59e0b', '#00a9c3', '#fde047', '#ffffff']
+        });
+      } catch {}
+
+      setPageView('success');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      console.error('Error placing delivery order:', err);
+      setCheckoutError(err.message || (isAr ? 'حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.' : 'Error placing delivery order. Please try again.'));
+    } finally {
+      setIsSubmittingOrder(false);
+    }
   };
 
   // WhatsApp order dispatch
   const handleSendToWhatsApp = () => {
     const phone = '201012345678';
-    const itemsList = cartItems.map(i => 
+    const finalItems = confirmedOrderItems.length > 0 ? confirmedOrderItems : cartItems;
+    const itemsList = finalItems.map(i => 
       `- ${isAr ? i.nameAr : i.nameEn} (${i.qty}x) = ${i.lineTotal.toFixed(2)} EGP`
     ).join('%0A');
 
     const msg = isAr
-      ? `طلب توصيل جديد من مطعم أمريكان دريم الإسماعيلية:%0A- كود الطلب: ${orderTrackingCode}%0A- اسم العميل: ${deliveryFullName}%0A- الهاتف: ${deliveryPhone}%0A- العنوان: ${deliveryAddress}%0A- الوجبات المطلوبة:%0A${itemsList}%0A- الإجمالي الكلي: ${grandTotal.toFixed(2)} ج.م (شامل الضريبة)%0A- وقت الوصول التقديري: 35-45 دقيقة%0A- ملاحظات: ${deliveryNotes || 'لا يوجد'}`
-      : `New Delivery Order from American Dream Ismailia:%0A- Order Ref: ${orderTrackingCode}%0A- Name: ${deliveryFullName}%0A- Phone: ${deliveryPhone}%0A- Address: ${deliveryAddress}%0A- Items:%0A${itemsList}%0A- Grand TOTAL: ${grandTotal.toFixed(2)} EGP (All Taxes Included)%0A- ETA: 35-45 MIN%0A- Notes: ${deliveryNotes || 'None'}`;
+      ? `طلب توصيل جديد من مطعم أمريكان دريم الإسماعيلية:%0A- كود الطلب: ${orderTrackingCode}%0A- اسم العميل: ${deliveryFullName}%0A- الهاتف: ${deliveryPhone}%0A- طريقة الدفع: ${deliveryPaymentMethod === 'cod' ? 'الدفع عند الاستلام (كاش)' : (deliveryPaymentMethod === 'instapay' ? 'إنستاباي' : 'فودافون كاش')}%0A- العنوان: ${deliveryAddress}%0A- الوجبات المطلوبة:%0A${itemsList}%0A- الإجمالي الكلي: ${grandTotal.toFixed(2)} ج.م (شامل الضريبة)%0A- وقت الوصول التقديري: 35-45 دقيقة%0A- ملاحظات: ${deliveryNotes || 'لا يوجد'}`
+      : `New Delivery Order from American Dream Ismailia:%0A- Order Ref: ${orderTrackingCode}%0A- Name: ${deliveryFullName}%0A- Phone: ${deliveryPhone}%0A- Payment: ${deliveryPaymentMethod}%0A- Address: ${deliveryAddress}%0A- Items:%0A${itemsList}%0A- Grand TOTAL: ${grandTotal.toFixed(2)} EGP (All Taxes Included)%0A- ETA: 35-45 MIN%0A- Notes: ${deliveryNotes || 'None'}`;
 
     window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
   };
@@ -461,6 +582,76 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
               </div>
             </div>
 
+            {/* Field 5: Payment Method Selector */}
+            <div className="deliv-field-group">
+              <div className="deliv-field-row-header">
+                <label className="deliv-field-label">
+                  <CreditCard size={18} style={{ color: '#00a9c3' }} />
+                  <span>{isAr ? 'طريقة الدفع' : 'Payment Method'}</span>
+                </label>
+              </div>
+
+              <div className="deliv-pay-methods-grid">
+                <button
+                  type="button"
+                  className={`deliv-pay-method-btn ${deliveryPaymentMethod === 'cod' ? 'active' : ''}`}
+                  onClick={() => setDeliveryPaymentMethod('cod')}
+                >
+                  <Banknote size={20} color="#10b981" />
+                  <div className="deliv-pay-text-wrap">
+                    <span className="deliv-pay-title">{isAr ? 'الدفع عند الاستلام (كاش)' : 'Cash on Delivery'}</span>
+                    <span className="deliv-pay-sub">{isAr ? 'نقداً للطيار عند استلام الوجبة' : 'Pay cash to rider upon arrival'}</span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  className={`deliv-pay-method-btn ${deliveryPaymentMethod === 'instapay' ? 'active' : ''}`}
+                  onClick={() => setDeliveryPaymentMethod('instapay')}
+                >
+                  <CreditCard size={20} color="#00a9c3" />
+                  <div className="deliv-pay-text-wrap">
+                    <span className="deliv-pay-title">{isAr ? 'تحويل لحظي إنستاباي (InstaPay)' : 'InstaPay Instant Transfer'}</span>
+                    <span className="deliv-pay-sub">americandream@instapay</span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  className={`deliv-pay-method-btn ${deliveryPaymentMethod === 'vodafone_cash' ? 'active' : ''}`}
+                  onClick={() => setDeliveryPaymentMethod('vodafone_cash')}
+                >
+                  <Phone size={20} color="#ef4444" />
+                  <div className="deliv-pay-text-wrap">
+                    <span className="deliv-pay-title">{isAr ? 'محفظة فودافون كاش' : 'Vodafone Cash Wallet'}</span>
+                    <span className="deliv-pay-sub">01023456789</span>
+                  </div>
+                </button>
+              </div>
+
+              {(deliveryPaymentMethod === 'instapay' || deliveryPaymentMethod === 'vodafone_cash') && (
+                <div className="deliv-online-pay-details">
+                  <p className="deliv-online-pay-instruction">
+                    {deliveryPaymentMethod === 'instapay'
+                      ? (isAr ? 'حول إجمالي الفاتورة إلى عنوان إنستاباي: americandream@instapay ثم اكتب رقمك المحول منه أدناه:' : 'Transfer total to InstaPay address: americandream@instapay and enter your phone:')
+                      : (isAr ? 'حول إجمالي الفاتورة إلى محفظة فودافون كاش: 01023456789 ثم اكتب رقم المحفظة أدناه:' : 'Transfer total to Vodafone Cash: 01023456789 and enter your wallet phone:')
+                    }
+                  </p>
+                  <div className="deliv-white-input-wrap" style={{ marginTop: '8px' }}>
+                    <Phone size={18} className="deliv-white-input-icon" />
+                    <input
+                      type="tel"
+                      required
+                      className="deliv-white-input"
+                      placeholder={isAr ? 'رقم الهاتف أو المحفظة المحول منها' : 'Sender phone or wallet number'}
+                      value={senderPhoneOrAccount}
+                      onChange={(e) => setSenderPhoneOrAccount(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Summary Box */}
             <div className="deliv-summary-box">
               <div className="deliv-summary-left">
@@ -472,7 +663,13 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
                     {totalItemsCount} {isAr ? 'عناصر في الطلب' : 'items in order'}
                   </span>
                   <span className="deliv-summary-pay-note">
-                    {isAr ? 'الدفع عند الاستلام • كاش أو فيزا' : 'Pay on arrival • Cash or Card'}
+                    {deliveryPaymentMethod === 'cod'
+                      ? (isAr ? 'الدفع نقداً عند وصول الطيار' : 'Pay cash upon arrival')
+                      : (deliveryPaymentMethod === 'instapay'
+                          ? (isAr ? 'الدفع عبر إنستاباي' : 'Paid via InstaPay')
+                          : (isAr ? 'الدفع عبر فودافون كاش' : 'Paid via Vodafone Cash')
+                        )
+                    }
                   </span>
                 </div>
               </div>
@@ -488,8 +685,15 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
             </div>
 
             {/* Confirm Button */}
-            <button type="submit" className="deliv-confirm-btn">
-              <span>{isAr ? 'تأكيد الطلب ←' : 'Confirm Order →'}</span>
+            <button type="submit" className="deliv-confirm-btn" disabled={isSubmittingOrder}>
+              {isSubmittingOrder ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  <span>{isAr ? 'جاري إرسال الطلب للمطبخ...' : 'Submitting to Kitchen...'}</span>
+                </>
+              ) : (
+                <span>{isAr ? 'تأكيد الطلب ←' : 'Confirm Order →'}</span>
+              )}
             </button>
 
             {/* Back to Cart Link */}
@@ -772,7 +976,14 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
         {/* ----------------------------------------------------------------- */}
         <div className="deliv-menu-column">
           <div className="deliv-dishes-grid">
-            {filteredDishes.length === 0 ? (
+            {isLoadingMenu ? (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '50px 20px', color: '#00a9c3' }}>
+                <Loader2 size={32} className="animate-spin" style={{ margin: '0 auto 10px auto' }} />
+                <p style={{ margin: 0, fontSize: '0.92rem', color: '#94a3b8' }}>
+                  {isAr ? 'جاري تحميل قائمة الطعام الطازجة...' : 'Loading fresh menu items...'}
+                </p>
+              </div>
+            ) : filteredDishes.length === 0 ? (
               <div className="deliv-empty-search">
                 <Search size={32} color="#94a3b8" style={{ marginBottom: '8px' }} />
                 <p>{isAr ? 'لم نتمكن من إيجاد أطباق تطابق بحثك.' : 'No dishes found matching your search.'}</p>
@@ -1116,182 +1327,6 @@ export default function OrderForDeliveryPage({ onBack, lang = 'ar' }) {
           </div>
         </div>
       )}
-
-
-
-      {/* ------------------------------------------------------------------- */}
-      {/* 7. MODAL: CHECKOUT & ORDER CONFIRMATION FLOW                        */}
-      {/* ------------------------------------------------------------------- */}
-      {isCheckoutModalOpen && (
-        <div className="deliv-modal-backdrop" onClick={() => setIsCheckoutModalOpen(false)}>
-          <div className="deliv-modal-box" onClick={(e) => e.stopPropagation()}>
-            <button type="button" className="deliv-modal-close" onClick={() => setIsCheckoutModalOpen(false)}>✕</button>
-
-            {checkoutStep === 'form' ? (
-              <form onSubmit={handleConfirmOrder} className="checkout-form-grid">
-                <div className="deliv-modal-header">
-                  <h3>{isAr ? 'إتمام طلب التوصيل السريع' : 'Complete Delivery Order'}</h3>
-                  <p>{isAr ? 'أدخل تفاصيل التوصيل لنبدأ بتحضير وجباتك فوراً' : 'Enter your details to prepare your order immediately'}</p>
-                </div>
-
-                <div className="form-group-field">
-                  <label>{isAr ? 'اسم المستلم بالكامل *' : 'Full Name *'}</label>
-                  <input 
-                    type="text" 
-                    required 
-                    className="checkout-input"
-                    placeholder={isAr ? 'مثال: أحمد محمود' : 'e.g. John Doe'}
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                  />
-                </div>
-
-                <div className="form-group-field">
-                  <label>{isAr ? 'رقم الهاتف / الواتساب للتواصل *' : 'Phone / WhatsApp Number *'}</label>
-                  <input 
-                    type="tel" 
-                    required 
-                    className="checkout-input"
-                    placeholder="01012345678"
-                    value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                  />
-                </div>
-
-                <div className="form-group-field">
-                  <label>{isAr ? 'عنوان التوصيل' : 'Delivery Destination'}</label>
-                  <input 
-                    type="text" 
-                    className="checkout-input"
-                    readOnly
-                    value={customAddress ? customAddress : (isAr ? selectedZone.nameAr : selectedZone.nameEn)}
-                  />
-                </div>
-
-                {/* Payment Method */}
-                <div className="form-group-field">
-                  <label>{isAr ? 'طريقة الدفع' : 'Payment Method'}</label>
-                  <div className="payment-methods-grid">
-                    <div 
-                      className={`payment-method-pill ${paymentMethod === 'cod' ? 'active' : ''}`}
-                      onClick={() => setPaymentMethod('cod')}
-                    >
-                      <span className="pay-icon">💵</span>
-                      <span>{isAr ? 'كاش عند الاستلام' : 'Cash on Delivery'}</span>
-                    </div>
-
-                    <div 
-                      className={`payment-method-pill ${paymentMethod === 'card' ? 'active' : ''}`}
-                      onClick={() => setPaymentMethod('card')}
-                    >
-                      <span className="pay-icon">💳</span>
-                      <span>{isAr ? 'فيزا / ماستركارد' : 'Bank Card'}</span>
-                    </div>
-
-                    <div 
-                      className={`payment-method-pill ${paymentMethod === 'wallet' ? 'active' : ''}`}
-                      onClick={() => setPaymentMethod('wallet')}
-                    >
-                      <span className="pay-icon">📱</span>
-                      <span>{isAr ? 'إنستاباي / محفظة' : 'InstaPay / Wallet'}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Loyalty points toggle in checkout */}
-                <div className="points-discount-card">
-                  <div className="points-card-left">
-                    <span className="points-card-title">{isAr ? 'استخدام 2,250 نقطة ولاء' : 'Apply 2,250 Loyalty Points'}</span>
-                    <span className="points-card-sub">{isAr ? 'خصم 112.50 ج.م فوري من الإجمالي' : 'Save 112.50 EGP on this order'}</span>
-                  </div>
-                  <input 
-                    type="checkbox" 
-                    checked={applyLoyaltyDiscount}
-                    onChange={(e) => setApplyLoyaltyDiscount(e.target.checked)}
-                    style={{ width: '20px', height: '20px', accentColor: '#d97706', cursor: 'pointer' }}
-                  />
-                </div>
-
-                {/* Final Breakdown */}
-                <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '12px', fontSize: '0.85rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span>{isAr ? 'عدد الوجبات:' : 'Meals Count:'}</span>
-                    <strong>{totalItemsCount} {isAr ? 'عناصر' : 'Items'}</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span>{isAr ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
-                    <span>{subtotal.toFixed(2)} {isAr ? 'ج.م' : 'EGP'}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span>{isAr ? 'التوصيل:' : 'Delivery:'}</span>
-                    <span style={{ color: '#0d9488', fontWeight: '700' }}>{isAr ? 'مجاني (0.00 ج.م)' : '0.00 EGP (FREE)'}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span>{isAr ? 'الضريبة والخدمة (14%):' : 'VAT & Municipal (14%):'}</span>
-                    <span>{vatAmount.toFixed(2)} {isAr ? 'ج.م' : 'EGP'}</span>
-                  </div>
-                  {loyaltyDiscountValue > 0 && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#b45309', fontWeight: '700', marginBottom: '4px' }}>
-                      <span>{isAr ? 'خصم النقاط:' : 'Points Discount:'}</span>
-                      <span>-{loyaltyDiscountValue.toFixed(2)} {isAr ? 'ج.م' : 'EGP'}</span>
-                    </div>
-                  )}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #cbd5e1', paddingTop: '8px', fontSize: '1.05rem', fontWeight: '900', color: '#073b4c' }}>
-                    <span>{isAr ? 'المبلغ المستحق:' : 'Total Payable:'}</span>
-                    <span>{grandTotal.toFixed(2)} {isAr ? 'ج.م' : 'EGP'}</span>
-                  </div>
-                </div>
-
-                <button type="submit" className="btn-proceed-checkout" style={{ padding: '14px 20px' }}>
-                  <Check size={18} />
-                  <span>{isAr ? `تأكيد طلب التوصيل (${grandTotal.toFixed(2)} ج.م)` : `CONFIRM ORDER (${grandTotal.toFixed(2)} EGP)`}</span>
-                </button>
-              </form>
-            ) : (
-              <div className="order-success-panel">
-                <div className="order-success-icon-badge">✓</div>
-                
-                <h3 style={{ margin: 0, fontSize: '1.4rem', color: '#073b4c', fontWeight: '900' }}>
-                  {isAr ? 'تم استلام طلب التوصيل بنجاح!' : 'Order Placed Successfully!'}
-                </h3>
-
-                <p style={{ margin: 0, color: '#64748b', fontSize: '0.88rem', lineHeight: 1.5 }}>
-                  {isAr 
-                    ? `شكراً لك يا ${customerName}! وجباتك بقيمة ${grandTotal.toFixed(2)} ج.م قيد التحضير في مطبخ أمريكان دريم الآن، وسيتصل بك الطيار فور انطلاقه.`
-                    : `Thank you ${customerName}! Your order (${grandTotal.toFixed(2)} EGP) is being prepared in American Dream kitchen now.`}
-                </p>
-
-                <div className="ref-code-card">
-                  <span>{isAr ? 'كود تتبع الطلب:' : 'Order Tracking Code:'}</span>
-                  <strong>{orderTrackingCode}</strong>
-                </div>
-
-                <button 
-                  type="button" 
-                  className="btn-whatsapp-order"
-                  onClick={handleSendToWhatsApp}
-                >
-                  <Share2 size={18} />
-                  <span>{isAr ? 'إرسال الفاتورة للمطعم عبر واتساب' : 'Send Invoice to WhatsApp'}</span>
-                </button>
-
-                <button 
-                  type="button" 
-                  className="btn-back-to-dining"
-                  style={{ width: '100%', justifyContent: 'center', marginTop: '6px' }}
-                  onClick={() => {
-                    setIsCheckoutModalOpen(false);
-                    onBack();
-                  }}
-                >
-                  <span>{isAr ? 'العودة لصفحة المطعم الرئيسية' : 'Return to Restaurant Home'}</span>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
     </div>
   );
 }

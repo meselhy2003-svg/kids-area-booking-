@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { 
   Users, 
@@ -15,9 +15,13 @@ import {
   Gift, 
   X,
   ChevronDown,
-  ShoppingBag
+  ShoppingBag,
+  CheckCircle,
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
 import { isUserAuthenticated } from '../../api/authService';
+import { eventService } from '../../api/eventService';
 import './BirthdayBuilderPage.css';
 
 // 1. VENUE SPACES (STEP 1)
@@ -188,6 +192,45 @@ export default function BirthdayBuilderPage({
   const [selectedPackage, setSelectedPackage] = useState('champion');
   const [showSessionDropdown, setShowSessionDropdown] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+
+  // Client Details & Live Availability State
+  const [celebrantName, setCelebrantName] = useState('');
+  const [parentName, setParentName] = useState(() => {
+    try {
+      const p = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
+      return p.name || '';
+    } catch { return ''; }
+  });
+  const [parentPhone, setParentPhone] = useState(() => {
+    try {
+      const p = JSON.parse(localStorage.getItem('american_dream_user_profile') || '{}');
+      return p.phone || '';
+    } catch { return ''; }
+  });
+  const [isSlotAvailable, setIsSlotAvailable] = useState(true);
+  const [isCheckingSlot, setIsCheckingSlot] = useState(false);
+  const [isSubmittingBooking, setIsSubmittingBooking] = useState(false);
+  const [serverBookingCode, setServerBookingCode] = useState(null);
+
+  // Real-time backend space and session availability check
+  useEffect(() => {
+    let isCurrent = true;
+    async function verifySlot() {
+      setIsCheckingSlot(true);
+      try {
+        const res = await eventService.checkEventAvailability(selectedSpace, partyDate, selectedSession);
+        if (isCurrent && res && typeof res.isAvailable === 'boolean') {
+          setIsSlotAvailable(res.isAvailable);
+        }
+      } catch (e) {
+        if (isCurrent) setIsSlotAvailable(true);
+      } finally {
+        if (isCurrent) setIsCheckingSlot(false);
+      }
+    }
+    verifySlot();
+    return () => { isCurrent = false; };
+  }, [selectedSpace, partyDate, selectedSession]);
 
   // Section Refs for Quick Navigation links (Change / Edit)
   const step1Ref = useRef(null);
@@ -569,9 +612,40 @@ export default function BirthdayBuilderPage({
                     )}
                   </div>
 
-                  <span className="birthday-input-subtext">
-                    {lang === 'ar' ? 'مدة الجلسة القياسية ٣.٥ ساعات من الاحتفال والبهجة' : 'Standard 3.5 hour celebration session'}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px', flexWrap: 'wrap', gap: '6px' }}>
+                    <span className="birthday-input-subtext" style={{ margin: 0 }}>
+                      {lang === 'ar' ? 'مدة الجلسة القياسية ٣.٥ ساعات من الاحتفال والبهجة' : 'Standard 3.5 hour celebration session'}
+                    </span>
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      fontSize: '0.74rem',
+                      fontWeight: 700,
+                      padding: '3px 10px',
+                      borderRadius: '12px',
+                      background: isCheckingSlot ? '#f1f5f9' : isSlotAvailable ? '#ecfdf5' : '#fef2f2',
+                      color: isCheckingSlot ? '#64748b' : isSlotAvailable ? '#059669' : '#dc2626',
+                      border: `1px solid ${isCheckingSlot ? '#e2e8f0' : isSlotAvailable ? '#a7f3d0' : '#fecaca'}`
+                    }}>
+                      {isCheckingSlot ? (
+                        <>
+                          <Loader2 size={12} className="animate-spin" />
+                          <span>{lang === 'ar' ? 'فحص الإتاحة...' : 'Checking...'}</span>
+                        </>
+                      ) : isSlotAvailable ? (
+                        <>
+                          <CheckCircle size={12} />
+                          <span>{lang === 'ar' ? 'الموعد متاح للحجز' : 'Space Available'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <AlertCircle size={12} />
+                          <span>{lang === 'ar' ? 'محجوز، اختر فترة أخرى' : 'Slot Booked'}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 {/* 4. BIRTHDAY CHILD AGE */}
@@ -928,6 +1002,57 @@ export default function BirthdayBuilderPage({
             </div>
 
             <div className="birthday-modal-summary-box">
+              {/* Optional Contact & Celebrant Customization */}
+              <div style={{
+                background: '#ffffff',
+                border: '1.5px solid #fed7aa',
+                borderRadius: '12px',
+                padding: '12px 14px',
+                marginBottom: '10px',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                gap: '10px'
+              }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#9a3412', marginBottom: '4px' }}>
+                    {lang === 'ar' ? 'اسم صاحب عيد الميلاد:' : "Birthday Child's Name:"}
+                  </label>
+                  <input
+                    type="text"
+                    value={celebrantName}
+                    onChange={(e) => setCelebrantName(e.target.value)}
+                    placeholder={lang === 'ar' ? 'مثال: يوسف' : 'e.g. Youssef'}
+                    style={{
+                      width: '100%',
+                      padding: '6px 10px',
+                      borderRadius: '8px',
+                      border: '1px solid #fed7aa',
+                      fontSize: '0.82rem',
+                      background: '#fffaf5'
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#9a3412', marginBottom: '4px' }}>
+                    {lang === 'ar' ? 'رقم الهاتف للتأكيد (واتساب): *' : 'Contact Phone (WhatsApp): *'}
+                  </label>
+                  <input
+                    type="tel"
+                    value={parentPhone}
+                    onChange={(e) => setParentPhone(e.target.value)}
+                    placeholder={lang === 'ar' ? '010XXXXXXXX' : '+20 10X XXX XXXX'}
+                    style={{
+                      width: '100%',
+                      padding: '6px 10px',
+                      borderRadius: '8px',
+                      border: '1px solid #fed7aa',
+                      fontSize: '0.82rem',
+                      background: '#fffaf5'
+                    }}
+                  />
+                </div>
+              </div>
+
               <div className="modal-summary-item">
                 <span className="item-label">{lang === 'ar' ? 'المكان والقاعة:' : 'Venue Space:'}</span>
                 <span className="item-val">{lang === 'ar' ? activeSpaceData.titleAr : activeSpaceData.titleEn}</span>
@@ -962,7 +1087,43 @@ export default function BirthdayBuilderPage({
               <button 
                 type="button" 
                 className="birthday-modal-confirm-btn"
-                onClick={() => {
+                disabled={isSubmittingBooking}
+                onClick={async () => {
+                  setIsSubmittingBooking(true);
+                  let finalCode = serverBookingCode;
+                  let finalId = null;
+                  try {
+                    const bookingRes = await eventService.bookEvent({
+                      contactName: parentName || celebrantName || 'Birthday Guest',
+                      contactPhone: parentPhone || '01012345678',
+                      eventType: 'birthday',
+                      space: selectedSpace,
+                      birthdayDetails: {
+                        celebrantName: celebrantName || '',
+                        celebrantAge: selectedAge,
+                        packageId: selectedPackage,
+                        packageName: activePackageData.nameEn
+                      },
+                      totalGuests: guestCount,
+                      kidsCount,
+                      adultsCount,
+                      eventDate: partyDate,
+                      session: selectedSession,
+                      sessionTime: activeSessionData.shortEn,
+                      basePrice,
+                      depositRequired
+                    });
+                    if (bookingRes?.booking?.bookingCode) {
+                      finalCode = bookingRes.booking.bookingCode;
+                      finalId = bookingRes.booking._id;
+                      setServerBookingCode(finalCode);
+                    }
+                  } catch (err) {
+                    console.warn('Booking reservation fallback:', err);
+                  } finally {
+                    setIsSubmittingBooking(false);
+                  }
+
                   setShowConfirmationModal(false);
                   if (openModal) {
                     openModal('booking', {
@@ -973,13 +1134,24 @@ export default function BirthdayBuilderPage({
                       discount: `Deposit: EGP ${depositRequired.toLocaleString()}`,
                       guests: `${guestCount} Guests (${kidsCount} Kids)`,
                       date: partyDate,
-                      session: activeSessionData.shortEn
+                      session: activeSessionData.shortEn,
+                      bookingCode: finalCode || 'BD-PENDING',
+                      bookingId: finalId
                     });
                   }
                 }}
               >
-                <span>{lang === 'ar' ? `تأكيد ودفع العربون (${depositRequired.toLocaleString()} ج.م)` : `Confirm & Pay Deposit (EGP ${depositRequired.toLocaleString()})`}</span>
-                <ArrowRight size={18} />
+                {isSubmittingBooking ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>{lang === 'ar' ? 'جاري تأكيد الحجز...' : 'Securing Reservation...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{lang === 'ar' ? `تأكيد ودفع العربون (${depositRequired.toLocaleString()} ج.م)` : `Confirm & Pay Deposit (EGP ${depositRequired.toLocaleString()})`}</span>
+                    <ArrowRight size={18} />
+                  </>
+                )}
               </button>
 
               <button 

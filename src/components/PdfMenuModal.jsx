@@ -50,12 +50,19 @@ export default function PdfMenuModal({ isOpen, onClose, lang = 'ar' }) {
   const scrollContainerRef = useRef(null);
   const pageRefs = useRef({});
   const categoryTabsRef = useRef(null);
+  const visibleMap = useRef({});
 
-  // Lock background scroll when open
+  // Reset to page 1 on open and lock background scroll
   useEffect(() => {
     if (isOpen) {
+      setCurrentPage(1);
+      setActiveCategoryIndex(0);
       const originalStyle = window.getComputedStyle(document.body).overflow;
       document.body.style.overflow = 'hidden';
+      // Reset scroll position to top
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = 0;
+      }
       return () => {
         document.body.style.overflow = originalStyle;
       };
@@ -77,22 +84,33 @@ export default function PdfMenuModal({ isOpen, onClose, lang = 'ar' }) {
   // Auto-detect current visible page using IntersectionObserver
   useEffect(() => {
     if (!isOpen) return;
+    visibleMap.current = {};
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const pageNum = parseInt(entry.target.getAttribute('data-page'), 10);
-            if (!isNaN(pageNum)) {
-              setCurrentPage(pageNum);
-              setActiveCategoryIndex(pageNum - 1);
+          const pageNum = parseInt(entry.target.getAttribute('data-page'), 10);
+          if (!isNaN(pageNum)) {
+            if (entry.isIntersecting) {
+              visibleMap.current[pageNum] = entry.intersectionRatio;
+            } else {
+              delete visibleMap.current[pageNum];
             }
           }
         });
+
+        // Pick page with the largest visible area
+        const visibleKeys = Object.keys(visibleMap.current);
+        if (visibleKeys.length > 0) {
+          visibleKeys.sort((a, b) => visibleMap.current[b] - visibleMap.current[a]);
+          const bestPage = parseInt(visibleKeys[0], 10);
+          setCurrentPage(bestPage);
+          setActiveCategoryIndex(bestPage - 1);
+        }
       },
       {
         root: scrollContainerRef.current,
-        threshold: 0.35,
+        threshold: [0.15, 0.4, 0.7],
       }
     );
 
@@ -172,7 +190,7 @@ export default function PdfMenuModal({ isOpen, onClose, lang = 'ar' }) {
       try {
         await navigator.share(shareData);
       } catch (err) {
-        // User cancelled share
+        // User cancelled
       }
     } else {
       navigator.clipboard?.writeText(window.location.href);
@@ -220,7 +238,7 @@ export default function PdfMenuModal({ isOpen, onClose, lang = 'ar' }) {
 
         {/* Right: Actions (Zoom, Download, Fullscreen, Share) */}
         <div className="pdf-menu-topbar-right">
-          {/* Zoom controls (hidden or compact on small mobile) */}
+          {/* Zoom controls */}
           <div className="pdf-zoom-group">
             <button
               className="pdf-control-btn"
@@ -341,23 +359,26 @@ export default function PdfMenuModal({ isOpen, onClose, lang = 'ar' }) {
                 </span>
               </div>
 
-              {/* Crisp Page Image with Picture fallback */}
+              {/* Crisp Page Image */}
               <div
                 className="pdf-page-image-wrapper"
                 onDoubleClick={() => {
                   setZoomLevel((prev) => (prev > 1.2 ? 1 : 1.6));
                 }}
               >
-                <picture>
-                  <source srcSet={`/menu/pages/page-${p.page}.webp`} type="image/webp" />
-                  <img
-                    src={`/menu/pages/page-${p.page}.jpg`}
-                    alt={`${lang === 'ar' ? p.titleAr : p.titleEn} - American Dream Menu`}
-                    className="pdf-page-image"
-                    loading={p.page <= 3 ? 'eager' : 'lazy'}
-                    decoding="async"
-                  />
-                </picture>
+                <img
+                  src={`/menu/pages/page-${p.page}.webp`}
+                  alt={`${lang === 'ar' ? p.titleAr : p.titleEn} - American Dream Menu`}
+                  className="pdf-page-image"
+                  loading="eager"
+                  decoding="async"
+                  onError={(e) => {
+                    if (!e.currentTarget.dataset.triedFallback) {
+                      e.currentTarget.dataset.triedFallback = 'true';
+                      e.currentTarget.src = `/menu/pages/page-${p.page}.jpg`;
+                    }
+                  }}
+                />
               </div>
             </section>
           ))}

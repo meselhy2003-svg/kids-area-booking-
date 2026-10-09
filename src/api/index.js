@@ -33,3 +33,5 @@ export { mediaCache, MEDIA_CACHE_KEYS } from './mediaCache';
 export { menuService } from './menuService';
 export { buyingService } from './buyingService';
 export { bookingTableService } from './bookingTableService';
+export { tripService } from './tripService';
+export { eventService } from './eventService';
