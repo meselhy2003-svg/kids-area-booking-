@@ -14,7 +14,9 @@ import {
   Sparkles,
   Heart,
   ChevronDown,
-  Filter
+  Filter,
+  Eye,
+  Clock
 } from 'lucide-react';
 import './GuestsManager.css';
 
