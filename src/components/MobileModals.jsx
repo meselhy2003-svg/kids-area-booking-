@@ -664,49 +664,9 @@ export default function MobileModals({
               className="drawer-nav-item"
               onClick={() => { closeModal(); setActiveTab('kids-area'); }}
             >
-              <img src="/photo/kid-area-pic/icon/kids-icon.png" alt="Kids Area" className="drawer-icon" />
+              <img src="/photo/kid-area-pic/icon/kids-icon.png" alt="Play Zone" className="drawer-icon" />
               <span className={lang === 'ar' ? 'font-alexandria' : ''}>
-                {lang === 'ar' ? 'منطقة الأطفال' : 'Kids Area'}
-              </span>
-            </button>
-
-            <button 
-              className="drawer-nav-item"
-              onClick={() => { closeModal(); setActiveTab('fun-park'); }}
-            >
-              <img src="/photo/kid-area-pic/icon/funpark-icon.png" alt="Fun Park" className="drawer-icon" />
-              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
-                {lang === 'ar' ? 'فن بارك' : 'Fun Park'}
-              </span>
-            </button>
-
-            <button 
-              className="drawer-nav-item"
-              onClick={() => { closeModal(); setActiveTab('challenge'); }}
-            >
-              <img src="/photo/kid-area-pic/icon/challenge-icon.png" alt="Challenge" className="drawer-icon" />
-              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
-                {lang === 'ar' ? 'منطقة التحدي والآركيد' : 'Challenge Zone'}
-              </span>
-            </button>
-
-            <button 
-              className="drawer-nav-item"
-              onClick={() => { closeModal(); setActiveTab('adventure'); }}
-            >
-              <img src="/photo/kid-area-pic/icon/package-icon.png" alt="Adventure" className="drawer-icon" />
-              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
-                {lang === 'ar' ? 'منطقة المغامرات والحبال' : 'Adventure Zone'}
-              </span>
-            </button>
-
-            <button 
-              className="drawer-nav-item"
-              onClick={() => { closeModal(); setActiveTab('package'); }}
-            >
-              <img src="/photo/kid-area-pic/icon/adventure-icon.png" alt="Packages" className="drawer-icon" />
-              <span className={lang === 'ar' ? 'font-alexandria' : ''}>
-                {lang === 'ar' ? 'باقات الألعاب والتوفير' : 'Party & Birthday Packages'}
+                {lang === 'ar' ? 'منطقة الألعاب' : 'Play Zone'}
               </span>
             </button>
 
