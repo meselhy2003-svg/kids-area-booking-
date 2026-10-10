@@ -499,8 +499,16 @@ export default function DesktopDashboardPage({
     return 'play-zones';
   });
 
-  // Sidebar Accordion state: expanded by default (Image 2), collapsible to Image 1
-  const [isWebAdminExpanded, setIsWebAdminExpanded] = useState(true);
+  // Sidebar Accordion state: collapsed by default (false), persists user toggle
+  const [isWebAdminExpanded, setIsWebAdminExpanded] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ados_sidebar_expanded');
+      if (saved !== null) {
+        return saved === 'true';
+      }
+    }
+    return false;
+  });
 
   // Exact 7 items from Image 2
   const sidebarItems = [
@@ -900,8 +908,16 @@ export default function DesktopDashboardPage({
             <button 
               type="button"
               className={`ados-accordion-btn ${isWebAdminExpanded ? 'expanded' : ''}`}
-              onClick={() => setIsWebAdminExpanded(prev => !prev)}
               title={isAr ? 'لوحة تحكم الموقع' : 'Web Admin Dashboard'}
+              onClick={() => {
+                setIsWebAdminExpanded(prev => {
+                  const next = !prev;
+                  try {
+                    localStorage.setItem('ados_sidebar_expanded', String(next));
+                  } catch (e) {}
+                  return next;
+                });
+              }}
             >
               <div className="ados-accordion-left">
                 <span className="ados-accordion-icon">
