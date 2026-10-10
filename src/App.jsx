@@ -45,21 +45,104 @@ import './components/MobilePlayZone.css';
 import './components/DesktopPlayZone.css';
 import { isUserAuthenticated } from './api/authService';
 
-export default function App() {
-  // Always open the Lobby Gateway first when the site loads
-  const [activeTab, setActiveTab] = useState('lobby');
+const VALID_TABS = [
+  'lobby',
+  'home',
+  'kids-area',
+  'fun-park',
+  'challenge',
+  'adventure',
+  'package',
+  'events',
+  'birthday',
+  'trips',
+  'cart',
+  'about',
+  'dashboard',
+  'profile',
+  'login'
+];
 
-  useEffect(() => {
-    // Ensure URL hash reflects the lobby when the website opens
-    if (typeof window !== 'undefined') {
-      window.location.hash = 'lobby';
+const resolveTabFromHash = (hashString) => {
+  if (!hashString) return null;
+  const h = hashString.replace(/^#\/?/, '').trim();
+  if (!h) return null;
+
+  if (h.startsWith('restaurant') || h === 'book-table' || h === 'delivery') {
+    return 'restaurant';
+  }
+  if (
+    h === 'dashboard' ||
+    h === 'orders' ||
+    h === 'playzone-orders' ||
+    h === 'restaurant-orders' ||
+    h === 'events-orders' ||
+    h === 'trips-orders' ||
+    h === 'guests' ||
+    h === 'play-zones'
+  ) {
+    return 'dashboard';
+  }
+  if (h === 'birthday') {
+    return 'events';
+  }
+  if (VALID_TABS.includes(h)) {
+    return h;
+  }
+  return null;
+};
+
+const getInitialActiveTab = () => {
+  if (typeof window === 'undefined') return 'lobby';
+
+  // 1. Check current URL hash first (direct URL navigation or page reload)
+  const tabFromHash = resolveTabFromHash(window.location.hash);
+  if (tabFromHash) {
+    return tabFromHash;
+  }
+
+  // 2. Check sessionStorage if user was in an active session
+  try {
+    const savedTab = sessionStorage.getItem('kids_area_active_tab');
+    if (savedTab && (VALID_TABS.includes(savedTab) || savedTab === 'dashboard')) {
+      return savedTab;
     }
-  }, []);
+  } catch (e) {
+    // ignore
+  }
+
+  // 3. Fallback to lobby only when opening site fresh with no hash
+  return 'lobby';
+};
+
+export default function App() {
+  // Retain the current tab across browser refreshes
+  const [activeTab, setActiveTab] = useState(getInitialActiveTab);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (activeTab === 'restaurant' && (window.location.hash.includes('delivery') || window.location.hash.includes('book-table'))) {
+      try {
+        sessionStorage.setItem('kids_area_active_tab', activeTab);
+      } catch (e) {
+        // ignore
+      }
+
+      const currentHash = window.location.hash.replace(/^#\/?/, '').trim();
+
+      // Keep subroute / sub-section intact if hash already matches the active tab domain
+      if (activeTab === 'restaurant' && (currentHash.includes('delivery') || currentHash.includes('book-table') || currentHash === 'restaurant')) {
         // keep subroute intact
+      } else if (activeTab === 'dashboard' && (
+        currentHash.includes('orders') ||
+        currentHash.includes('trips') ||
+        currentHash.includes('events') ||
+        currentHash.includes('restaurant') ||
+        currentHash.includes('guests') ||
+        currentHash.includes('about') ||
+        currentHash.includes('play-zones') ||
+        currentHash === 'dashboard'
+      )) {
+        // keep dashboard sub-section hash intact
       } else {
         window.location.hash = activeTab;
       }
@@ -68,13 +151,9 @@ export default function App() {
 
   useEffect(() => {
     const handleHashSync = () => {
-      const h = window.location.hash.replace('#', '');
-      if (h.startsWith('restaurant') || h === 'book-table') {
-        setActiveTab('restaurant');
-      } else if (h === 'playzone-orders' || h === 'orders') {
-        setActiveTab('dashboard');
-      } else if (['lobby', 'home', 'kids-area', 'fun-park', 'challenge', 'adventure', 'package', 'events', 'birthday', 'trips', 'cart', 'about', 'dashboard', 'profile', 'login'].includes(h)) {
-        setActiveTab(h);
+      const tab = resolveTabFromHash(window.location.hash);
+      if (tab) {
+        setActiveTab(tab);
       }
     };
     window.addEventListener('hashchange', handleHashSync);

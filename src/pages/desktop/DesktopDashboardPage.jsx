@@ -565,6 +565,24 @@ export default function DesktopDashboardPage({
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const sectionHashMap = {
+        'play-zones': '#play-zones',
+        'restaurant-orders': '#restaurant-orders',
+        'events-orders': '#events-orders',
+        'trips-orders': '#trips-orders',
+        'about': '#about',
+        'guests': '#guests',
+        'orders': '#orders'
+      };
+      const targetHash = sectionHashMap[adminSection];
+      if (targetHash && window.location.hash !== targetHash) {
+        window.location.hash = targetHash;
+      }
+    }
+  }, [adminSection]);
+
 
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [cardModalMode, setCardModalMode] = useState('edit'); // 'edit' | 'add'
