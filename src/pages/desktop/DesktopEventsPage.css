@@ -161,6 +161,11 @@
   box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
 }
 
+.desktop-events-page.lang-ar .events-hero-tour-btn {
+  right: auto;
+  left: 28px;
+}
+
 /* --------------------------------------------------------------------------
    2. CHOOSE YOUR OCCASION SECTION
    -------------------------------------------------------------------------- */
@@ -913,5 +918,47 @@
 
   .events-mosaic-caption svg {
     display: none;
+  }
+
+  /* Floating 360 Tour Button: Smaller & moved up on mobile */
+  .events-hero-tour-btn {
+    bottom: 34px !important;
+    right: 14px !important;
+    padding: 6px 12px !important;
+    font-size: 0.72rem !important;
+    gap: 5px !important;
+    border-radius: 20px !important;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  .events-hero-tour-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .desktop-events-page.lang-ar .events-hero-tour-btn {
+    right: auto !important;
+    left: 14px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .events-hero-tour-btn {
+    bottom: 38px !important;
+    right: 10px !important;
+    padding: 5px 10px !important;
+    font-size: 0.67rem !important;
+    gap: 4px !important;
+    border-radius: 18px !important;
+  }
+
+  .events-hero-tour-btn svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .desktop-events-page.lang-ar .events-hero-tour-btn {
+    right: auto !important;
+    left: 10px !important;
   }
 }
