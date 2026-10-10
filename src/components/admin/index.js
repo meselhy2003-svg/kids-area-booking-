@@ -5,3 +5,5 @@ export { default as RestaurantAnalyticsPanel } from './RestaurantAnalyticsPanel'
 export { default as EventsAnalyticsPanel } from './EventsAnalyticsPanel';
 export { default as RestaurantOrdersManager } from './RestaurantOrdersManager';
 export { default as EventsOrdersManager } from './EventsOrdersManager';
+export { default as HomePageMediaManager } from './HomePageMediaManager';
+export { default as KidsAreaMediaManager } from './KidsAreaMediaManager';
