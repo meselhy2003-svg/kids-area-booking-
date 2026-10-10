@@ -2,7 +2,7 @@ import React from 'react';
 import { usePackages } from '../../hooks/usePackages';
 import { useData } from '../../context/DataContext';
 import { getTranslations } from '../../data/translations';
-import { getLocalizedPackage } from '../../utils/packageLocalization';
+import { getLocalizedPackage, getLocalizedFeature } from '../../utils/packageLocalization';
 
 export default function DesktopPackagePage({ setActiveTab, openModal, lang = 'ar' }) {
   const t = getTranslations(lang);
@@ -171,7 +171,7 @@ export default function DesktopPackagePage({ setActiveTab, openModal, lang = 'ar
                         <circle cx="10" cy="10" r="8.5" stroke="#00bcd4" strokeWidth="1.8" />
                         <path d="M6 10.2L8.6 12.8L14 7.5" stroke="#00bcd4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      <span className="pass-check-bold">{typeof item === 'object' ? (isArabic ? item.labelAr || item.label : item.label) : item}</span>
+                      <span className="pass-check-bold">{typeof item === 'object' ? getLocalizedFeature(item, isArabic) : item}</span>
                     </div>
                   ))}
                 </div>
