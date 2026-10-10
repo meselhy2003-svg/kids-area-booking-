@@ -953,11 +953,12 @@ export default function PlayZoneOrdersManager({
     const total = eventsOrders.length;
     const confirmed = eventsOrders.filter(e => String(e.status).toLowerCase() === 'confirmed').length;
     const pendingDeposit = eventsOrders.filter(e => String(e.status).toLowerCase().includes('pending')).length;
+    const cancelled = eventsOrders.filter(e => String(e.status).toLowerCase().includes('cancel')).length;
     const totalGuests = eventsOrders.reduce((sum, e) => sum + (Number(e.totalGuests) || 0), 0);
     const totalRevenue = eventsOrders.reduce((sum, e) => sum + (Number(e.totalAmount) || 0), 0);
     const totalDeposits = eventsOrders.reduce((sum, e) => sum + (e.depositPaid ? (Number(e.depositRequired) || 0) : 0), 0);
 
-    return { total, confirmed, pendingDeposit, totalGuests, totalRevenue, totalDeposits };
+    return { total, confirmed, pendingDeposit, cancelled, totalGuests, totalRevenue, totalDeposits };
   }, [eventsOrders]);
 
   // Dynamic Page Numbers Generator
@@ -2404,33 +2405,57 @@ export default function PlayZoneOrdersManager({
                 )}
               </div>
 
-              {/* Status Filters Group */}
-              <div className="pz-status-filters-group">
-                {['All', 'Confirmed', 'pending', 'Cancelled'].map((st) => (
-                  <button
-                    key={st}
-                    type="button"
-                    className={`pz-status-chip ${eventStatusFilter === st ? 'active' : ''}`}
-                    onClick={() => {
-                      setEventStatusFilter(st);
-                      setEventCurrentPage(1);
-                    }}
-                  >
-                    <span>
-                      {st === 'All' 
-                        ? (isAr ? 'الكل' : 'All')
-                        : st === 'Confirmed'
-                          ? (isAr ? 'مؤكد' : 'Confirmed')
-                          : st === 'pending'
-                            ? (isAr ? 'بانتظار العربون' : 'Pending Deposit')
-                            : (isAr ? 'ملغي' : 'Cancelled')}
-                    </span>
-                  </button>
-                ))}
+            </div>
+
+            {/* Status Segmented Tabs */}
+            <div className="pz-filter-status-row">
+              <div className="pz-status-tabs">
+                <button 
+                  type="button" 
+                  className={`status-tab ${eventStatusFilter === 'All' ? 'active' : ''}`}
+                  onClick={() => {
+                    setEventStatusFilter('All');
+                    setEventCurrentPage(1);
+                  }}
+                >
+                  {isAr ? 'جميع الحالات' : 'All Statuses'} <span className="tab-count">({eventsMetrics.total})</span>
+                </button>
+                <button 
+                  type="button" 
+                  className={`status-tab ${eventStatusFilter === 'Confirmed' ? 'active' : ''}`}
+                  onClick={() => {
+                    setEventStatusFilter('Confirmed');
+                    setEventCurrentPage(1);
+                  }}
+                >
+                  {isAr ? 'مؤكد' : 'Confirmed'} <span className="tab-count-blue">({eventsMetrics.confirmed})</span>
+                </button>
+                <button 
+                  type="button" 
+                  className={`status-tab ${eventStatusFilter === 'pending' ? 'active' : ''}`}
+                  onClick={() => {
+                    setEventStatusFilter('pending');
+                    setEventCurrentPage(1);
+                  }}
+                >
+                  {isAr ? 'بانتظار العربون' : 'Pending Deposit'} <span className="tab-count-neutral">({eventsMetrics.pendingDeposit})</span>
+                </button>
+                <button 
+                  type="button" 
+                  className={`status-tab ${eventStatusFilter === 'Cancelled' ? 'active' : ''}`}
+                  onClick={() => {
+                    setEventStatusFilter('Cancelled');
+                    setEventCurrentPage(1);
+                  }}
+                >
+                  {isAr ? 'ملغي' : 'Cancelled'} <span className="tab-count-red">({eventsMetrics.cancelled})</span>
+                </button>
               </div>
 
               <span className="pz-records-count">
-                {isAr ? `عرض ${filteredEventsOrders.length} حجز مسجل` : `Showing ${filteredEventsOrders.length} bookings`}
+                {isAr 
+                  ? `عرض ${filteredEventsOrders.length} من أصل ${eventsOrders.length} حجز مسجل`
+                  : `Showing ${filteredEventsOrders.length} of ${eventsOrders.length} bookings recorded`}
               </span>
             </div>
           </div>
