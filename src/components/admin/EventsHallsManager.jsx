@@ -25,7 +25,6 @@ import {
   Layers
 } from 'lucide-react';
 import './EventsHallsManager.css';
-import PlayZoneOrdersManager from '../../pages/desktop/PlayZoneOrdersManager';
 
 // Project Media Library Assets matching Image 2 exactly + Event assets
 const ALL_PROJECT_ASSETS = [
@@ -315,9 +314,6 @@ export default function EventsHallsManager({
   const [imagePickerTarget, setImagePickerTarget] = useState(null); // { type: 'hero' | 'explore' | 'item', slotIndex?: number }
   const [is360ModalOpen, setIs360ModalOpen] = useState(false);
 
-  // Subview toggle: 'editor' | 'orders'
-  const [currentViewMode, setCurrentViewMode] = useState('editor');
-
   // File ref for PC upload
   const fileInputRef = useRef(null);
 
@@ -595,27 +591,8 @@ export default function EventsHallsManager({
       {/* 1. TOPBAR                                                          */}
       {/* ------------------------------------------------------------------ */}
       <header className="ados-topbar">
-        {/* Left Toggle / Subview switch */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button 
-            type="button"
-            className={`events-topbar-mode-btn ${currentViewMode === 'editor' ? 'active' : ''}`}
-            onClick={() => setCurrentViewMode('editor')}
-            title={isAr ? 'إدارة الباقات والقاعات' : 'Halls & Packages Editor'}
-          >
-            <Building2 size={14} />
-            <span>{isAr ? 'إدارة الباقات والقاعات' : 'Halls Editor'}</span>
-          </button>
-          <button 
-            type="button"
-            className={`events-topbar-mode-btn ${currentViewMode === 'orders' ? 'active' : ''}`}
-            onClick={() => setCurrentViewMode('orders')}
-            title={isAr ? 'حجوزات وطلبات القاعات الحية' : 'Live Event Bookings & Orders'}
-          >
-            <Calendar size={14} />
-            <span>{isAr ? 'حجوزات المناسبات' : 'Live Bookings'}</span>
-          </button>
-        </div>
+        {/* Balanced spacer on left */}
+        <div style={{ width: 140 }}></div>
 
         {/* Center Title Group */}
         <div className="ados-topbar-title-group">
@@ -675,18 +652,9 @@ export default function EventsHallsManager({
       </header>
 
       {/* ------------------------------------------------------------------ */}
-      {/* 2. BODY CONTENT: EDITOR OR ORDERS VIEW                             */}
+      {/* 2. BODY CONTENT                                                    */}
       {/* ------------------------------------------------------------------ */}
-      {currentViewMode === 'orders' ? (
-        <PlayZoneOrdersManager 
-          initialView="events-orders"
-          isEmbedded={true}
-          onBackToDashboard={() => setCurrentViewMode('editor')}
-          lang={lang}
-          setLang={setLang}
-        />
-      ) : (
-        <div className="ados-content">
+      <div className="ados-content">
           {/* CATEGORY NAVIGATION PILLS (Exact match to Play Zone nav) */}
           <nav className="ados-zone-nav events-category-nav">
             {data.categories?.map(cat => (
@@ -1102,7 +1070,6 @@ export default function EventsHallsManager({
             </button>
           </div>
         </div>
-      )}
 
       {/* ------------------------------------------------------------------ */}
       {/* 3. MODAL: EDIT / ADD PACKAGE OR HALL                               */}
