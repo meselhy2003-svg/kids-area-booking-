@@ -774,7 +774,77 @@
   }
 
   .about-offer-grid {
-    grid-template-columns: 1fr;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 16px !important;
+    padding: 8px 16px 20px !important;
+    margin: 0 -16px 16px !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #f59e0b rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .about-offer-grid::-webkit-scrollbar {
+    height: 5px !important;
+    display: block !important;
+  }
+
+  .about-offer-grid::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.06) !important;
+    border-radius: 9999px !important;
+  }
+
+  .about-offer-grid::-webkit-scrollbar-thumb {
+    background: #f59e0b !important;
+    border-radius: 9999px !important;
+  }
+
+  .about-offer-grid .about-offer-card {
+    flex: 0 0 270px !important;
+    min-width: 260px !important;
+    max-width: 80vw !important;
+    scroll-snap-align: start !important;
+  }
+
+  .about-reviews-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 16px !important;
+    padding: 8px 16px 20px !important;
+    margin: 0 -16px 16px !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #00bcd4 rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .about-reviews-grid::-webkit-scrollbar {
+    height: 5px !important;
+    display: block !important;
+  }
+
+  .about-reviews-grid::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.06) !important;
+    border-radius: 9999px !important;
+  }
+
+  .about-reviews-grid::-webkit-scrollbar-thumb {
+    background: #00bcd4 !important;
+    border-radius: 9999px !important;
+  }
+
+  .about-reviews-grid .about-review-card {
+    flex: 0 0 280px !important;
+    min-width: 270px !important;
+    max-width: 82vw !important;
+    scroll-snap-align: start !important;
   }
 
   .about-section-title,

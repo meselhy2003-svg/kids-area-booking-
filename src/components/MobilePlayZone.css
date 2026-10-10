@@ -766,12 +766,39 @@ html[dir="rtl"] .mobile-header {
 }
 
 .four-ways-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  gap: 10px !important;
+  padding: 4px 16px 14px !important;
+  margin: 0 -16px !important;
+  scroll-snap-type: x mandatory !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #f59e0b rgba(0, 0, 0, 0.08) !important;
+}
+
+.four-ways-grid::-webkit-scrollbar {
+  height: 4px !important;
+  display: block !important;
+}
+
+.four-ways-grid::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.06) !important;
+  border-radius: 9999px !important;
+}
+
+.four-ways-grid::-webkit-scrollbar-thumb {
+  background: #f59e0b !important;
+  border-radius: 9999px !important;
 }
 
 .four-way-tile {
+  flex: 0 0 170px !important;
+  min-width: 160px !important;
+  scroll-snap-align: start !important;
   position: relative;
   height: 95px;
   border-radius: 12px;
@@ -804,7 +831,7 @@ html[dir="rtl"] .mobile-header {
 }
 
 /* ==========================================================
-   PLAYZONE VIBES MASONRY GRID
+   PLAYZONE VIBES HORIZONTAL SLIDER
    ========================================================== */
 .playzone-vibes-section {
   padding: 26px 16px 10px;
@@ -827,16 +854,43 @@ html[dir="rtl"] .mobile-header {
 }
 
 .vibes-masonry-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  gap: 10px !important;
+  padding: 4px 16px 14px !important;
+  margin: 0 -16px !important;
+  scroll-snap-type: x mandatory !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #00bcd4 rgba(0, 0, 0, 0.08) !important;
+}
+
+.vibes-masonry-grid::-webkit-scrollbar {
+  height: 4px !important;
+  display: block !important;
+}
+
+.vibes-masonry-grid::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.06) !important;
+  border-radius: 9999px !important;
+}
+
+.vibes-masonry-grid::-webkit-scrollbar-thumb {
+  background: #00bcd4 !important;
+  border-radius: 9999px !important;
 }
 
 .vibe-tile {
+  flex: 0 0 150px !important;
+  min-width: 140px !important;
+  scroll-snap-align: start !important;
+  aspect-ratio: 1 / 1 !important;
   position: relative;
   border-radius: 12px;
   overflow: hidden;
-  aspect-ratio: 1 / 1;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
@@ -853,8 +907,8 @@ html[dir="rtl"] .mobile-header {
 }
 
 .vibe-tile:last-child:nth-child(odd) {
-  grid-column: span 2;
-  aspect-ratio: 2 / 1;
+  grid-column: auto !important;
+  aspect-ratio: 1 / 1 !important;
 }
 
 /* ==========================================================
@@ -1201,21 +1255,47 @@ html[dir="rtl"] .mobile-header {
 }
 
 /* ==========================================================
-   OFFER CARDS (2x2 GRID & SLIDER)
+   OFFER CARDS (HORIZONTAL ROW SLIDER ON MOBILE)
    ========================================================== */
-.offers-grid-2x2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+.offers-grid-2x2,
+.offers-slider-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  gap: 12px !important;
+  padding: 4px 16px 14px !important;
+  margin: 0 -16px 16px !important;
+  scroll-snap-type: x mandatory !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #f59e0b rgba(0, 0, 0, 0.08) !important;
 }
 
-.offers-slider-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+.offers-grid-2x2::-webkit-scrollbar,
+.offers-slider-row::-webkit-scrollbar {
+  height: 5px !important;
+  display: block !important;
+}
+
+.offers-grid-2x2::-webkit-scrollbar-track,
+.offers-slider-row::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.06) !important;
+  border-radius: 9999px !important;
+}
+
+.offers-grid-2x2::-webkit-scrollbar-thumb,
+.offers-slider-row::-webkit-scrollbar-thumb {
+  background: #f59e0b !important;
+  border-radius: 9999px !important;
 }
 
 .offer-card-item {
+  flex: 0 0 240px !important;
+  min-width: 230px !important;
+  max-width: 78vw !important;
+  scroll-snap-align: start !important;
   background: #ffffff;
   border-radius: 14px;
   border: 1px solid #e5e9eb;
@@ -1355,16 +1435,43 @@ html[dir="rtl"] .mobile-header {
 }
 
 /* ==========================================================
-   EXPLORE ATTRACTIONS ROW
+   EXPLORE ATTRACTIONS ROW (HORIZONTAL ROW SLIDER ON MOBILE)
    ========================================================== */
 .explore-attractions-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 18px;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  gap: 10px !important;
+  padding: 4px 16px 14px !important;
+  margin: 0 -16px 18px !important;
+  scroll-snap-type: x mandatory !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #00bcd4 rgba(0, 0, 0, 0.08) !important;
+}
+
+.explore-attractions-row::-webkit-scrollbar {
+  height: 4px !important;
+  display: block !important;
+}
+
+.explore-attractions-row::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.06) !important;
+  border-radius: 9999px !important;
+}
+
+.explore-attractions-row::-webkit-scrollbar-thumb {
+  background: #00bcd4 !important;
+  border-radius: 9999px !important;
 }
 
 .explore-attraction-card {
+  flex: 0 0 160px !important;
+  min-width: 150px !important;
+  max-width: 55vw !important;
+  scroll-snap-align: start !important;
   background: #ffffff;
   border-radius: 12px;
   overflow: hidden;
@@ -2761,15 +2868,42 @@ html[dir="rtl"] .mobile-header {
   transform: scale(0.96);
 }
 
-/* 2-Column Game Tickets Grid */
+/* Game Tickets Horizontal Row Slider */
 .game-tickets-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 18px;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  gap: 12px !important;
+  padding: 4px 16px 14px !important;
+  margin: 0 -16px 18px !important;
+  scroll-snap-type: x mandatory !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #f59e0b rgba(0, 0, 0, 0.08) !important;
+}
+
+.game-tickets-grid::-webkit-scrollbar {
+  height: 5px !important;
+  display: block !important;
+}
+
+.game-tickets-grid::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.06) !important;
+  border-radius: 9999px !important;
+}
+
+.game-tickets-grid::-webkit-scrollbar-thumb {
+  background: #f59e0b !important;
+  border-radius: 9999px !important;
 }
 
 .game-ticket-card {
+  flex: 0 0 240px !important;
+  min-width: 230px !important;
+  max-width: 78vw !important;
+  scroll-snap-align: start !important;
   background: #ffffff;
   border-radius: 14px;
   border: 1px solid #e2e8f0;
@@ -2779,11 +2913,10 @@ html[dir="rtl"] .mobile-header {
   flex-direction: column;
 }
 
-/* If there is an odd last card (e.g. 9th Boxing Machine card), center it matching screenshot */
 .game-ticket-card:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-  width: calc(50% - 5px);
-  justify-self: center;
+  grid-column: auto !important;
+  width: auto !important;
+  justify-self: auto !important;
 }
 
 .game-ticket-media {
