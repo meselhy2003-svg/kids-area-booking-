@@ -555,7 +555,7 @@ export default function DesktopDashboardPage({
         setAdminSection('events-orders');
       } else if (h === '#guests') {
         setAdminSection('guests');
-      } else if (h === '#about') {
+      } else if (h === '#about-cms' || h === '#admin-about' || h === '#about') {
         setAdminSection('about');
       } else if (h === '#play-zones' || h === '#dashboard') {
         setAdminSection('play-zones');
@@ -572,7 +572,7 @@ export default function DesktopDashboardPage({
         'restaurant-orders': '#restaurant-orders',
         'events-orders': '#events-orders',
         'trips-orders': '#trips-orders',
-        'about': '#about',
+        'about': '#about-cms',
         'guests': '#guests',
         'orders': '#orders'
       };

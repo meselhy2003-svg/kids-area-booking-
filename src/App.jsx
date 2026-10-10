@@ -68,9 +68,7 @@ const resolveTabFromHash = (hashString) => {
   const h = hashString.replace(/^#\/?/, '').trim();
   if (!h) return null;
 
-  if (h.startsWith('restaurant') || h === 'book-table' || h === 'delivery') {
-    return 'restaurant';
-  }
+  // 1. Dashboard specific admin hashes (Check FIRST to prevent clash with public routes)
   if (
     h === 'dashboard' ||
     h === 'orders' ||
@@ -79,16 +77,32 @@ const resolveTabFromHash = (hashString) => {
     h === 'events-orders' ||
     h === 'trips-orders' ||
     h === 'guests' ||
-    h === 'play-zones'
+    h === 'play-zones' ||
+    h === 'about-cms' ||
+    h === 'admin-about'
   ) {
     return 'dashboard';
   }
+
+  // 2. Public restaurant routes
+  if (
+    h === 'restaurant' ||
+    h === 'restaurant-delivery' ||
+    h === 'restaurant-book-table' ||
+    h === 'delivery' ||
+    h === 'book-table'
+  ) {
+    return 'restaurant';
+  }
+
   if (h === 'birthday') {
     return 'events';
   }
+
   if (VALID_TABS.includes(h)) {
     return h;
   }
+
   return null;
 };
 
