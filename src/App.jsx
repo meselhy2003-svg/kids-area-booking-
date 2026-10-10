@@ -111,6 +111,9 @@ const getInitialActiveTab = () => {
 
   // 1. Check current URL hash first (direct URL navigation or page reload)
   const tabFromHash = resolveTabFromHash(window.location.hash);
+  if (tabFromHash === 'profile' && !isUserAuthenticated()) {
+    return 'home';
+  }
   if (tabFromHash) {
     return tabFromHash;
   }
@@ -119,6 +122,9 @@ const getInitialActiveTab = () => {
   try {
     const savedTab = sessionStorage.getItem('kids_area_active_tab');
     if (savedTab && (VALID_TABS.includes(savedTab) || savedTab === 'dashboard')) {
+      if (savedTab === 'profile' && !isUserAuthenticated()) {
+        return 'home';
+      }
       return savedTab;
     }
   } catch (e) {
@@ -167,6 +173,12 @@ export default function App() {
     const handleHashSync = () => {
       const tab = resolveTabFromHash(window.location.hash);
       if (tab) {
+        if (tab === 'profile' && !isUserAuthenticated()) {
+          openModal('auth', { initialMode: 'login' });
+          setActiveTab('home');
+          window.location.hash = '#home';
+          return;
+        }
         setActiveTab(tab);
       }
     };
@@ -405,11 +417,19 @@ export default function App() {
               )}
 
               {activeTab === 'profile' && (
-                <DesktopProfilePage 
-                  setActiveTab={setActiveTab}
-                  openModal={openModal}
-                  lang={lang}
-                />
+                isUserAuthenticated() ? (
+                  <DesktopProfilePage 
+                    setActiveTab={setActiveTab}
+                    openModal={openModal}
+                    lang={lang}
+                  />
+                ) : (
+                  <DesktopHomePage 
+                    setActiveTab={setActiveTab}
+                    openModal={openModal}
+                    lang={lang}
+                  />
+                )
               )}
 
               {activeTab === 'login' && (
@@ -445,7 +465,13 @@ export default function App() {
           <MobileHeader 
             setActiveTab={setActiveTab}
             onOpenMenu={() => openModal('menu-drawer')}
-            onOpenProfile={() => setActiveTab('profile')}
+            onOpenProfile={() => {
+              if (isUserAuthenticated()) {
+                openModal('profile');
+              } else {
+                openModal('auth', { initialMode: 'login' });
+              }
+            }}
             lang={lang}
             setLang={setLang}
           />

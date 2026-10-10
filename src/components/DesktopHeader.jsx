@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { LogOut } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { LogOut, User, LogIn, UserPlus, ShoppingBag, Sparkles } from 'lucide-react';
 import { getTranslations } from '../data/translations';
 import { authService, isUserAuthenticated } from '../api/authService';
 
@@ -7,20 +7,28 @@ export default function DesktopHeader({
   activeTab, 
   setActiveTab, 
   openModal, 
-  lang, 
+  lang = 'ar', 
   setLang,
   isDesktopView,
   setIsDesktopView
 }) {
   const t = getTranslations(lang);
+  const isAr = lang === 'ar';
   const isPlayZonesActive = ['kids-area', 'fun-park', 'challenge', 'adventure', 'package'].includes(activeTab);
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => isUserAuthenticated());
+  const [currentUser, setCurrentUser] = useState(() => authService.getCurrentUserSync());
+  const [menuOpen, setMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
 
+  // Sync authentication state across storage events and custom events
   useEffect(() => {
     const handleAuthChange = () => {
-      setIsLoggedIn(isUserAuthenticated());
+      const auth = isUserAuthenticated();
+      setIsLoggedIn(auth);
+      setCurrentUser(authService.getCurrentUserSync());
     };
+
     window.addEventListener('auth-changed', handleAuthChange);
     window.addEventListener('storage', handleAuthChange);
     return () => {
@@ -29,13 +37,62 @@ export default function DesktopHeader({
     };
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+    if (menuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [menuOpen]);
+
+  // Handle Profile Icon Click
+  const handleProfileIconClick = () => {
+    setMenuOpen(prev => !prev);
+  };
+
+  // Handle Login action from Guest Popover
+  const handleGuestLogin = () => {
+    setMenuOpen(false);
+    if (typeof openModal === 'function') {
+      openModal('auth', { initialMode: 'login' });
+    } else if (setActiveTab) {
+      setActiveTab('login');
+      window.location.hash = '#login';
+    }
+  };
+
+  // Handle Sign Up action from Guest Popover
+  const handleGuestSignup = () => {
+    setMenuOpen(false);
+    if (typeof openModal === 'function') {
+      openModal('auth', { initialMode: 'signup' });
+    } else if (setActiveTab) {
+      setActiveTab('login');
+      window.location.hash = '#signup';
+    }
+  };
+
+  // Handle Logout
   const handleLogout = async () => {
+    setMenuOpen(false);
     await authService.logout();
+    setIsLoggedIn(false);
+    setCurrentUser(null);
     if (setActiveTab) setActiveTab('lobby');
     if (typeof window !== 'undefined') {
       window.location.hash = '#lobby';
     }
   };
+
+  const userName = currentUser?.name || (isAr ? 'عضو أمريكان دريم' : 'American Dream Member');
+  const userPoints = currentUser?.points || 0;
 
   return (
     <header className="desktop-navbar">
@@ -94,7 +151,7 @@ export default function DesktopHeader({
 
         {/* Right Nav Actions */}
         <div className="desktop-nav-right">
-          {/* Language Switcher Pill: Main Arabic (Alexandria), Second English */}
+          {/* Language Switcher Pill */}
           <div className="desktop-lang-switcher-pill" style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -159,7 +216,7 @@ export default function DesktopHeader({
             </button>
           </div>
 
-          {/* Parachute / Fast Pass Cart Button */}
+          {/* Cart Button */}
           <button 
             className={`desktop-nav-parachute-btn ${activeTab === 'cart' ? 'active' : ''}`}
             onClick={() => setActiveTab('cart')}
@@ -173,42 +230,137 @@ export default function DesktopHeader({
             />
           </button>
 
-          {/* User Profile Pill (Opens Profile Page - Icon Only) */}
-          <button 
-            className={`desktop-nav-user-pill ${activeTab === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profile')}
-            title={t.nav.profileName}
-            aria-label={t.nav.profileName}
-          >
-            <span className="desktop-nav-user-icon-wrap">
-              <svg 
-                className="desktop-nav-user-svg" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                strokeWidth="2.2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <circle cx="12" cy="10" r="3.2" />
-                <path d="M7 20.662V19a2.5 2.5 0 0 1 2.5-2.5h5a2.5 2.5 0 0 1 2.5 2.5v1.662" />
-              </svg>
-            </span>
-          </button>
-
-          {/* Log Out Button */}
-          {isLoggedIn && (
-            <button
+          {/* User Profile Container & Dropdown */}
+          <div className="desktop-user-menu-wrapper" ref={userMenuRef} style={{ position: 'relative' }}>
+            {/* User Profile Pill */}
+            <button 
               type="button"
-              className="desktop-nav-logout-btn"
-              onClick={handleLogout}
-              title={lang === 'ar' ? 'تسجيل الخروج' : 'Log Out'}
-              aria-label={lang === 'ar' ? 'تسجيل الخروج' : 'Log Out'}
+              className={`desktop-nav-user-pill ${activeTab === 'profile' || menuOpen ? 'active' : ''} ${!isLoggedIn ? 'guest-pill' : ''}`}
+              onClick={handleProfileIconClick}
+              title={isLoggedIn ? userName : (isAr ? 'حساب الزائر' : 'Guest Account')}
+              aria-label={isLoggedIn ? userName : 'User Account'}
+              aria-expanded={menuOpen}
             >
-              <LogOut size={15} />
-              <span>{lang === 'ar' ? 'خروج' : 'Logout'}</span>
+              <span className="desktop-nav-user-icon-wrap">
+                <svg 
+                  className="desktop-nav-user-svg" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  strokeWidth="2.2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <circle cx="12" cy="10" r="3.2" />
+                  <path d="M7 20.662V19a2.5 2.5 0 0 1 2.5-2.5h5a2.5 2.5 0 0 1 2.5 2.5v1.662" />
+                </svg>
+              </span>
             </button>
-          )}
+
+            {/* DYNAMIC DROPDOWN / POPOVER */}
+            {menuOpen && (
+              <div className={`desktop-user-dropdown-popover ${isAr ? 'lang-ar font-alexandria' : 'lang-en'}`}>
+                {isLoggedIn ? (
+                  /* 1. AUTHENTICATED USER MENU */
+                  <div className="user-popover-auth-body">
+                    <div className="user-popover-header">
+                      <div className="user-popover-avatar">
+                        <User size={18} className="avatar-icon" />
+                      </div>
+                      <div className="user-popover-info">
+                        <div className="user-popover-name">{userName}</div>
+                        <div className="user-popover-phone">{currentUser?.phone || ''}</div>
+                      </div>
+                      <div className="user-popover-points-tag">
+                        <Sparkles size={12} />
+                        <span>{isAr ? `${userPoints} نقطة` : `${userPoints} pts`}</span>
+                      </div>
+                    </div>
+
+                    <div className="user-popover-divider" />
+
+                    <div className="user-popover-actions">
+                      <button 
+                        type="button" 
+                        className="user-popover-item"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setActiveTab('profile');
+                        }}
+                      >
+                        <User size={16} className="item-icon" />
+                        <span>{isAr ? 'الملف الشخصي والمحفظة' : 'My Profile & Wallet'}</span>
+                      </button>
+
+                      <button 
+                        type="button" 
+                        className="user-popover-item"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setActiveTab('profile');
+                        }}
+                      >
+                        <ShoppingBag size={16} className="item-icon" />
+                        <span>{isAr ? 'تذاكري وحجوزاتي النشطة' : 'My Active Passes'}</span>
+                      </button>
+
+                      <div className="user-popover-divider" />
+
+                      <button 
+                        type="button" 
+                        className="user-popover-item logout-item"
+                        onClick={handleLogout}
+                      >
+                        <LogOut size={16} className="item-icon" />
+                        <span>{isAr ? 'تسجيل الخروج' : 'Log Out'}</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* 2. GUEST USER POPOVER */
+                  <div className="user-popover-guest-body">
+                    <div className="guest-popover-top">
+                      <div className="guest-badge-icon-wrap">
+                        <User size={22} className="guest-top-icon" />
+                      </div>
+                      <div className="guest-badge-pill">
+                        {isAr ? 'وضع الزائر' : 'Guest Mode'}
+                      </div>
+                    </div>
+
+                    <h4 className="guest-popover-title">
+                      {isAr ? 'أهلاً بك، ضيفنا العزيز! 👋' : 'Welcome, Guest! 👋'}
+                    </h4>
+                    <p className="guest-popover-desc">
+                      {isAr 
+                        ? 'سجل دخولك أو أنشئ حساباً جديداً للوصول إلى محفظة تذاكرك، وتجميع نقاط المكافآت والعروض الحصرية.'
+                        : 'Sign in or create an account to access your digital passes, earn reward points, and view orders.'}
+                    </p>
+
+                    <div className="guest-popover-buttons">
+                      <button 
+                        type="button" 
+                        className="guest-login-primary-btn font-alexandria"
+                        onClick={handleGuestLogin}
+                      >
+                        <LogIn size={16} />
+                        <span>{isAr ? 'تسجيل الدخول' : 'Login'}</span>
+                      </button>
+
+                      <button 
+                        type="button" 
+                        className="guest-signup-secondary-btn font-alexandria"
+                        onClick={handleGuestSignup}
+                      >
+                        <UserPlus size={16} />
+                        <span>{isAr ? 'إنشاء حساب جديد' : 'Sign Up'}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* About us Button */}
           <button 
@@ -221,13 +373,21 @@ export default function DesktopHeader({
         </div>
       </div>
 
-      {/* Floating points Badge (Opens Profile Page) */}
+      {/* Floating points Badge */}
       <div 
         className="desktop-points-badge"
-        onClick={() => setActiveTab('profile')}
-        title={lang === 'ar' ? 'رصيد نقاطك: ٢,٢٥٠ نقطة' : 'Balance: 2,250 points'}
+        onClick={() => {
+          if (isLoggedIn) {
+            setActiveTab('profile');
+          } else {
+            setMenuOpen(true);
+          }
+        }}
+        title={isLoggedIn 
+          ? (lang === 'ar' ? `رصيد نقاطك: ${userPoints} نقطة` : `Balance: ${userPoints} points`)
+          : (lang === 'ar' ? 'سجل دخولك لكسب النقاط' : 'Login to earn points')}
       >
-        {t.common.ptsValue}
+        {isLoggedIn ? `${userPoints} PTS` : t.common.ptsValue}
       </div>
     </header>
   );
