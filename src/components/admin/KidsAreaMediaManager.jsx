@@ -15,7 +15,8 @@ import {
   Compass
 } from 'lucide-react';
 
-const BASE_IMAGE_URL = 'https://backend-ados.vercel.app/media/';
+const BASE_URL = 'https://backend-ados.vercel.app';
+const BASE_IMAGE_URL = `${BASE_URL}/upload/media/`;
 
 /**
  * Resolves full image URL from filename or path
@@ -30,7 +31,7 @@ const getFullImageUrl = (imagePath) => {
 };
 
 export default function KidsAreaMediaManager({ 
-  apiUrl = 'https://backend-ados.vercel.app/api/media', 
+  apiUrl = `${BASE_URL}/api/media/page/kidsArea`, 
   authToken,
   onUploadSuccess,
   onDeleteSuccess
@@ -59,12 +60,22 @@ export default function KidsAreaMediaManager({
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(apiUrl, {
+      let response = await fetch(apiUrl, {
         headers: {
           'Content-Type': 'application/json',
           ...(authToken ? { Authorization: `Bearer ${authToken}` } : {})
         }
       });
+
+      // Fallback to /api/media if /api/media/page/kidsArea fails
+      if (!response.ok && apiUrl.includes('/page/')) {
+        response = await fetch(`${BASE_URL}/api/media`, {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(authToken ? { Authorization: `Bearer ${authToken}` } : {})
+          }
+        });
+      }
 
       if (!response.ok) {
         throw new Error(`Failed to fetch media: ${response.status} ${response.statusText}`);
