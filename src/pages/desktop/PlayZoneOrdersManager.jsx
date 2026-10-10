@@ -1054,10 +1054,10 @@ export default function PlayZoneOrdersManager({
         {/* Top Right Subview Switchers & Language Toggle */}
         <div className="pz-topbar-right">
           {/* Language Toggle */}
-          <div className="pz-lang-toggle-wrap">
+          <div className="pz-lang-toggle-wrap font-alexandria">
             <button 
               type="button" 
-              className={`pz-lang-btn ${isAr ? 'active' : ''}`}
+              className={`pz-lang-btn font-alexandria ${isAr ? 'active' : ''}`}
               onClick={() => setLang && setLang('ar')}
               title="عربي"
             >
@@ -1065,7 +1065,7 @@ export default function PlayZoneOrdersManager({
             </button>
             <button 
               type="button" 
-              className={`pz-lang-btn ${!isAr ? 'active' : ''}`}
+              className={`pz-lang-btn font-alexandria ${!isAr ? 'active' : ''}`}
               onClick={() => setLang && setLang('en')}
               title="English"
             >

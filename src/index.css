@@ -79,6 +79,12 @@ body[dir="rtl"],
 .desktop-lang-btn,
 .mobile-lang-toggle-btn,
 .lang-toggle-btn,
+.ados-lang-btn,
+.ados-topbar-lang-toggle,
+.ados-topbar-lang-toggle *,
+.pz-lang-btn,
+.pz-lang-toggle-wrap,
+.pz-lang-toggle-wrap *,
 [lang="ar"],
 :lang(ar) {
   font-family: 'Alexandria', 'Tajawal', sans-serif !important;

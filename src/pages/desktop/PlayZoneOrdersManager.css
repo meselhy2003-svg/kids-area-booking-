@@ -1873,6 +1873,7 @@
   padding: 2px 4px;
   gap: 2px;
   margin-right: 4px;
+  font-family: 'Alexandria', 'Tajawal', sans-serif !important;
 }
 
 .pz-orders-manager-root.lang-ar .pz-lang-toggle-wrap {
@@ -1890,6 +1891,8 @@
   font-weight: 800;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: 'Alexandria', 'Tajawal', sans-serif !important;
+  line-height: 1.2;
 }
 
 .pz-lang-btn:hover {

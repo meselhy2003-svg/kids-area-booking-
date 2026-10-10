@@ -1581,6 +1581,7 @@
   border-radius: 20px;
   padding: 2px 4px;
   gap: 2px;
+  font-family: 'Alexandria', 'Tajawal', sans-serif !important;
 }
 
 .ados-lang-btn {
@@ -1593,6 +1594,8 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: 'Alexandria', 'Tajawal', sans-serif !important;
+  line-height: 1.2;
 }
 
 .ados-lang-btn:hover {

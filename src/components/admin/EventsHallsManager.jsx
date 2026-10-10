@@ -606,10 +606,10 @@ export default function EventsHallsManager({
 
         {/* Right Controls: Language & Logout */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div className="ados-topbar-lang-toggle">
+          <div className="ados-topbar-lang-toggle font-alexandria">
             <button 
               type="button" 
-              className={`ados-lang-btn ${isAr ? 'active' : ''}`}
+              className={`ados-lang-btn font-alexandria ${isAr ? 'active' : ''}`}
               onClick={() => setLang && setLang('ar')}
               title="عربي"
             >
@@ -617,7 +617,7 @@ export default function EventsHallsManager({
             </button>
             <button 
               type="button" 
-              className={`ados-lang-btn ${!isAr ? 'active' : ''}`}
+              className={`ados-lang-btn font-alexandria ${!isAr ? 'active' : ''}`}
               onClick={() => setLang && setLang('en')}
               title="English"
             >

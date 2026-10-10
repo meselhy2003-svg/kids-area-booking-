@@ -976,10 +976,10 @@ export default function DesktopDashboardPage({
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 {/* Language Toggle */}
-                <div className="ados-topbar-lang-toggle">
+                <div className="ados-topbar-lang-toggle font-alexandria">
                   <button 
                     type="button" 
-                    className={`ados-lang-btn ${isAr ? 'active' : ''}`}
+                    className={`ados-lang-btn font-alexandria ${isAr ? 'active' : ''}`}
                     onClick={() => setLang && setLang('ar')}
                     title="عربي"
                   >
@@ -987,7 +987,7 @@ export default function DesktopDashboardPage({
                   </button>
                   <button 
                     type="button" 
-                    className={`ados-lang-btn ${!isAr ? 'active' : ''}`}
+                    className={`ados-lang-btn font-alexandria ${!isAr ? 'active' : ''}`}
                     onClick={() => setLang && setLang('en')}
                     title="English"
                   >
@@ -1606,10 +1606,10 @@ export default function DesktopDashboardPage({
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div className="ados-topbar-lang-toggle">
+                <div className="ados-topbar-lang-toggle font-alexandria">
                   <button 
                     type="button" 
-                    className={`ados-lang-btn ${isAr ? 'active' : ''}`}
+                    className={`ados-lang-btn font-alexandria ${isAr ? 'active' : ''}`}
                     onClick={() => setLang && setLang('ar')}
                     title="عربي"
                   >
@@ -1617,7 +1617,7 @@ export default function DesktopDashboardPage({
                   </button>
                   <button 
                     type="button" 
-                    className={`ados-lang-btn ${!isAr ? 'active' : ''}`}
+                    className={`ados-lang-btn font-alexandria ${!isAr ? 'active' : ''}`}
                     onClick={() => setLang && setLang('en')}
                     title="English"
                   >
