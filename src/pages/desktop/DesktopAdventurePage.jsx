@@ -4,6 +4,7 @@ import { useTickets } from '../../hooks/useTickets';
 import { usePackages } from '../../hooks/usePackages';
 import { useData } from '../../context/DataContext';
 import { getTranslations } from '../../data/translations';
+import { getLocalizedPackage } from '../../utils/packageLocalization';
 
 export default function DesktopAdventurePage({ setActiveTab, openModal, lang = 'ar', searchQuery }) {
   const t = getTranslations(lang);
@@ -19,7 +20,8 @@ export default function DesktopAdventurePage({ setActiveTab, openModal, lang = '
   } = useAdventureMedia();
   const [viewType, setViewType] = useState('packages'); // 'packages' | 'tickets'
   const { tickets: serverTickets } = useTickets('adventure');
-  const { currentPackage: adventurePkg } = usePackages('adventure');
+  const { currentPackage: rawAdventurePkg } = usePackages('adventure');
+  const adventurePkg = rawAdventurePkg ? getLocalizedPackage(rawAdventurePkg, lang) : null;
 
   // Individual ticket adventure attractions
   const ticketGames = [

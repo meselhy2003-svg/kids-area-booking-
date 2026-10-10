@@ -2,6 +2,7 @@ import React from 'react';
 import { usePackages } from '../../hooks/usePackages';
 import { useData } from '../../context/DataContext';
 import { getTranslations } from '../../data/translations';
+import { getLocalizedPackage } from '../../utils/packageLocalization';
 
 export default function DesktopPackagePage({ setActiveTab, openModal, lang = 'ar' }) {
   const t = getTranslations(lang);
@@ -16,25 +17,18 @@ export default function DesktopPackagePage({ setActiveTab, openModal, lang = 'ar
     loading
   } = usePackages('adventure');
 
-  const currentTitle = currentPkg ? (currentPkg.title || (isArabic ? currentPkg.titleAr : currentPkg.titleEn) || '') : '';
-  const currentSubtitle = currentPkg ? (currentPkg.subtitle || (isArabic ? currentPkg.subtitleAr : currentPkg.subtitleEn) || '') : '';
-  const currentBadge = currentPkg ? (currentPkg.saveBadge || (isArabic ? currentPkg.saveBadgeAr : currentPkg.saveBadgeEn) || '') : '';
-  const priceDisplay = currentPkg ? (isArabic ? `${currentPkg.priceNum || 0} ج.م` : `EGP ${currentPkg.priceNum || 0}`) : '';
-  const oldPriceDisplay = currentPkg?.oldPrice && currentPkg.oldPrice > currentPkg.priceNum
-    ? (isArabic ? `${currentPkg.oldPrice} ج.م` : `EGP ${currentPkg.oldPrice}`)
-    : null;
-
-  const featureItems = currentPkg ? (
-    (Array.isArray(currentPkg.features) && currentPkg.features.length > 0)
-      ? currentPkg.features
-      : (Array.isArray(currentPkg.feature) && currentPkg.feature.length > 0
-        ? currentPkg.feature
-        : (isArabic ? currentPkg.featuresAr : currentPkg.featuresEn) || [])
-  ) : [];
+  const localizedCurrentPkg = currentPkg ? getLocalizedPackage(currentPkg, lang) : null;
+  const currentTitle = localizedCurrentPkg?.title || '';
+  const currentSubtitle = localizedCurrentPkg?.subtitle || '';
+  const currentBadge = localizedCurrentPkg?.saveBadge || '';
+  const priceDisplay = localizedCurrentPkg?.priceDisplay || (currentPkg ? (isArabic ? `${currentPkg.priceNum || 0} ج.م` : `EGP ${currentPkg.priceNum || 0}`) : '');
+  const oldPriceDisplay = localizedCurrentPkg?.oldPriceDisplay || null;
+  const featureItems = localizedCurrentPkg?.features || [];
 
   const handleBooking = (pkg) => {
     if (!pkg) return;
-    const pkgTitle = pkg.title || (isArabic ? pkg.titleAr : pkg.titleEn) || pkg.titleAr;
+    const localized = getLocalizedPackage(pkg, lang);
+    const pkgTitle = localized?.title || pkg.title;
     const currentPrice = pkg.priceNum || pkg.priceAfterDiscount || 0;
     const origPrice = pkg.oldPrice || pkg.price;
 
@@ -43,17 +37,17 @@ export default function DesktopPackagePage({ setActiveTab, openModal, lang = 'ar
       package: pkg._id || pkg.id || `package-${activeCategory}`,
       type: 'package',
       title: pkgTitle,
-      titleAr: pkgTitle,
-      titleEn: pkgTitle,
+      titleAr: isArabic ? pkgTitle : (pkg.titleAr || pkg.title),
+      titleEn: !isArabic ? pkgTitle : (pkg.titleEn || pkg.title),
       zone: 'packages',
       zoneLabel: isArabic ? 'باقات الرحلات' : 'Packages',
       age: 'All Ages',
-      inclusions: pkg.description || pkg.details || pkg.subtitle || (Array.isArray(featureItems) ? featureItems.join(' • ') : ''),
+      inclusions: localized?.subtitle || pkg.description || pkg.details || (Array.isArray(featureItems) ? featureItems.join(' • ') : ''),
       priceEgp: currentPrice,
       oldPriceEgp: origPrice,
       pointsGets: pkg.pointsGets || 0,
       thumb: pkg.image || pkg.img || '/photo/kid-area-pic/family-bumper-cars.png',
-      saveBadge: pkg.saveBadge || (isArabic ? pkg.saveBadgeAr : pkg.saveBadge)
+      saveBadge: localized?.saveBadge || pkg.saveBadge
     });
     if (typeof setActiveTab === 'function') {
       setActiveTab('cart');
@@ -125,13 +119,14 @@ export default function DesktopPackagePage({ setActiveTab, openModal, lang = 'ar
           <div className="desktop-pkg-tabs-row">
             {packageList && packageList.length > 0 ? (
               packageList.map((pkg) => {
-                const isSelected = (currentPkg?._id === pkg._id) || (activeCategory === pkg._id);
-                const tabTitle = pkg.title || (isArabic ? pkg.titleAr : pkg.titleEn) || pkg.titleAr;
+                const isSelected = (currentPkg?._id === pkg._id) || (currentPkg?.id === pkg.id) || (activeCategory === pkg._id) || (activeCategory === pkg.id);
+                const localized = getLocalizedPackage(pkg, lang);
+                const tabTitle = localized?.title || pkg.title;
                 return (
                   <button
-                    key={pkg._id}
+                    key={pkg._id || pkg.id}
                     className={`desktop-pkg-tab-btn ${isSelected ? 'active' : ''}`}
-                    onClick={() => setActiveCategory(pkg._id)}
+                    onClick={() => setActiveCategory(pkg._id || pkg.id)}
                   >
                     {tabTitle}
                   </button>

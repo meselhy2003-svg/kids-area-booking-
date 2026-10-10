@@ -2,6 +2,7 @@ import React from 'react';
 import { usePackages } from '../../hooks/usePackages';
 import { useData } from '../../context/DataContext';
 import { getTranslations } from '../../data/translations';
+import { getLocalizedPackage } from '../../utils/packageLocalization';
 
 export default function MobilePackagePage({ setActiveTab, openModal, lang = 'ar' }) {
   const t = getTranslations(lang);
@@ -16,39 +17,34 @@ export default function MobilePackagePage({ setActiveTab, openModal, lang = 'ar'
     loading
   } = usePackages('adventure');
 
-  const pkgTitle = currentPkg ? (currentPkg.title || (isArabic ? currentPkg.titleAr : currentPkg.titleEn) || '') : '';
-  const pkgSubtitle = currentPkg ? (currentPkg.subtitle || (isArabic ? currentPkg.subtitleAr : currentPkg.subtitleEn) || '') : '';
-  const pkgSaveBadge = currentPkg ? (currentPkg.saveBadge || (isArabic ? currentPkg.saveBadgeAr : currentPkg.saveBadgeEn) || '') : '';
-  const priceDisplay = currentPkg ? (isArabic ? `${currentPkg.priceNum || 0} ج.م` : `EGP ${currentPkg.priceNum || 0}`) : '';
-  const origPriceDisplay = currentPkg?.oldPrice && currentPkg.oldPrice > currentPkg.priceNum
-    ? (isArabic ? `${currentPkg.oldPrice} ج.م` : `EGP ${currentPkg.oldPrice}`)
-    : null;
-  const featuresList = currentPkg ? (
-    (Array.isArray(currentPkg.features) && currentPkg.features.length > 0)
-      ? currentPkg.features
-      : (Array.isArray(currentPkg.feature) && currentPkg.feature.length > 0
-        ? currentPkg.feature
-        : (isArabic ? currentPkg.featuresAr : currentPkg.featuresEn) || [])
-  ) : [];
+  const localizedCurrentPkg = currentPkg ? getLocalizedPackage(currentPkg, lang) : null;
+  const pkgTitle = localizedCurrentPkg?.title || '';
+  const pkgSubtitle = localizedCurrentPkg?.subtitle || '';
+  const pkgSaveBadge = localizedCurrentPkg?.saveBadge || '';
+  const priceDisplay = localizedCurrentPkg?.priceDisplay || (currentPkg ? (isArabic ? `${currentPkg.priceNum || 0} ج.م` : `EGP ${currentPkg.priceNum || 0}`) : '');
+  const origPriceDisplay = localizedCurrentPkg?.oldPriceDisplay || null;
+  const featuresList = localizedCurrentPkg?.features || [];
 
   const handleBooking = () => {
     if (!currentPkg) return;
+    const localized = getLocalizedPackage(currentPkg, lang);
+    const title = localized?.title || currentPkg.title;
     addToCart({
       id: currentPkg._id || currentPkg.id || `package-${activeCategory}`,
       package: currentPkg._id || currentPkg.id || `package-${activeCategory}`,
       type: 'package',
-      title: pkgTitle,
-      titleAr: pkgTitle,
-      titleEn: pkgTitle,
+      title: title,
+      titleAr: isArabic ? title : (currentPkg.titleAr || currentPkg.title),
+      titleEn: !isArabic ? title : (currentPkg.titleEn || currentPkg.title),
       zone: 'packages',
       zoneLabel: isArabic ? 'باقات الرحلات' : 'Packages',
       age: 'All Ages',
-      inclusions: currentPkg?.details || currentPkg?.description || (Array.isArray(featuresList) ? featuresList.join(' • ') : ''),
+      inclusions: localized?.subtitle || currentPkg?.details || currentPkg?.description || (Array.isArray(featuresList) ? featuresList.join(' • ') : ''),
       priceEgp: currentPkg?.priceNum || 0,
       oldPriceEgp: currentPkg?.oldPrice,
       pointsGets: currentPkg?.pointsGets || 0,
       thumb: currentPkg?.image || currentPkg?.img,
-      saveBadge: pkgSaveBadge
+      saveBadge: localized?.saveBadge || pkgSaveBadge
     });
     if (typeof setActiveTab === 'function') {
       setActiveTab('cart');
@@ -93,13 +89,14 @@ export default function MobilePackagePage({ setActiveTab, openModal, lang = 'ar'
         <div className="dream-filter-pills">
           {packageList && packageList.length > 0 ? (
             packageList.map((pkg) => {
-              const isSelected = (currentPkg?._id === pkg._id) || (activeCategory === pkg._id);
-              const tabTitle = pkg.title || (isArabic ? pkg.titleAr : pkg.titleEn) || pkg.titleAr;
+              const isSelected = (currentPkg?._id === pkg._id) || (currentPkg?.id === pkg.id) || (activeCategory === pkg._id) || (activeCategory === pkg.id);
+              const localized = getLocalizedPackage(pkg, lang);
+              const tabTitle = localized?.title || pkg.title;
               return (
                 <button
-                  key={pkg._id}
+                  key={pkg._id || pkg.id}
                   className={`dream-pill-btn ${isSelected ? 'active' : ''}`}
-                  onClick={() => setActiveCategory(pkg._id)}
+                  onClick={() => setActiveCategory(pkg._id || pkg.id)}
                 >
                   {tabTitle}
                 </button>

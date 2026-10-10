@@ -7,6 +7,7 @@ import { usePackages } from '../../hooks/usePackages';
 import { useChallengeMedia } from '../../hooks';
 import { useData } from '../../context/DataContext';
 import { getTranslations } from '../../data/translations';
+import { getLocalizedPackage } from '../../utils/packageLocalization';
 
 export default function MobileChallengePage({ setActiveTab, openModal, lang = 'ar' }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,7 +19,8 @@ export default function MobileChallengePage({ setActiveTab, openModal, lang = 'a
 
   const { gameTickets } = useTickets('challenge');
   const { filteredAttractions, attractions } = useZoneData('challenge', searchQuery);
-  const { currentPackage: challengePkg } = usePackages('challenge');
+  const { currentPackage: rawChallengePkg } = usePackages('challenge');
+  const challengePkg = rawChallengePkg ? getLocalizedPackage(rawChallengePkg, lang) : null;
 
   const defaultSelected = isArabic
     ? ['واقع افتراضي VR', 'كرة السلة', 'الرماية بالليزر', 'سباق السيارات']

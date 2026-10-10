@@ -7,6 +7,7 @@ import { usePackages } from '../../hooks/usePackages';
 import { useAdventureMedia } from '../../hooks';
 import { useData } from '../../context/DataContext';
 import { getTranslations } from '../../data/translations';
+import { getLocalizedPackage } from '../../utils/packageLocalization';
 
 export default function MobileAdventurePage({ setActiveTab, openModal, lang = 'ar' }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,7 +18,8 @@ export default function MobileAdventurePage({ setActiveTab, openModal, lang = 'a
 
   const { gameTickets: adventureTickets } = useTickets('adventure');
   const { filteredAttractions, attractions } = useZoneData('adventure', searchQuery);
-  const { currentPackage: adventurePkg } = usePackages('adventure');
+  const { currentPackage: rawAdventurePkg } = usePackages('adventure');
+  const adventurePkg = rawAdventurePkg ? getLocalizedPackage(rawAdventurePkg, lang) : null;
 
   // Adventure Zone Hero & Explore image caching and server synchronization
   const { currentHero, exploreItems } = useAdventureMedia();

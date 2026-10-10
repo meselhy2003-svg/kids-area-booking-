@@ -4,6 +4,7 @@ import { useTickets } from '../../hooks/useTickets';
 import { usePackages } from '../../hooks/usePackages';
 import { useData } from '../../context/DataContext';
 import { getTranslations } from '../../data/translations';
+import { getLocalizedPackage } from '../../utils/packageLocalization';
 
 export default function DesktopChallengePage({ setActiveTab, openModal, lang = 'ar', searchQuery }) {
   const t = getTranslations(lang);
@@ -19,7 +20,8 @@ export default function DesktopChallengePage({ setActiveTab, openModal, lang = '
   } = useChallengeMedia();
   const [viewType, setViewType] = useState('packages'); // 'packages' | 'tickets'
   const { tickets: serverTickets } = useTickets('challenge');
-  const { currentPackage: challengePkg } = usePackages('challenge');
+  const { currentPackage: rawChallengePkg } = usePackages('challenge');
+  const challengePkg = rawChallengePkg ? getLocalizedPackage(rawChallengePkg, lang) : null;
 
   // Individual ticket attractions
   const ticketGames = [
