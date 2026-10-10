@@ -215,7 +215,7 @@ export default function KidsAreaMediaManager({
     }
 
     try {
-      const res = await fetch(`${apiUrl}/upload`, {
+      const res = await fetch(`${BASE_URL}/api/media`, {
         method: 'POST',
         headers: {
           ...(authToken ? { Authorization: `Bearer ${authToken}` } : {})

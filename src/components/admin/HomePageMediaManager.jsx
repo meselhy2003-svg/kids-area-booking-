@@ -207,7 +207,7 @@ export default function HomePageMediaManager({
     }
 
     try {
-      const res = await fetch(`${apiUrl}/upload`, {
+      const res = await fetch(`${BASE_URL}/api/media`, {
         method: 'POST',
         headers: {
           ...(authToken ? { Authorization: `Bearer ${authToken}` } : {})
