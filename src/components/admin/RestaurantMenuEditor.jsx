@@ -25,7 +25,6 @@ import {
   Filter
 } from 'lucide-react';
 import './RestaurantMenuEditor.css';
-import PlayZoneOrdersManager from '../../pages/desktop/PlayZoneOrdersManager';
 
 // Project Media Library Assets matching Image 2 exactly
 const ALL_PROJECT_ASSETS = [
@@ -408,9 +407,6 @@ export default function RestaurantMenuEditor({
   const [is360ModalOpen, setIs360ModalOpen] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Subview toggle: 'menu' (editor) | 'orders' (incoming orders)
-  const [currentViewMode, setCurrentViewMode] = useState('menu');
-
   // Toast feedback state
   const [toastMessage, setToastMessage] = useState('');
   const showToast = (msg) => {
@@ -686,27 +682,8 @@ export default function RestaurantMenuEditor({
       {/* 1. TOPBAR                                                          */}
       {/* ------------------------------------------------------------------ */}
       <header className="ados-topbar">
-        {/* Left Toggle / Subview switch */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button 
-            type="button"
-            className={`rest-topbar-mode-btn ${currentViewMode === 'menu' ? 'active' : ''}`}
-            onClick={() => setCurrentViewMode('menu')}
-            title={isAr ? 'إدارة الأصناف والقائمة' : 'Menu & Content Editor'}
-          >
-            <Utensils size={14} />
-            <span>{isAr ? 'إدارة القائمة والمحتوى' : 'Menu Editor'}</span>
-          </button>
-          <button 
-            type="button"
-            className={`rest-topbar-mode-btn ${currentViewMode === 'orders' ? 'active' : ''}`}
-            onClick={() => setCurrentViewMode('orders')}
-            title={isAr ? 'طلبات التوصيل وحجوزات الطاولات' : 'Live Delivery & Table Orders'}
-          >
-            <ShoppingBag size={14} />
-            <span>{isAr ? 'الطلبات والحجوزات' : 'Live Orders'}</span>
-          </button>
-        </div>
+        {/* Balanced spacer on left */}
+        <div style={{ width: 140 }}></div>
 
         {/* Center Title Group */}
         <div className="ados-topbar-title-group">
@@ -766,18 +743,9 @@ export default function RestaurantMenuEditor({
       </header>
 
       {/* ------------------------------------------------------------------ */}
-      {/* 2. BODY CONTENT: MENU EDITOR OR ORDERS VIEW                        */}
+      {/* 2. BODY CONTENT                                                    */}
       {/* ------------------------------------------------------------------ */}
-      {currentViewMode === 'orders' ? (
-        <PlayZoneOrdersManager 
-          initialView="restaurant-orders"
-          isEmbedded={true}
-          onBackToDashboard={() => setCurrentViewMode('menu')}
-          lang={lang}
-          setLang={setLang}
-        />
-      ) : (
-        <div className="ados-content">
+      <div className="ados-content">
           {/* CATEGORY NAVIGATION PILLS (Exact match to Play Zone nav) */}
           <nav className="ados-zone-nav rest-category-nav">
             {data.categories?.map(cat => (
@@ -1184,7 +1152,6 @@ export default function RestaurantMenuEditor({
             </button>
           </div>
         </div>
-      )}
 
       {/* ------------------------------------------------------------------ */}
       {/* 3. MODAL: EDIT / ADD ITEM OR COMBO                                 */}
