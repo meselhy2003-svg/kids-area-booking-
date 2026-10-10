@@ -43,11 +43,11 @@ export default function MobilePackagePage({ setActiveTab, openModal, lang = 'ar'
       zone: 'packages',
       zoneLabel: isArabic ? 'باقات الرحلات' : 'Packages',
       age: 'All Ages',
-      inclusions: currentPkg.details || currentPkg.description || (Array.isArray(featuresList) ? featuresList.join(' • ') : ''),
-      priceEgp: currentPkg.priceNum || 0,
-      oldPriceEgp: currentPkg.oldPrice,
-      pointsGets: currentPkg.pointsGets || 0,
-      thumb: currentPkg.image || currentPkg.img,
+      inclusions: currentPkg?.details || currentPkg?.description || (Array.isArray(featuresList) ? featuresList.join(' • ') : ''),
+      priceEgp: currentPkg?.priceNum || 0,
+      oldPriceEgp: currentPkg?.oldPrice,
+      pointsGets: currentPkg?.pointsGets || 0,
+      thumb: currentPkg?.image || currentPkg?.img,
       saveBadge: pkgSaveBadge
     });
     if (typeof setActiveTab === 'function') {

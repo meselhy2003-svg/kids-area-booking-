@@ -146,16 +146,17 @@ export default function DesktopPackagePage({ setActiveTab, openModal, lang = 'ar
 
           {/* The Selected Package Offer Card */}
           <div className="desktop-horizontal-pass-container">
-            <div className="desktop-horizontal-pass-card">
-              {/* Left composite photo */}
-              <div className="pass-card-left-img-wrap">
-                <img
-                  src={currentPkg.image || currentPkg.img || '/photo/kid-area-pic/family-bumper-cars.png'}
-                  alt={currentTitle}
-                  className="pass-card-composite-img"
-                  onError={(e) => { e.target.src = '/photo/mobile-challenge/offer-collage.png'; }}
-                />
-              </div>
+            {currentPkg ? (
+              <div className="desktop-horizontal-pass-card">
+                {/* Left composite photo */}
+                <div className="pass-card-left-img-wrap">
+                  <img
+                    src={currentPkg?.image || currentPkg?.img || '/photo/kid-area-pic/family-bumper-cars.png'}
+                    alt={currentTitle}
+                    className="pass-card-composite-img"
+                    onError={(e) => { e.target.src = '/photo/mobile-challenge/offer-collage.png'; }}
+                  />
+                </div>
 
               {/* Right Offer Details */}
               <div className="pass-card-right-body">
@@ -199,6 +200,11 @@ export default function DesktopPackagePage({ setActiveTab, openModal, lang = 'ar
                 </div>
               </div>
             </div>
+            ) : (
+              <div className="desktop-horizontal-pass-card" style={{ padding: '40px', textAlign: 'center', color: '#888' }}>
+                <p>{isArabic ? 'جاري تحميل الباقات...' : 'Loading packages...'}</p>
+              </div>
+            )}
           </div>
 
         </div>
